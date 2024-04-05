@@ -72,6 +72,7 @@
 - [createOffer](RTCPeerConnection.md#createoffer)
 - [emit](RTCPeerConnection.md#emit)
 - [eventNames](RTCPeerConnection.md#eventnames)
+- [getConfiguration](RTCPeerConnection.md#getconfiguration)
 - [getMaxListeners](RTCPeerConnection.md#getmaxlisteners)
 - [getReceivers](RTCPeerConnection.md#getreceivers)
 - [getSenders](RTCPeerConnection.md#getsenders)
@@ -664,6 +665,16 @@ v6.0.0
 #### Inherited from
 
 EventTarget.eventNames
+
+___
+
+### getConfiguration
+
+▸ **getConfiguration**(): [`PeerConfig`](../interfaces/PeerConfig.md)
+
+#### Returns
+
+[`PeerConfig`](../interfaces/PeerConfig.md)
 
 ___
 
