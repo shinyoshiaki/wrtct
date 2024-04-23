@@ -1,4 +1,4 @@
-import { BitWriter, getBit } from "../../../common/src";
+import { BitReader, BitWriter } from "../../../common/src";
 
 export type Extension = { id: number; payload: Buffer };
 
@@ -56,11 +56,11 @@ export class RtpHeader {
   static deSerialize(rawPacket: Buffer) {
     const h = new RtpHeader();
     let currOffset = 0;
-    const v_p_x_cc = rawPacket[currOffset++];
-    h.version = getBit(v_p_x_cc, 0, 2);
-    h.padding = getBit(v_p_x_cc, 2) > 0;
-    h.extension = getBit(v_p_x_cc, 3) > 0;
-    h.csrcLength = getBit(v_p_x_cc, 4, 4);
+    const v_p_x_cc = new BitReader(rawPacket[currOffset++]);
+    h.version = v_p_x_cc.readBits(2);
+    h.padding = v_p_x_cc.readBits(1) > 0;
+    h.extension = v_p_x_cc.readBits(1) > 0;
+    h.csrcLength = v_p_x_cc.readBits(4);
     h.csrc = [...Array(h.csrcLength)].map(() => {
       const csrc = rawPacket.readUInt32BE(currOffset);
       currOffset += 4;
@@ -68,9 +68,9 @@ export class RtpHeader {
     });
     currOffset += csrcOffset - 1;
 
-    const m_pt = rawPacket[1];
-    h.marker = getBit(m_pt, 0) > 0;
-    h.payloadType = getBit(m_pt, 1, 7);
+    const m_pt = new BitReader(rawPacket[1]);
+    h.marker = m_pt.readBits(1) > 0;
+    h.payloadType = m_pt.readBits(7);
 
     h.sequenceNumber = rawPacket.readUInt16BE(seqNumOffset);
     h.timestamp = rawPacket.readUInt32BE(timestampOffset);

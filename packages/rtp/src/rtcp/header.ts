@@ -1,8 +1,8 @@
 import {
+  BitReader,
   BitWriter,
   bufferReader,
   bufferWriter,
-  getBit,
 } from "../../../common/src";
 
 export const RTCP_HEADER_SIZE = 4;
@@ -38,9 +38,10 @@ export class RtcpHeader {
 
   static deSerialize(buf: Buffer) {
     const [v_p_rc, type, length] = bufferReader(buf, [1, 1, 2]);
-    const version = getBit(v_p_rc, 0, 2);
-    const padding = getBit(v_p_rc, 2, 1) > 0;
-    const count = getBit(v_p_rc, 3, 5);
+    const stream = new BitReader(v_p_rc);
+    const version = stream.readBits(2);
+    const padding = stream.readBits(1) > 0;
+    const count = stream.readBits(5);
     return new RtcpHeader({ version, padding, count, type, length });
   }
 }

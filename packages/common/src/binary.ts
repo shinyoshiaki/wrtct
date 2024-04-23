@@ -101,11 +101,9 @@ export class BitWriter2 {
 }
 
 export function getBit(bits: number, startIndex: number, length: number = 1) {
-  let bin = bits.toString(2).split("");
-  bin = [...Array(8 - bin.length).fill("0"), ...bin];
-  const s = bin.slice(startIndex, startIndex + length).join("");
-  const v = parseInt(s, 2);
-  return v;
+  const stream = new BitReader(bits);
+  stream.readBits(startIndex);
+  return stream.readBits(length);
 }
 
 export function paddingByte(bits: number) {
@@ -279,5 +277,36 @@ export class BitStream {
       this.bitsPending = 8 - this.bitsPending;
       this.position++;
     }
+  }
+}
+
+export class BitReader {
+  private number: number;
+  private bitIndex: number;
+
+  constructor(number: number) {
+    this.number = number;
+    this.bitIndex = 0;
+  }
+
+  // 次のnビットを読み込むメソッド
+  readBits(n: number): number {
+    let result = 0;
+    for (let i = 0; i < n; i++) {
+      if (this.eof()) {
+        throw new Error("No more bits to read");
+      }
+
+      // 現在のビット位置からビットを読み込む
+      const bit = (this.number >> (7 - this.bitIndex)) & 1;
+      result = (result << 1) | bit;
+      this.bitIndex++;
+    }
+    return result;
+  }
+
+  // ストリームが終わったかどうかを確認するメソッド
+  eof(): boolean {
+    return this.bitIndex >= 8;
   }
 }
