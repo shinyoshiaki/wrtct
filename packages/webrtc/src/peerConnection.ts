@@ -243,6 +243,10 @@ export class RTCPeerConnection extends EventTarget {
     );
   }
 
+  getConfiguration() {
+    return this.config;
+  }
+
   async createOffer() {
     await this.ensureCerts();
     const description = this.buildOfferSdp();
