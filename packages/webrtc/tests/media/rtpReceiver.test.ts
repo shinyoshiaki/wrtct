@@ -12,6 +12,7 @@ import {
 } from "../../src";
 import { RTCRtpReceiver } from "../../src/media/rtpReceiver";
 import { createDtlsTransport } from "../fixture";
+import {vi} from 'vitest'
 
 describe("packages/webrtc/src/media/rtpReceiver.ts", () => {
   test("abort runRtcp", async () =>
@@ -20,7 +21,7 @@ describe("packages/webrtc/src/media/rtpReceiver.ts", () => {
       const receiver = new RTCRtpReceiver(defaultPeerConfig, "audio", 1234);
       receiver.setDtlsTransport(dtls);
 
-      jest.spyOn(dtls, "sendRtcp");
+      vi.spyOn(dtls, "sendRtcp");
 
       Promise.any([
         setTimeout(200).then(() => false),

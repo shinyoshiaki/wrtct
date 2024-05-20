@@ -15,7 +15,7 @@ import { RTCRtpSender } from "../../src/media/rtpSender";
 import { createDtlsTransport } from "../fixture";
 
 describe("media/router", () => {
-  test("routeRtp", (done) => {
+  test("routeRtp", ()=>new Promise<void>((done) => {
     const router = new RtpRouter();
     const dtls = createDtlsTransport();
     const transceiver = new RTCRtpTransceiver(
@@ -56,5 +56,5 @@ describe("media/router", () => {
       done();
     });
     router.routeRtp(packet);
-  });
+  }));
 });

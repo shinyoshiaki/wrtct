@@ -1,6 +1,6 @@
 import { createDataChannelPair } from "../utils";
 
-jest.setTimeout(10_000);
+
 
 describe.each([{}, { negotiated: true, id: 0 }])(
   "datachannel/close",

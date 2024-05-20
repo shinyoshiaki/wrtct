@@ -2,7 +2,7 @@ import inRange from "lodash/inRange";
 
 import { RTCIceGatherer, RTCIceTransport } from "../../src";
 
-jest.setTimeout(10_000);
+
 
 describe("iceTransport", () => {
   test("test_connect", async () => {
@@ -40,7 +40,7 @@ describe("iceTransport", () => {
     expect(transport2.state).toBe("closed");
   });
 
-  xtest("portRange", async () => {
+  test.skip("portRange", async () => {
     const gatherer = new RTCIceGatherer({
       stunServer: ["stun.l.google.com", 19302],
       portRange: [44444, 44455],
@@ -55,7 +55,7 @@ describe("iceTransport", () => {
     await gatherer.connection.close();
   });
 
-  xtest("minimum target port", async () => {
+  test.skip("minimum target port", async () => {
     const gatherer = new RTCIceGatherer({
       stunServer: ["stun.l.google.com", 19302],
       portRange: [44546, 44547],

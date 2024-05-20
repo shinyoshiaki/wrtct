@@ -8,7 +8,7 @@ import {
 } from "../../src";
 import { SignatureAlgorithm } from "../../src/const";
 
-jest.setTimeout(10_000);
+
 
 describe("peerConnection", () => {
   test("test_connect_datachannel_modern_sdp", async () =>
@@ -135,7 +135,7 @@ describe("peerConnection", () => {
       await assertDataChannelOpen(dc);
     }));
 
-  xtest("portRange", async () => {
+  test.skip("portRange", async () => {
     const peer = new RTCPeerConnection({ icePortRange: [44444, 44455] });
     peer.createDataChannel("test");
     const offer = await peer.createOffer();

@@ -1,7 +1,7 @@
 import { MediaStreamTrack, RTCPeerConnection } from "../../src";
 import { generateAnswer } from "../fixture";
 
-jest.setTimeout(10_000);
+
 
 // webrtc/RTCPeerConnection-removeTrack.https.html
 describe("peerConnection/removeTrack", () => {
@@ -216,7 +216,7 @@ describe("peerConnection/removeTrack", () => {
   });
 
   // todo fix
-  xtest("Calling removeTrack on a stopped transceiver should be a no-op", async () => {
+  test.skip("Calling removeTrack on a stopped transceiver should be a no-op", async () => {
     const pc = new RTCPeerConnection();
 
     const track = new MediaStreamTrack({ kind: "audio" });

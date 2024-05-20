@@ -33,7 +33,7 @@
     "doc": "rm -rf doc && typedoc --excludePrivate --disableSources --excludeInternal --plugin typedoc-plugin-markdown --out doc ./src/index.ts",
     "format": "biome check --apply src tests",
     "knip": "knip",
-    "test": "npm run type && jest --runInBand --forceExit --coverage",
+    "test": "vitest run ./tests",
     "type": "tsc --noEmit --project ./tsconfig.json",
     "unused": "organize-imports-cli src/**/*.ts",
     "upgrade-interactive": "npx npm-check-updates -i"
