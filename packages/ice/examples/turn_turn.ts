@@ -19,11 +19,12 @@ const password = "";
     password,
     {},
   );
-  const turn2 = await createTurnEndpoint(address, username, password, {});
 
-  await turn1.turn.getChannel(turn2.turn.relayedAddress);
+  const turn2 = await createTurnEndpoint(address, username, password, {});
   await turn2.turn.getChannel(turn1.turn.relayedAddress);
 
+  await turn1.turn.getChannel(turn2.turn.relayedAddress);
+  
   turn1.turn.onData.subscribe((data, addr) => {
     console.log("turn1 onData", data.toString(), addr);
     turn1.sendData(Buffer.from("pong"), turn2.turn.mappedAddress);
