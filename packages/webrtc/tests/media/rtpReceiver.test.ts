@@ -1,5 +1,6 @@
 import { setTimeout } from "timers/promises";
 
+import { vi } from "vitest";
 import { wrapRtx } from "../../../rtp/src";
 import {
   MediaStreamTrack,
@@ -12,7 +13,6 @@ import {
 } from "../../src";
 import { RTCRtpReceiver } from "../../src/media/rtpReceiver";
 import { createDtlsTransport } from "../fixture";
-import {vi} from 'vitest'
 
 describe("packages/webrtc/src/media/rtpReceiver.ts", () => {
   test("abort runRtcp", async () =>

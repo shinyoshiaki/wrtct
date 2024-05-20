@@ -1,9 +1,9 @@
 import { setTimeout } from "timers/promises";
 
+import { vi } from "vitest";
 import { MediaStreamTrack } from "../../src";
 import { RTCRtpSender } from "../../src/media/rtpSender";
 import { createDtlsTransport, createRtpPacket } from "../fixture";
-import {vi} from 'vitest'
 
 describe("media/rtpSender", () => {
   test("stop track", () => {
@@ -55,8 +55,6 @@ describe("media/rtpSender", () => {
       const dtls = createDtlsTransport();
       const sender = new RTCRtpSender("audio");
       sender.setDtlsTransport(dtls);
-
-      
 
       Promise.any([
         setTimeout(200).then(() => false),

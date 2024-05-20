@@ -9,8 +9,6 @@ import {
   useSdesMid,
 } from "../../src";
 
-
-
 describe("media", () => {
   test("test_sendonly_recvonly", async () =>
     new Promise<void>(async (done) => {

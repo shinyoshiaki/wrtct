@@ -1,7 +1,5 @@
 import { RTCPeerConnection } from "../../src";
 
-
-
 describe("trickle", () => {
   test(
     "half trickle",

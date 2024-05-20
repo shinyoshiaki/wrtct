@@ -8,7 +8,9 @@ export class IceTransport implements Transport {
   }
   onData?: (buf: Buffer) => void;
 
-  readonly send = this.ice.send;
+   send = async(data:Buffer)=>{
+   await this.ice.send(data)
+  };
 
   close() {
     this.ice.close();

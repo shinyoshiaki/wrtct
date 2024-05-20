@@ -2,8 +2,6 @@ import { setTimeout } from "timers/promises";
 
 import { dtlsTransportPair } from "../fixture";
 
-
-
 describe("RTCDtlsTransportTest", () => {
   test("dtls_test_data", async () => {
     const [session1, session2] = await dtlsTransportPair();

@@ -4,8 +4,6 @@ import { RTCPeerConnection } from "../../src";
 import { generateAnswer, generateOffer } from "../fixture";
 import { generateAudioReceiveOnlyOffer } from "../utils";
 
-
-
 describe("onnegotiationneeded", () => {
   test("Creating first data channel should fire negotiationneeded event", async () => {
     const pc = new RTCPeerConnection();

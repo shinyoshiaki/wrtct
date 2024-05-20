@@ -1,7 +1,5 @@
 import { createDataChannelPair } from "../utils";
 
-
-
 describe.each([{}, { negotiated: true, id: 0 }])(
   "datachannel/close",
   (options) => {

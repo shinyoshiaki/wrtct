@@ -1,7 +1,5 @@
 import { RTCPeerConnection } from "../../src";
 
-
-
 describe("datachannel", () => {
   test("send some messages at same time", async () =>
     new Promise<void>(async (done) => {

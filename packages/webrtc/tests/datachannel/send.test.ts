@@ -1,7 +1,5 @@
 import { awaitMessage, createDataChannelPair } from "../utils";
 
-
-
 const helloString = "hello";
 const unicodeString = "世界你好";
 const helloBuffer = Buffer.from([0x68, 0x65, 0x6c, 0x6c, 0x6f]);

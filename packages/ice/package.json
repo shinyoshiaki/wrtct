@@ -23,7 +23,7 @@
     "deploy:alpha": "npm run build && npm publish --tag alpha",
     "format": "biome check --apply src tests examples",
     "start": "ts-node --project ./tsconfig.json ./example/cli/index.ts",
-    "test": "npm run type && jest --runInBand --forceExit",
+    "test": "vitest run ./tests",
     "type": "tsc --noEmit --project ./tsconfig.json",
     "unused": "organize-imports-cli src/**/*.ts",
     "upgrade-interactive": "npx npm-check-updates -i"

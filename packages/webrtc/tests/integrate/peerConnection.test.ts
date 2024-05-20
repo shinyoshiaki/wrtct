@@ -8,8 +8,6 @@ import {
 } from "../../src";
 import { SignatureAlgorithm } from "../../src/const";
 
-
-
 describe("peerConnection", () => {
   test("test_connect_datachannel_modern_sdp", async () =>
     new Promise<void>(async (done) => {
