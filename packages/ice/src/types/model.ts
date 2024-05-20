@@ -1,5 +1,5 @@
-import { Candidate } from "../candidate";
-import { Message } from "../stun/message";
+import type { Candidate } from "../candidate";
+import type { Message } from "../stun/message";
 
 export type Address = Readonly<[string, number]>;
 

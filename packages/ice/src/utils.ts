@@ -1,9 +1,9 @@
 import os from "os";
 import * as nodeIp from "ip";
-import { InterfaceAddresses } from "../../common/src/network";
+import type { InterfaceAddresses } from "../../common/src/network";
 import { Connection, serverReflexiveCandidate } from "./ice";
 import { StunProtocol } from "./stun/protocol";
-import { Address } from "./types/model";
+import type { Address } from "./types/model";
 
 export async function getGlobalIp(
   stunServer?: Address,

@@ -9,16 +9,16 @@ import PCancelable from "p-cancelable";
 import { Event } from "rx.mini";
 import timers from "timers/promises";
 
-import { InterfaceAddresses } from "../../common/src/network";
+import type { InterfaceAddresses } from "../../common/src/network";
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import { MdnsLookup } from "./dns/lookup";
-import { TransactionError } from "./exceptions";
-import { Future, PQueue, future, randomString } from "./helper";
+import type { TransactionError } from "./exceptions";
+import { type Future, PQueue, future, randomString } from "./helper";
 import { classes, methods } from "./stun/const";
 import { Message, parseMessage } from "./stun/message";
 import { StunProtocol } from "./stun/protocol";
 import { createTurnEndpoint } from "./turn/protocol";
-import { Address, Protocol } from "./types/model";
+import type { Address, Protocol } from "./types/model";
 import { getHostAddresses, normalizeFamilyNodeV18 } from "./utils";
 
 const log = debug("werift-ice : packages/ice/src/ice.ts : log");

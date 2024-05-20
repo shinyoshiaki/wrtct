@@ -1,3 +1,4 @@
+export * from "./turn/protocol";
 export * from "./candidate";
 export * from "./ice";
 export * from "./types/model";

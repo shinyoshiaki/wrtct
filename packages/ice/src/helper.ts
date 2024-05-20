@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import debug from "debug";
-import PCancelable from "p-cancelable";
+import type PCancelable from "p-cancelable";
 import { Event } from "rx.mini";
 
 const log = debug("werift-ice:packages/ice/src/helper.ts");

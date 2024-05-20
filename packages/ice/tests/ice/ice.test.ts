@@ -4,7 +4,7 @@ import { Candidate } from "../../src/candidate";
 import { CandidatePair, CandidatePairState, Connection } from "../../src/ice";
 import { classes, methods } from "../../src/stun/const";
 import { Message } from "../../src/stun/message";
-import { Address, Protocol } from "../../src/types/model";
+import type { Address, Protocol } from "../../src/types/model";
 import { assertCandidateTypes, inviteAccept } from "../utils";
 
 class ProtocolMock implements Protocol {

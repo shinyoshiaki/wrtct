@@ -1,6 +1,6 @@
 {
   "name": "werift-ice",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "> TODO: description",
   "homepage": "https://github.com/shinyoshiaki/werift-webrtc/tree/master/packages/ice#readme",
   "bugs": {
@@ -21,7 +21,7 @@
     "build": "npm run format && tsc -p ./tsconfig.production.json",
     "deploy": "npm run build && npm publish",
     "deploy:alpha": "npm run build && npm publish --tag alpha",
-    "format": "biome check --apply src tests",
+    "format": "biome check --apply src tests examples",
     "start": "ts-node --project ./tsconfig.json ./example/cli/index.ts",
     "test": "npm run type && jest --runInBand --forceExit",
     "type": "tsc --noEmit --project ./tsconfig.json",

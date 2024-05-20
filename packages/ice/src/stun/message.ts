@@ -6,8 +6,8 @@ import { bufferXor, randomTransactionId } from "../helper";
 import {
   ATTRIBUTES_BY_NAME,
   ATTRIBUTES_BY_TYPE,
-  AttributeKey,
-  AttributePair,
+  type AttributeKey,
+  type AttributePair,
   AttributeRepository,
   packXorAddress,
   unpackXorAddress,

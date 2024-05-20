@@ -1,13 +1,13 @@
 import debug from "debug";
 import { Event } from "rx.mini";
 
-import { InterfaceAddresses } from "../../../common/src/network";
-import { Candidate } from "../candidate";
-import { Connection } from "../ice";
+import type { InterfaceAddresses } from "../../../common/src/network";
+import type { Candidate } from "../candidate";
+import type { Connection } from "../ice";
 import { UdpTransport } from "../transport";
-import { Address, Protocol } from "../types/model";
+import type { Address, Protocol } from "../types/model";
 import { classes } from "./const";
-import { Message, parseMessage } from "./message";
+import { type Message, parseMessage } from "./message";
 import { Transaction } from "./transaction";
 
 const log = debug("packages/ice/src/stun/protocol.ts");

@@ -5,16 +5,16 @@ import PCancelable from "p-cancelable";
 import Event from "rx.mini";
 import { setTimeout } from "timers/promises";
 
-import { InterfaceAddresses } from "../../../common/src/network";
-import { Candidate } from "../candidate";
-import { TransactionFailed } from "../exceptions";
-import { Future, future } from "../helper";
-import { Connection } from "../ice";
+import type { InterfaceAddresses } from "../../../common/src/network";
+import type { Candidate } from "../candidate";
+import type { TransactionFailed } from "../exceptions";
+import { type Future, future } from "../helper";
+import type { Connection } from "../ice";
 import { classes, methods } from "../stun/const";
 import { Message, parseMessage } from "../stun/message";
 import { Transaction } from "../stun/transaction";
-import { Transport, UdpTransport } from "../transport";
-import { Address, Protocol } from "../types/model";
+import { type Transport, UdpTransport } from "../transport";
+import type { Address, Protocol } from "../types/model";
 
 const log = debug("werift-ice:packages/ice/src/turn/protocol.ts");
 
@@ -120,6 +120,7 @@ class TurnClient implements Protocol {
     if (this.channel?.address) {
       const payload = data.slice(4, 4 + length);
       this.onDatagramReceived(payload, this.channel.address);
+      this.onData.execute(payload, this.channel.address);
     }
   }
 
@@ -258,7 +259,7 @@ class TurnClient implements Protocol {
     );
   }
 
-  private async getChannel(addr: Address) {
+  async getChannel(addr: Address) {
     if (this.channelBinding) {
       await this.channelBinding;
     }

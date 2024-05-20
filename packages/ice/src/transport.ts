@@ -1,12 +1,12 @@
-import { Socket, SocketType, createSocket } from "dgram";
+import { type Socket, type SocketType, createSocket } from "dgram";
 import debug from "debug";
 
 import {
-  InterfaceAddresses,
+  type InterfaceAddresses,
   findPort,
   interfaceAddress,
 } from "../../common/src";
-import { Address } from "./types/model";
+import type { Address } from "./types/model";
 import { normalizeFamilyNodeV18 } from "./utils";
 
 const log = debug("werift-ice:packages/ice/src/transport.ts");

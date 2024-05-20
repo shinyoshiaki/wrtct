@@ -3,8 +3,13 @@ import { Int64BE } from "int64-buffer";
 import * as nodeIp from "ip";
 import range from "lodash/range";
 
-import { Address } from "../types/model";
-import { AttributeKeys, COOKIE, IPV4_PROTOCOL, IPV6_PROTOCOL } from "./const";
+import type { Address } from "../types/model";
+import {
+  type AttributeKeys,
+  COOKIE,
+  IPV4_PROTOCOL,
+  IPV6_PROTOCOL,
+} from "./const";
 
 function packAddress(value: Address) {
   const [address] = value;
