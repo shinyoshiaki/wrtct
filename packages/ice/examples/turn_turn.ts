@@ -27,13 +27,19 @@ const password = "";
 
   turn1.turn.onData.subscribe((data, addr) => {
     console.log("turn1 onData", data.toString(), addr);
-    turn1.sendData(Buffer.from("pong"), turn2.turn.mappedAddress);
+    turn1.sendData(
+      Buffer.from("pong " + new Date().toISOString()),
+      turn2.turn.relayedAddress,
+    );
   });
   turn2.turn.onData.subscribe((data, addr) => {
     console.log("turn2 onData", data.toString(), addr);
   });
 
   setInterval(() => {
-    turn2.sendData(Buffer.from("ping"), turn1.turn.mappedAddress);
-  }, 1000);
+    turn2.sendData(
+      Buffer.from("ping " + new Date().toISOString()),
+      turn1.turn.relayedAddress,
+    );
+  }, 3000);
 })();

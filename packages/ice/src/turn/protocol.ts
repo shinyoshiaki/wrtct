@@ -5,10 +5,11 @@ import PCancelable from "p-cancelable";
 import Event from "rx.mini";
 import { setTimeout } from "timers/promises";
 
+import { int } from "../../../common/src";
 import type { InterfaceAddresses } from "../../../common/src/network";
 import type { Candidate } from "../candidate";
-import type { TransactionFailed } from "../exceptions";
-import { type Future, future } from "../helper";
+import { TransactionFailed } from "../exceptions";
+import { type Future, future, randomTransactionId } from "../helper";
 import type { Connection } from "../ice";
 import { classes, methods } from "../stun/const";
 import { Message, parseMessage } from "../stun/message";
@@ -18,6 +19,8 @@ import type { Address, Protocol } from "../types/model";
 
 const log = debug("werift-ice:packages/ice/src/turn/protocol.ts");
 
+const DEFAULT_CHANNEL_REFRESH_TIME = 500;
+const DEFAULT_ALLOCATION_LIFETIME = 600;
 const TCP_TRANSPORT = 0x06000000;
 const UDP_TRANSPORT = 0x11000000;
 
@@ -93,12 +96,17 @@ class TurnClient implements Protocol {
   mappedAddress!: Address;
   refreshHandle?: Future;
   channelNumber = 0x4000;
-  channel?: { number: number; address: Address };
+  channelByAddr: { [addr: string]: { number: number; address: Address } } = {};
+  addrByChannel: { [channel: number]: Address } = {};
   localCandidate!: Candidate;
+  /**sec */
+  channelRefreshTime =
+    this.options.channelRefreshTime ?? DEFAULT_CHANNEL_REFRESH_TIME;
 
   onDatagramReceived: (data: Buffer, addr: Address) => void = () => {};
 
   private channelBinding?: Promise<void>;
+  channelRefreshAt = 0;
 
   constructor(
     public server: Address,
@@ -106,6 +114,10 @@ class TurnClient implements Protocol {
     public password: string,
     public lifetime: number,
     public transport: Transport,
+    public options: {
+      /**sec */
+      channelRefreshTime?: number;
+    } = {},
   ) {}
 
   async connectionMade() {
@@ -115,12 +127,13 @@ class TurnClient implements Protocol {
   }
 
   private handleChannelData(data: Buffer) {
-    const [, length] = jspack.Unpack("!HH", data.slice(0, 4));
+    const [channel, length] = jspack.Unpack("!HH", data.slice(0, 4));
+    const addr = this.addrByChannel[channel];
 
-    if (this.channel?.address) {
-      const payload = data.slice(4, 4 + length);
-      this.onDatagramReceived(payload, this.channel.address);
-      this.onData.execute(payload, this.channel.address);
+    if (addr) {
+      const payload = data.subarray(4, 4 + length);
+      this.onDatagramReceived(payload, addr);
+      this.onData.execute(payload, addr);
     }
   }
 
@@ -133,7 +146,9 @@ class TurnClient implements Protocol {
         message.messageClass === classes.ERROR
       ) {
         const transaction = this.transactions[message.transactionIdHex];
-        if (transaction) transaction.responseReceived(message, addr);
+        if (transaction) {
+          transaction.responseReceived(message, addr);
+        }
       } else if (message.messageClass === classes.REQUEST) {
         this.onDatagramReceived(data, addr);
       }
@@ -157,39 +172,23 @@ class TurnClient implements Protocol {
   }
 
   async connect() {
-    const withoutCred = new Message(methods.ALLOCATE, classes.REQUEST);
-    withoutCred
+    const request = new Message(methods.ALLOCATE, classes.REQUEST);
+    request
       .setAttribute("LIFETIME", this.lifetime)
       .setAttribute("REQUESTED-TRANSPORT", UDP_TRANSPORT);
 
-    const err: TransactionFailed = await this.request(
-      withoutCred,
-      this.server,
-    ).catch((e) => e);
-
-    // resolve dns address
-    this.server = err.addr;
-
-    if (err.response.getAttributeValue("NONCE")) {
-      this.nonce = err.response.getAttributeValue("NONCE");
-    }
-    if (err.response.getAttributeValue("REALM")) {
-      this.realm = err.response.getAttributeValue("REALM");
-    }
-    this.integrityKey = makeIntegrityKey(
-      this.username,
-      this.realm!,
-      this.password,
+    const [response] = await this.requestWithRetry(request, this.server).catch(
+      (e) => {
+        log("connect error", e);
+        throw e;
+      },
     );
-
-    const request = new Message(methods.ALLOCATE, classes.REQUEST);
-    request.setAttribute("REQUESTED-TRANSPORT", UDP_TRANSPORT);
-
-    const [response] = await this.request(request, this.server);
     this.relayedAddress = response.getAttributeValue("XOR-RELAYED-ADDRESS");
     this.mappedAddress = response.getAttributeValue("XOR-MAPPED-ADDRESS");
+    const exp = response.getAttributeValue("LIFETIME");
+    log("connect", this.relayedAddress, this.mappedAddress, { exp });
 
-    this.refreshHandle = future(this.refresh());
+    this.refreshHandle = future(this.refresh(exp));
   }
 
   async createPermission(peerAddress: Address) {
@@ -206,7 +205,7 @@ class TurnClient implements Protocol {
     return response;
   }
 
-  refresh = () =>
+  refresh = (exp: number) =>
     new PCancelable(async (_, f, onCancel) => {
       let run = true;
       onCancel(() => {
@@ -216,12 +215,20 @@ class TurnClient implements Protocol {
 
       while (run) {
         // refresh before expire
-        await setTimeout((5 / 6) * this.lifetime * 1000);
+        const delay = (5 / 6) * exp * 1000;
+        log("refresh delay", delay, { exp });
+        await setTimeout(delay);
 
         const request = new Message(methods.REFRESH, classes.REQUEST);
-        request.setAttribute("LIFETIME", this.lifetime);
+        request.setAttribute("LIFETIME", exp);
 
-        await this.request(request, this.server);
+        try {
+          const [message] = await this.requestWithRetry(request, this.server);
+          exp = message.getAttributeValue("LIFETIME");
+          log("refresh", { exp });
+        } catch (error) {
+          log("refresh error", error);
+        }
       }
     });
 
@@ -250,6 +257,51 @@ class TurnClient implements Protocol {
     }
   }
 
+  async requestWithRetry(
+    request: Message,
+    addr: Address,
+  ): Promise<[Message, Address]> {
+    let message: Message, address: Address;
+    try {
+      [message, address] = await this.request(request, addr);
+    } catch (error) {
+      if (error instanceof TransactionFailed == false) {
+        log("requestWithRetry error", error);
+        throw error;
+      }
+
+      // resolve dns address
+      this.server = error.addr;
+
+      const [errorCode] = error.response.getAttributeValue("ERROR-CODE");
+      const nonce = error.response.getAttributeValue("NONCE");
+      const realm = error.response.getAttributeValue("REALM");
+
+      if (
+        ((errorCode === 401 && realm) || (errorCode === 438 && this.realm)) &&
+        nonce
+      ) {
+        log("retry with nonce", errorCode);
+
+        this.nonce = nonce;
+        if (errorCode === 401) {
+          this.realm = realm;
+        }
+        this.integrityKey = makeIntegrityKey(
+          this.username,
+          this.realm!,
+          this.password,
+        );
+
+        request.transactionId = randomTransactionId();
+        [message, address] = await this.request(request, this.server);
+      } else {
+        throw error;
+      }
+    }
+    return [message!, address!];
+  }
+
   async sendData(data: Buffer, addr: Address) {
     const channel = await this.getChannel(addr);
 
@@ -264,18 +316,36 @@ class TurnClient implements Protocol {
     if (this.channelBinding) {
       await this.channelBinding;
     }
-    if (!this.channel) {
-      this.channel = { number: this.channelNumber++, address: addr };
 
-      this.channelBinding = this.channelBind(this.channel.number, addr);
+    let channel = this.channelByAddr[addr.join("")];
+
+    if (!channel) {
+      this.channelByAddr[addr.join("")] = {
+        number: this.channelNumber++,
+        address: addr,
+      };
+      channel = this.channelByAddr[addr.join("")];
+      this.addrByChannel[channel.number] = addr;
+
+      this.channelBinding = this.channelBind(channel.number, addr);
+      await this.channelBinding.catch((e) => {
+        log("channelBind error", e);
+        throw e;
+      });
+      this.channelRefreshAt = int(Date.now() / 1000) + this.channelRefreshTime;
+      this.channelBinding = undefined;
+      log("channelBind", channel);
+    } else if (this.channelRefreshAt < int(Date.now() / 1000)) {
+      this.channelBinding = this.channelBind(channel.number, addr);
+      this.channelRefreshAt = int(Date.now() / 1000) + this.channelRefreshTime;
       await this.channelBinding.catch((e) => {
         log("channelBind error", e);
         throw e;
       });
       this.channelBinding = undefined;
-      log("channelBind", this.channel);
+      log("channelBind refresh", channel);
     }
-    return this.channel;
+    return channel;
   }
 
   private async channelBind(channelNumber: number, addr: Address) {
@@ -283,7 +353,7 @@ class TurnClient implements Protocol {
     request
       .setAttribute("CHANNEL-NUMBER", channelNumber)
       .setAttribute("XOR-PEER-ADDRESS", addr);
-    const [response] = await this.request(request, this.server);
+    const [response] = await this.requestWithRetry(request, this.server);
     if (response.messageMethod !== methods.CHANNEL_BIND) {
       throw new Error("should be CHANNEL_BIND");
     }
@@ -311,7 +381,7 @@ export async function createTurnEndpoint(
   },
 ) {
   if (lifetime == undefined) {
-    lifetime = 600;
+    lifetime = DEFAULT_ALLOCATION_LIFETIME;
   }
 
   const transport = await UdpTransport.init(
