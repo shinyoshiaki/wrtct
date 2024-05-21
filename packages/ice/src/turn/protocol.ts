@@ -339,10 +339,6 @@ class TurnClient implements Protocol {
       this.channelBinding = this.channelBind(channel.number, addr);
       this.channelRefreshAt = int(Date.now() / 1000) + this.channelRefreshTime;
       await this.channelBinding.catch((e) => {
-        // [
-        //   400,
-        //   "You cannot use the same channel number with different peer\u0000\u0000",
-        // ]
         log("channelBind error", e);
         throw e;
       });
