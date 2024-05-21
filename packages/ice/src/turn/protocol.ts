@@ -141,6 +141,7 @@ class TurnClient implements Protocol {
       if (message.getAttributeValue("DATA")) {
         const buf: Buffer = message.getAttributeValue("DATA");
         this.onDatagramReceived(buf, addr);
+        this.onData.execute(buf, addr);
       }
     } catch (error) {
       log("parse error", data.toString());
