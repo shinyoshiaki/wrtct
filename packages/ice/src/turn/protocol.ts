@@ -134,7 +134,9 @@ class TurnClient implements Protocol {
         message.messageClass === classes.ERROR
       ) {
         const transaction = this.transactions[message.transactionIdHex];
-        if (transaction) transaction.responseReceived(message, addr);
+        if (transaction) {
+          transaction.responseReceived(message, addr);
+        }
       } else if (message.messageClass === classes.REQUEST) {
         this.onDatagramReceived(data, addr);
       }
@@ -163,7 +165,12 @@ class TurnClient implements Protocol {
       .setAttribute("LIFETIME", this.lifetime)
       .setAttribute("REQUESTED-TRANSPORT", UDP_TRANSPORT);
 
-    const [response] = await this.requestWithRetry(request, this.server);
+    const [response] = await this.requestWithRetry(request, this.server).catch(
+      (e) => {
+        log("connect error", e);
+        throw e;
+      },
+    );
     this.relayedAddress = response.getAttributeValue("XOR-RELAYED-ADDRESS");
     this.mappedAddress = response.getAttributeValue("XOR-MAPPED-ADDRESS");
     const exp = response.getAttributeValue("LIFETIME");
@@ -200,7 +207,9 @@ class TurnClient implements Protocol {
         const request = new Message(methods.REFRESH, classes.REQUEST);
         request.setAttribute("LIFETIME", exp);
 
-        await this.requestWithRetry(request, this.server);
+        await this.requestWithRetry(request, this.server).catch((e) => {
+          log("refresh error", e);
+        });
       }
     });
 
@@ -238,19 +247,23 @@ class TurnClient implements Protocol {
       [message, address] = await this.request(request, addr);
     } catch (error) {
       if (error instanceof TransactionFailed == false) {
+        log("requestWithRetry error", error);
         throw error;
       }
 
       // resolve dns address
       this.server = error.addr;
 
-      const errorCode = error.response.getAttributeValue("ERROR-CODE");
+      const [errorCode] = error.response.getAttributeValue("ERROR-CODE");
       const nonce = error.response.getAttributeValue("NONCE");
       const realm = error.response.getAttributeValue("REALM");
+
       if (
-        nonce &&
-        ((errorCode === 401 && realm) || (errorCode === 438 && this.realm))
+        ((errorCode === 401 && realm) || (errorCode === 438 && this.realm)) &&
+        nonce
       ) {
+        log("retry with nonce", errorCode);
+
         this.nonce = nonce;
         if (errorCode === 401) {
           this.realm = realm;
@@ -260,8 +273,9 @@ class TurnClient implements Protocol {
           this.realm!,
           this.password,
         );
+
         request.transactionId = randomTransactionId();
-        [message, address] = await this.request(request, addr);
+        [message, address] = await this.request(request, this.server);
       } else {
         throw error;
       }
