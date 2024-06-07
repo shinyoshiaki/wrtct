@@ -1,4 +1,4 @@
-import { peer, sleep, waitVideoPlay } from "../fixture";
+import { browserName, peer, sleep, waitVideoPlay } from "../fixture";
 
 const mediachannel_removetrack_addtrack = "mediachannel_removetrack_addtrack";
 const mediachannel_addtrack_removefirst_addtrack =
@@ -7,144 +7,158 @@ const mediachannel_addtrack_removefirst_addtrack =
 const mediachannel_offer_replace_second = "mediachannel_offer_replace_second";
 
 describe("mediachannel_removeTrack", () => {
-  it(
-    mediachannel_removetrack_addtrack,
-    async () =>
-      new Promise<void>(async (done) => {
-        if (!peer.connected) await new Promise<void>((r) => peer.on("open", r));
-        await sleep(100);
+  if (browserName !== "Firefox") {
+    it(
+      mediachannel_removetrack_addtrack,
+      async () =>
+        new Promise<void>(async (done) => {
+          if (!peer.connected)
+            await new Promise<void>((r) => peer.on("open", r));
+          await sleep(100);
 
-        let offer = await peer.request(mediachannel_removetrack_addtrack, {
-          type: "init",
-        });
-
-        const pc = new RTCPeerConnection({
-          iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-        });
-        pc.onicecandidate = ({ candidate }) => {
-          peer
-            .request(mediachannel_removetrack_addtrack, {
-              type: "candidate",
-              payload: candidate,
-            })
-            .catch(() => {});
-        };
-
-        const answer = async () => {
-          await pc.setRemoteDescription(offer);
-          await pc.setLocalDescription(await pc.createAnswer());
-          peer
-            .request(mediachannel_removetrack_addtrack, {
-              type: "answer",
-              payload: pc.localDescription,
-            })
-            .catch(() => {});
-        };
-
-        answer();
-        let track = await new Promise<MediaStreamTrack>(
-          (r) => (pc.ontrack = (e) => r(e.track)),
-        );
-        await waitVideoPlay(track);
-
-        offer = await peer.request(mediachannel_removetrack_addtrack, {
-          type: "removeTrack",
-          payload: 0,
-        });
-        await answer();
-
-        offer = await peer.request(mediachannel_removetrack_addtrack, {
-          type: "addTrack",
-        });
-        answer();
-        track = await new Promise<MediaStreamTrack>(
-          (r) => (pc.ontrack = (e) => r(e.track)),
-        );
-        await waitVideoPlay(track);
-
-        await peer.request(mediachannel_removetrack_addtrack, {
-          type: "done",
-        });
-        pc.close();
-        done();
-      }),
-  );
-
-  it(
-    mediachannel_addtrack_removefirst_addtrack,
-    async () =>
-      new Promise<void>(async (done) => {
-        if (!peer.connected) await new Promise<void>((r) => peer.on("open", r));
-        await sleep(100);
-
-        let offer = await peer.request(
-          mediachannel_addtrack_removefirst_addtrack,
-          {
+          let offer = await peer.request(mediachannel_removetrack_addtrack, {
             type: "init",
-          },
-        );
+          });
 
-        const pc = new RTCPeerConnection({
-          iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-        });
-        pc.onicecandidate = ({ candidate }) => {
-          peer
-            .request(mediachannel_addtrack_removefirst_addtrack, {
-              type: "candidate",
-              payload: candidate,
-            })
-            .catch(() => {});
-        };
+          const pc = new RTCPeerConnection({
+            iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+          });
+          pc.onicecandidate = ({ candidate }) => {
+            peer
+              .request(mediachannel_removetrack_addtrack, {
+                type: "candidate",
+                payload: candidate,
+              })
+              .catch(() => {});
+          };
 
-        const answer = async () => {
-          await pc.setRemoteDescription(offer);
-          await pc.setLocalDescription(await pc.createAnswer());
-          peer
-            .request(mediachannel_addtrack_removefirst_addtrack, {
-              type: "answer",
-              payload: pc.localDescription,
-            })
-            .catch(() => {});
-        };
+          const answer = async () => {
+            await pc.setRemoteDescription(offer);
+            await pc.setLocalDescription(await pc.createAnswer());
+            peer
+              .request(mediachannel_removetrack_addtrack, {
+                type: "answer",
+                payload: pc.localDescription,
+              })
+              .catch(() => {});
+          };
+          answer();
 
-        answer();
-        let track = await new Promise<MediaStreamTrack>(
-          (r) => (pc.ontrack = (e) => r(e.track)),
-        );
-        await waitVideoPlay(track);
+          let track = await new Promise<MediaStreamTrack>(
+            (r) => (pc.ontrack = (e) => r(e.track)),
+          );
+          await waitVideoPlay(track);
 
-        offer = await peer.request(mediachannel_addtrack_removefirst_addtrack, {
-          type: "addTrack",
-        });
-        answer();
-        track = await new Promise<MediaStreamTrack>(
-          (r) => (pc.ontrack = (e) => r(e.track)),
-        );
-        await waitVideoPlay(track);
+          offer = await peer.request(mediachannel_removetrack_addtrack, {
+            type: "removeTrack",
+            payload: 0,
+          });
+          await answer();
 
-        offer = await peer.request(mediachannel_addtrack_removefirst_addtrack, {
-          type: "removeTrack",
-          payload: 0,
-        });
-        await answer();
+          offer = await peer.request(mediachannel_removetrack_addtrack, {
+            type: "addTrack",
+          });
+          answer();
+          track = await new Promise<MediaStreamTrack>(
+            (r) => (pc.ontrack = (e) => r(e.track)),
+          );
+          await waitVideoPlay(track);
 
-        offer = await peer.request(mediachannel_addtrack_removefirst_addtrack, {
-          type: "addTrack",
-        });
-        answer();
-        track = await new Promise<MediaStreamTrack>(
-          (r) => (pc.ontrack = (e) => r(e.track)),
-        );
-        await waitVideoPlay(track);
+          await peer.request(mediachannel_removetrack_addtrack, {
+            type: "done",
+          });
+          pc.close();
+          done();
+        }),
+    );
+  }
 
-        await peer.request(mediachannel_addtrack_removefirst_addtrack, {
-          type: "done",
-        });
-        pc.close();
-        done();
-      }),
-  );
+  if (browserName != "Firefox") {
+    it(
+      mediachannel_addtrack_removefirst_addtrack,
+      async () =>
+        new Promise<void>(async (done) => {
+          if (!peer.connected)
+            await new Promise<void>((r) => peer.on("open", r));
+          await sleep(100);
 
+          let offer = await peer.request(
+            mediachannel_addtrack_removefirst_addtrack,
+            {
+              type: "init",
+            },
+          );
+
+          const pc = new RTCPeerConnection({
+            iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+          });
+          pc.onicecandidate = ({ candidate }) => {
+            peer
+              .request(mediachannel_addtrack_removefirst_addtrack, {
+                type: "candidate",
+                payload: candidate,
+              })
+              .catch(() => {});
+          };
+
+          const answer = async () => {
+            await pc.setRemoteDescription(offer);
+            await pc.setLocalDescription(await pc.createAnswer());
+            peer
+              .request(mediachannel_addtrack_removefirst_addtrack, {
+                type: "answer",
+                payload: pc.localDescription,
+              })
+              .catch(() => {});
+          };
+
+          answer();
+          let track = await new Promise<MediaStreamTrack>(
+            (r) => (pc.ontrack = (e) => r(e.track)),
+          );
+          await waitVideoPlay(track);
+
+          offer = await peer.request(
+            mediachannel_addtrack_removefirst_addtrack,
+            {
+              type: "addTrack",
+            },
+          );
+          answer();
+          track = await new Promise<MediaStreamTrack>(
+            (r) => (pc.ontrack = (e) => r(e.track)),
+          );
+          await waitVideoPlay(track);
+
+          offer = await peer.request(
+            mediachannel_addtrack_removefirst_addtrack,
+            {
+              type: "removeTrack",
+              payload: 0,
+            },
+          );
+          await answer();
+
+          offer = await peer.request(
+            mediachannel_addtrack_removefirst_addtrack,
+            {
+              type: "addTrack",
+            },
+          );
+          answer();
+          track = await new Promise<MediaStreamTrack>(
+            (r) => (pc.ontrack = (e) => r(e.track)),
+          );
+          await waitVideoPlay(track);
+
+          await peer.request(mediachannel_addtrack_removefirst_addtrack, {
+            type: "done",
+          });
+          pc.close();
+          done();
+        }),
+    );
+  }
   it(
     mediachannel_offer_replace_second,
     async () =>

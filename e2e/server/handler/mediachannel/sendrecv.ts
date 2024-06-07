@@ -7,28 +7,31 @@ export class mediachannel_sendrecv_answer {
 
   async exec(type: string, payload: any, accept: AcceptFn) {
     switch (type) {
-      case "init": {
-        this.pc = new RTCPeerConnection(await peerConfig);
-        const transceiver = this.pc.addTransceiver("video");
-        transceiver.onTrack.subscribe((track) => {
-          transceiver.sender.replaceTrack(track);
-        });
-        await this.pc.setLocalDescription(await this.pc.createOffer());
-        accept(this.pc.localDescription);
-      }
-      break;
-      case "candidate": {
-        await this.pc.addIceCandidate(payload);
-        try {
+      case "init":
+        {
+          this.pc = new RTCPeerConnection(await peerConfig);
+          const transceiver = this.pc.addTransceiver("video");
+          transceiver.onTrack.subscribe((track) => {
+            transceiver.sender.replaceTrack(track);
+          });
+          await this.pc.setLocalDescription(await this.pc.createOffer());
+          accept(this.pc.localDescription);
+        }
+        break;
+      case "candidate":
+        {
+          await this.pc.addIceCandidate(payload);
+          try {
+            accept({});
+          } catch (error) {}
+        }
+        break;
+      case "answer":
+        {
+          await this.pc.setRemoteDescription(payload);
           accept({});
-        } catch (error) {}
-      }
-      break;
-      case "answer": {
-        await this.pc.setRemoteDescription(payload);
-        accept({});
-      }
-      break;
+        }
+        break;
     }
   }
 }
@@ -38,22 +41,24 @@ export class mediachannel_sendrecv_offer {
 
   async exec(type: string, payload: any, accept: AcceptFn) {
     switch (type) {
-      case "init": {
-        this.pc = new RTCPeerConnection(await peerConfig);
-        const transceiver = this.pc.addTransceiver("video");
-        transceiver.onTrack.subscribe((track) => {
-          transceiver.sender.replaceTrack(track);
-        });
-        await this.pc.setRemoteDescription(payload);
-        await this.pc.setLocalDescription(await this.pc.createAnswer());
-        accept(this.pc.localDescription);
-      }
-      break;
-      case "candidate": {
-        await this.pc.addIceCandidate(payload);
-        accept({});
-      }
-      break;
+      case "init":
+        {
+          this.pc = new RTCPeerConnection(await peerConfig);
+          const transceiver = this.pc.addTransceiver("video");
+          transceiver.onTrack.subscribe((track) => {
+            transceiver.sender.replaceTrack(track);
+          });
+          await this.pc.setRemoteDescription(payload);
+          await this.pc.setLocalDescription(await this.pc.createAnswer());
+          accept(this.pc.localDescription);
+        }
+        break;
+      case "candidate":
+        {
+          await this.pc.addIceCandidate(payload);
+          accept({});
+        }
+        break;
     }
   }
 }

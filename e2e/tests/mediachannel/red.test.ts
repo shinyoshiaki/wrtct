@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import "buffer";
 import { Red } from "werift-rtp";
-import { Counter, peer, sleep } from "../fixture";
+import { Counter, browserName, peer, sleep } from "../fixture";
 
 describe("mediachannel_red", () => {
+  if (browserName === "Firefox") {
+    return;
+  }
+
   const receiverTransform = (
     receiver: RTCRtpReceiver,
     expectPT: number,

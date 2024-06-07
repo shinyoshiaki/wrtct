@@ -35,6 +35,8 @@ export const flight2 =
     srtp: SrtpContext,
   ) =>
   (clientHello: ClientHello) => {
+    log("dtls version", clientHello.clientVersion);
+
     dtls.flight = 2;
 
     // if flight 2 restarts due to packet loss, sequence numbers are reused from the top:

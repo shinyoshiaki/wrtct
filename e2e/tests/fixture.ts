@@ -1,4 +1,10 @@
+import Bowser from "bowser";
 import { Peer, WebSocketTransport } from "protoo-client";
+
+const browser = Bowser.getParser(window.navigator.userAgent);
+export const browserName = browser.getBrowserName();
+
+console.log({ browserName, version: browser.getBrowserVersion() });
 
 const transport = new WebSocketTransport("ws://localhost:8886");
 export const peer = new Peer(transport);
@@ -9,6 +15,7 @@ export async function waitVideoPlay(track: MediaStreamTrack) {
   media.addTrack(track);
   video.srcObject = media;
   video.autoplay = true;
+  video.muted = true;
   video.load();
   video.width = 100;
   video.height = 100;
@@ -31,6 +38,9 @@ export async function waitVideoPlay(track: MediaStreamTrack) {
 
     if (snapshot !== data) break;
   }
+
+  video.pause();
+  video.srcObject = null;
 }
 
 async function digestMessage(data: Uint8ClampedArray) {
