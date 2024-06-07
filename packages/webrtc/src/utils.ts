@@ -110,16 +110,21 @@ export class MediaStreamTrackFactory {
   static async rtpSource({
     port,
     kind,
+    cb,
   }: {
     port?: number;
     kind: "audio" | "video";
+    cb?: (buf: Buffer) => Buffer;
   }) {
     port ??= await randomPort();
     const track = new MediaStreamTrack({ kind });
 
     const udp = createSocket("udp4");
     udp.bind(port);
-    const onMessage = (msg: Buffer, rinfo: RemoteInfo) => {
+    const onMessage = (msg: Buffer) => {
+      if (cb) {
+        msg = cb(msg);
+      }
       track.writeRtp(msg);
     };
     udp.addListener("message", onMessage);
