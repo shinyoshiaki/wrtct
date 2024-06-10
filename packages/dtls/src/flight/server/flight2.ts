@@ -103,6 +103,12 @@ export const flight2 =
         case RenegotiationIndication.type: {
           log(dtls.sessionId, "RenegotiationIndication", extension.data);
         }
+        case 43: {
+          // todo dtls1.3
+          const data = extension.data.subarray(1);
+          const versions = [...data].map((v) => v.toString(10));
+          log("dtls supported version", versions);
+        }
         break;
       }
     });
