@@ -49,6 +49,7 @@ export class MediaStreamTrack extends EventTarget {
     this.stopped = true;
     this.muted = true;
     this.onReceiveRtp.complete();
+    this.emit("ended");
   };
 
   writeRtp = (rtp: RtpPacket | Buffer) => {
