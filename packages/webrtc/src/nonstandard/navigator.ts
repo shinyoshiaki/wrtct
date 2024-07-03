@@ -1,14 +1,14 @@
 import { MediaStream, MediaStreamTrack } from "../media/track";
 
 export class Navigator {
-  readonly mediaDevices: MediaDevices;
+  mediaDevices: MediaDevices;
 
   constructor(props: ConstructorParameters<typeof MediaDevices>[0] = {}) {
     this.mediaDevices = new MediaDevices(props);
   }
 }
 
-class MediaDevices extends EventTarget {
+export class MediaDevices extends EventTarget {
   video?: MediaStreamTrack;
   audio?: MediaStreamTrack;
 
