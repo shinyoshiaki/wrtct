@@ -1,3 +1,5 @@
+import { randomBytes } from "crypto";
+import { jspack } from "@shinyoshiaki/jspack";
 import { MediaStream, MediaStreamTrack } from "../media/track";
 
 export class Navigator {
@@ -21,12 +23,33 @@ export class MediaDevices extends EventTarget {
   readonly getUserMedia = async (
     constraints: MediaStreamConstraints,
   ): Promise<MediaStream> => {
+    const video = constraints.video
+      ? new MediaStreamTrack({ kind: "video" })
+      : undefined;
+    if (video) {
+      this.video?.onReceiveRtp.subscribe((rtp) => {
+        const cloned = rtp.clone();
+        cloned.header.ssrc = jspack.Unpack("!L", randomBytes(4))[0];
+        video.onReceiveRtp.execute(cloned);
+      });
+    }
+    const audio = constraints.audio
+      ? new MediaStreamTrack({ kind: "audio" })
+      : undefined;
+    if (audio) {
+      this.audio?.onReceiveRtp.subscribe((rtp) => {
+        const cloned = rtp.clone();
+        cloned.header.ssrc = jspack.Unpack("!L", randomBytes(4))[0];
+        audio.onReceiveRtp.execute(cloned);
+      });
+    }
+
     if (constraints.video && constraints.audio) {
-      return new MediaStream([this.video!, this.audio!]);
+      return new MediaStream([video!, audio!]);
     } else if (constraints.audio) {
-      return new MediaStream([this.audio!]);
+      return new MediaStream([audio!]);
     } else if (constraints.video) {
-      return new MediaStream([this.video!]);
+      return new MediaStream([video!]);
     }
 
     throw new Error("Not implemented");
