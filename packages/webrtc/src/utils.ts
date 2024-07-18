@@ -131,7 +131,9 @@ export class MediaStreamTrackFactory {
 
     const dispose = () => {
       udp.removeListener("message", onMessage);
-      udp.close();
+      try {
+        udp.close();
+      } catch (error) {}
     };
 
     return [track, port, dispose] as const;
