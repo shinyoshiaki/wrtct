@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@fidm/x509": "^1.2.1",
-    "@peculiar/webcrypto": "^1.4.1",
     "@peculiar/x509": "^1.9.2",
     "@shinyoshiaki/binary-data": "^0.6.1",
     "date-fns": "^2.29.3",

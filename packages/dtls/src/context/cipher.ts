@@ -1,6 +1,5 @@
 import nodeCrypto, { createSign } from "crypto";
 import { Certificate, PrivateKey } from "@fidm/x509";
-import { Crypto } from "@peculiar/webcrypto";
 import * as x509 from "@peculiar/x509";
 import { decode, encode, types } from "@shinyoshiaki/binary-data";
 import addYears from "date-fns/addYears";
@@ -22,7 +21,7 @@ import { ProtocolVersion } from "../handshake/binary";
 import { DtlsRandom } from "../handshake/random";
 import { DtlsPlaintext } from "../record/message/plaintext";
 
-const crypto = new Crypto();
+const crypto = nodeCrypto.webcrypto;
 x509.cryptoProvider.set(crypto as any);
 
 export class CipherContext {
@@ -103,7 +102,7 @@ export class CipherContext {
       }
     })();
 
-    const keys = await crypto.subtle.generateKey(alg, true, ["sign", "verify"]);
+    const keys = await crypto.subtle.generateKey(alg, true, ["sign", "verify"]) as nodeCrypto.webcrypto.CryptoKeyPair;
 
     const cert = await x509.X509CertificateGenerator.createSelfSigned({
       serialNumber: nodeCrypto.randomBytes(8).toString("hex"),

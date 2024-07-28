@@ -1,4 +1,4 @@
-import { Crypto } from "@peculiar/webcrypto";
+import nodeCrypto from "crypto";
 import * as x509 from "@peculiar/x509";
 import { createSocket } from "dgram";
 
@@ -11,7 +11,7 @@ import {
 import { CipherContext } from "../src/context/cipher";
 import { DtlsServer } from "../src/server";
 
-const crypto = new Crypto();
+const crypto = nodeCrypto.webcrypto;
 x509.cryptoProvider.set(crypto as any);
 
 const port = 4444;
