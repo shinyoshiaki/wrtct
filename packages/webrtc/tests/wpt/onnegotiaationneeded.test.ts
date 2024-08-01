@@ -81,14 +81,11 @@ describe("onnegotiationneeded", () => {
   test("negotiationneeded event should not fire if signaling state is not stable", async () =>
     new Promise<void>(async (done) => {
       const pc = new RTCPeerConnection();
-      let negotiated;
 
-      generateAudioReceiveOnlyOffer(pc)
-        .then((offer) => {
+      const offerPromise = generateAudioReceiveOnlyOffer(pc);
+      const negotiated = awaitNegotiation(pc);
+      offerPromise.then((offer) => {
           pc.setLocalDescription(offer);
-          negotiated = awaitNegotiation(pc);
-        })
-        .then(() => {
           return negotiated;
         })
         .then(({ nextPromise }) => {
