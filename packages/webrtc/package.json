@@ -56,7 +56,7 @@
     "date-fns": "^2.29.3",
     "debug": "^4.3.4",
     "int64-buffer": "^1.0.1",
-    "ip": "^1.1.9",
+    "ip": "^2.0.1",
     "@shinyoshiaki/jspack": "^0.0.6",
     "lodash": "^4.17.21",
     "mp4box": "^0.5.2",

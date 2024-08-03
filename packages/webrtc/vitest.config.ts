@@ -5,5 +5,6 @@ export default defineConfig({
     globals: true,
     minWorkers: 2,
     maxWorkers: 2,
+    retry: 1,
   },
 });
