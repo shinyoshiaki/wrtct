@@ -1,11 +1,11 @@
-import { ChildProcess, spawn } from "child_process";
+import { type ChildProcess, spawn } from "child_process";
+import { createSocket } from "dgram";
 import { config } from "dotenv";
 import * as google from "googleapis";
 import {
   RTCPeerConnection,
   RTCRtpCodecParameters,
 } from "../../packages/webrtc/src";
-import { createSocket } from "dgram";
 
 config({ path: __dirname + "/../../credential.env" });
 
@@ -25,7 +25,7 @@ async function main() {
   const ffmpegProcess: ChildProcess = spawn(
     pathToFfmpeg,
     ffmpegArgs.split(/\s+/),
-    { env: process.env }
+    { env: process.env },
   );
 
   if (ffmpegProcess.stdout) {
@@ -118,7 +118,7 @@ async function main() {
     track.onReceiveRtp.once(() => {
       setInterval(
         () => videoTransceiver.receiver.sendRtcpPLI(track.ssrc!),
-        2000
+        2000,
       );
     });
   });

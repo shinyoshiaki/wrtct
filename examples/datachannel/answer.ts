@@ -1,7 +1,7 @@
 // client side is ./offer.html
 
-import { RTCPeerConnection } from "../../packages/webrtc/src";
 import { Server } from "ws";
+import { RTCPeerConnection } from "../../packages/webrtc/src";
 
 const server = new Server({ port: 8888 });
 console.log("start");

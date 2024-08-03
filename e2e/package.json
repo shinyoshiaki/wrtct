@@ -11,7 +11,7 @@
     "clean": "pkill -9 gst-launch",
     "debug": "cd debug && npm run dev",
     "firefox:dev": "vitest run ./tests --browser.headless --config vitest.firefox.config.ts",
-    "format": "biome check --apply server tests",
+    "format": "biome check --write server tests",
     "server:dev": "DEBUG=werift* ts-node-dev --project tsconfig.server.json ./server/main.ts",
     "server:prod": "DEBUG=werift* node lib/e2e/server/main.js",
     "type": "tsc --noEmit -p tsconfig.server.json && tsc --noEmit -p tsconfig.json"

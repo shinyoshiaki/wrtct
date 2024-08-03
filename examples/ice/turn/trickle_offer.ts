@@ -1,9 +1,9 @@
+import { Server } from "ws";
 import {
-  RTCPeerConnection,
   RTCIceCandidate,
+  RTCPeerConnection,
   RTCSessionDescription,
 } from "../../../packages/webrtc/src";
-import { Server } from "ws";
 
 const server = new Server({ port: 8889 });
 console.log("start");

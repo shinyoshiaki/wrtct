@@ -1,9 +1,9 @@
+import { Server } from "ws";
 import {
   RTCPeerConnection,
   RTCRtpCodecParameters,
   Vp9RtpPayload,
 } from "../../../packages/webrtc/src";
-import { Server } from "ws";
 
 const server = new Server({ port: 8888 });
 console.log("start");

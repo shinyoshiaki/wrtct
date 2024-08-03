@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { FC, useRef } from "react";
+import React, { type FC, useRef } from "react";
 import ReactDOM from "react-dom";
 import {
   Red,
-  buffer2ArrayBuffer,
   RedEncoder,
+  buffer2ArrayBuffer,
 } from "../../../../packages/rtp/src";
 import { getAudioStream } from "./util";
 
@@ -23,7 +23,7 @@ const App: FC = () => {
     console.log("open websocket");
 
     const offer = await new Promise<any>(
-      (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data)))
+      (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data))),
     );
     console.log("offer", offer.sdp);
 

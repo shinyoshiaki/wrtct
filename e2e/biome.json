@@ -14,7 +14,8 @@
         "useSingleVarDeclarator": "off",
         "useDefaultParameterLast": "off",
         "noVar": "off",
-        "noInferrableTypes": "off"
+        "noInferrableTypes": "off",
+        "useNodejsImportProtocol": "off"
       },
       "complexity": {
         "noStaticOnlyClass": "off",
@@ -35,10 +36,12 @@
         "noFallthroughSwitchClause": "off",
         "noAssignInExpressions": "off",
         "noRedeclare": "off",
-        "noConfusingVoidType": "off"
+        "noConfusingVoidType": "off",
+        "noImplicitAnyLet": "off"
       },
       "correctness": {
-        "noSwitchDeclarations": "error"
+        "noSwitchDeclarations": "error",
+        "noInvalidUseBeforeDeclaration": "off"
       }
     }
   }

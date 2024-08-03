@@ -19,7 +19,7 @@
     "client": "DEBUG=werift* ts-node-dev --files --project tsconfig.json examples/client.ts",
     "dep": "depcheck",
     "deploy": "npm run build && npm publish",
-    "format": "biome check --apply src tests",
+    "format": "biome check --write src tests",
     "server": "DEBUG=werift* ts-node-dev --files --project tsconfig.json examples/server.ts",
     "test": "vitest run ./tests",
     "type": "tsc --noEmit -p .",

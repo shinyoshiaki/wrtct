@@ -1,15 +1,18 @@
+import { appendFile, open } from "fs/promises";
 import {
+  type ReadableStreamDefaultReadResult,
+  TransformStream,
+} from "stream/web";
+import { Server } from "ws";
+import {
+  type DepacketizerInput,
+  type DepacketizerOutput,
   RTCPeerConnection,
   RtpPacket,
   RtpSourceStream,
   WebmStream,
-  DepacketizerInput,
-  DepacketizerOutput,
-  WebmStreamOutput,
+  type WebmStreamOutput,
 } from "../../../packages/webrtc/src";
-import { Server } from "ws";
-import { ReadableStreamDefaultReadResult, TransformStream } from "stream/web";
-import { appendFile, open } from "fs/promises";
 
 const server = new Server({ port: 8888 });
 console.log("start");
@@ -46,7 +49,7 @@ const webm = new WebmStream(
       trackNumber: 1,
     },
   ],
-  { duration: 1000 * 60 * 60 * 24 }
+  { duration: 1000 * 60 * 60 * 24 },
 );
 
 const transform = new TransformStream<DepacketizerInput, DepacketizerOutput>({

@@ -1,14 +1,14 @@
-import {
-  getUserMedia,
-  randomPorts,
-  RTCPeerConnection,
-  RTCRtpCodecParameters,
-  RtcpSrPacket,
-} from "../../../packages/webrtc/src";
-import { Server } from "ws";
 import { exec } from "child_process";
 import { createSocket } from "dgram";
 import { setTimeout } from "timers/promises";
+import { Server } from "ws";
+import {
+  RTCPeerConnection,
+  RTCRtpCodecParameters,
+  RtcpSrPacket,
+  getUserMedia,
+  randomPorts,
+} from "../../../packages/webrtc/src";
 
 console.log("start", __dirname);
 

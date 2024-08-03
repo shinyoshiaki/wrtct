@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { FC, useRef } from "react";
+import React, { type FC, useRef } from "react";
 import ReactDOM from "react-dom";
 import "buffer";
 import { Red } from "../../../../packages/rtp/src";
@@ -21,7 +21,7 @@ const App: FC = () => {
     console.log("open websocket");
 
     const offer = await new Promise<any>(
-      (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data)))
+      (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data))),
     );
     console.log("offer", offer.sdp);
 
@@ -52,7 +52,7 @@ const App: FC = () => {
       const stats = await peer.getStats();
       const arr = [...(stats as any).values()];
       const remoteInbound = arr.find((a) =>
-        a.id.includes("RTCRemoteInboundRtpAudioStream")
+        a.id.includes("RTCRemoteInboundRtpAudioStream"),
       );
       if (remoteInbound) {
         const { fractionLost } = remoteInbound;
@@ -106,7 +106,7 @@ class RedSender {
         blockPT: 97,
         timestampOffset: uint32Add(
           presentPayload.timestamp,
-          -redundant.timestamp
+          -redundant.timestamp,
         ),
       });
     });
@@ -132,7 +132,7 @@ const senderTransform = (sender: RTCRtpSender) => {
 
       encodedFrame.data = red.buffer.slice(
         red.byteOffset,
-        red.byteOffset + red.byteLength
+        red.byteOffset + red.byteLength,
       );
       controller.enqueue(encodedFrame);
     },

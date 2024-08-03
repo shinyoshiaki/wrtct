@@ -1,3 +1,5 @@
+import { unlink } from "fs/promises";
+import { Server } from "ws";
 import {
   DepacketizeCallback,
   JitterBufferCallback,
@@ -5,11 +7,9 @@ import {
   RTCRtpCodecParameters,
   RtpSourceCallback,
   RtpTimeCallback,
-  saveToFileSystem,
   WebmCallback,
+  saveToFileSystem,
 } from "../../packages/webrtc/src";
-import { Server } from "ws";
-import { unlink } from "fs/promises";
 
 // open ./answer.html
 
@@ -49,7 +49,7 @@ server.on("connection", async (socket) => {
         trackNumber: 1,
       },
     ],
-    { duration: 1000 * 60 * 60 }
+    { duration: 1000 * 60 * 60 },
   );
 
   const video = new RtpSourceCallback();

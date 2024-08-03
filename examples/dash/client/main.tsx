@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from "react";
+import React, { type FC, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 
 const App: FC = () => {
@@ -11,7 +11,7 @@ const App: FC = () => {
       console.log("open websocket");
 
       const offer = await new Promise<any>(
-        (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data)))
+        (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data))),
       );
       console.log({ offer });
 

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from "react";
+import React, { type FC, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { createTestTrack } from "./util";
 
@@ -10,7 +10,7 @@ const App: FC = () => {
       const socket = new WebSocket("ws://localhost:8888");
 
       const offer = await new Promise<any>(
-        (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data)))
+        (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data))),
       );
       console.log("offer", offer.sdp);
 

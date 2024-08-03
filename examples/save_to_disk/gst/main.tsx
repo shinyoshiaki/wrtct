@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { type FC, useEffect } from "react";
 import ReactDOM from "react-dom";
 
 const App: FC = () => {
@@ -9,7 +9,7 @@ const App: FC = () => {
       console.log("open websocket");
 
       const offer = await new Promise<any>(
-        (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data)))
+        (r) => (socket.onmessage = (ev) => r(JSON.parse(ev.data))),
       );
       console.log("offer", offer.sdp);
 
@@ -30,7 +30,7 @@ const App: FC = () => {
     })();
   }, []);
 
-  return <div></div>;
+  return <div />;
 };
 
 ReactDOM.render(<App />, document.getElementById("root"));

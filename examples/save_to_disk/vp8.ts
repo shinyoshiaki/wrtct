@@ -1,5 +1,5 @@
-import { MediaRecorder, RTCPeerConnection } from "../../packages/webrtc/src";
 import { Server } from "ws";
+import { MediaRecorder, RTCPeerConnection } from "../../packages/webrtc/src";
 
 // open ./answer.html
 

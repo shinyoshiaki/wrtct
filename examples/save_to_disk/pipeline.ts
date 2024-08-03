@@ -1,3 +1,5 @@
+import { unlink } from "fs/promises";
+import { Server } from "ws";
 import {
   DepacketizeCallback,
   JitterBufferCallback,
@@ -6,11 +8,9 @@ import {
   RTCPeerConnection,
   RtcpSourceCallback,
   RtpSourceCallback,
-  saveToFileSystem,
   WebmCallback,
+  saveToFileSystem,
 } from "../../packages/webrtc/src";
-import { Server } from "ws";
-import { unlink } from "fs/promises";
 
 // open ./answer.html
 
@@ -39,7 +39,7 @@ server.on("connection", async (socket) => {
         trackNumber: 2,
       },
     ],
-    { duration: 1000 * 60 * 60 }
+    { duration: 1000 * 60 * 60 },
   );
 
   const audio = new RtpSourceCallback();

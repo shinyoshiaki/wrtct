@@ -1,10 +1,10 @@
+import { RingApi } from "ring-client-api";
+import { Server } from "ws";
 import {
-  RTCPeerConnection,
   MediaStreamTrack,
+  RTCPeerConnection,
   RTCRtpCodecParameters,
 } from "../../packages/webrtc/src";
-import { Server } from "ws";
-import { RingApi } from "ring-client-api";
 import { CustomPeerConnection } from "./peer";
 
 const example = async () => {

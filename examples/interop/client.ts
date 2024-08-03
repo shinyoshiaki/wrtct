@@ -1,14 +1,14 @@
+import { exec } from "child_process";
+import { createSocket } from "dgram";
+import got from "got";
+import { setTimeout } from "timers/promises";
+import * as yargs from "yargs";
 import {
   MediaStreamTrack,
   RTCPeerConnection,
   RtpPacket,
   randomPort,
 } from "../../packages/webrtc/src";
-import got from "got";
-import * as yargs from "yargs";
-import { setTimeout } from "timers/promises";
-import { exec } from "child_process";
-import { createSocket } from "dgram";
 
 const TestType = { PeerConnection: 0, DataChannelEcho: 1 };
 

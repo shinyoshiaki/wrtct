@@ -1,8 +1,8 @@
-import express from "express";
-import { RTCPeerConnection } from "../../packages/webrtc/src";
-import * as yargs from "yargs";
-import https from "https";
 import { readFileSync } from "fs";
+import https from "https";
+import express from "express";
+import * as yargs from "yargs";
+import { RTCPeerConnection } from "../../packages/webrtc/src";
 
 (async () => {
   const args = await yargs

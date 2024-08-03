@@ -52,6 +52,6 @@ describe("e2e/certificate_request/client", () => {
           }, 100);
         }
       }),
-    10_000
+    10_000,
   );
 });
