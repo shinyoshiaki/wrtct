@@ -39,7 +39,7 @@ server.on("connection", async (socket) => {
         trackNumber: 2,
       },
     ],
-    { duration: 1000 * 60 * 60 }
+    { duration: 1000 * 60 * 60 },
   );
 
   const audio = new RtpSourceCallback();

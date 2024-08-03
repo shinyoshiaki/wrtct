@@ -51,7 +51,7 @@ server.on("connection", async (socket) => {
         trackNumber: 1,
       },
     ],
-    { duration: 1000 * 60 * 60 }
+    { duration: 1000 * 60 * 60 },
   );
 
   const video = new RtpSourceCallback();

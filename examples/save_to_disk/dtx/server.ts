@@ -68,7 +68,7 @@ server.on("connection", async (socket) => {
         trackNumber: 2,
       },
     ],
-    { duration: 1000 * 60 * 60 }
+    { duration: 1000 * 60 * 60 },
   );
 
   const audio = new RtpSourceCallback();
@@ -106,13 +106,13 @@ server.on("connection", async (socket) => {
     (track) => {
       track.onReceiveRtp.subscribe(audio.input);
       track.onReceiveRtcp.subscribe(audioRtcp.input);
-    }
+    },
   );
   pc.addTransceiver("video", { direction: "recvonly" }).onTrack.subscribe(
     (track) => {
       track.onReceiveRtp.subscribe(video.input);
       track.onReceiveRtcp.subscribe(videoRtcp.input);
-    }
+    },
   );
 
   await pc.setLocalDescription(await pc.createOffer());

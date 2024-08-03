@@ -65,9 +65,8 @@ export class WEBMContainer {
     const trackElements: EBML.EBMLData[] = [];
 
     if (kind === "video") {
-      if (!width || !height) {
-        throw new Error();
-      }
+      width ??= 640;
+      height ??= 360;
       trackElements.push(
         EBML.element(EBML.ID.Video, [
           EBML.element(EBML.ID.PixelWidth, EBML.number(width)),

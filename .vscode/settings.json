@@ -76,5 +76,6 @@
     "**"
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "biome.lspBin": "node_modules/@biomejs/biome/bin/biome"
+  "biome.lspBin": "node_modules/@biomejs/biome/bin/biome",
+  "prettier.enable": false
 }

@@ -48,7 +48,7 @@ const webm = new WebmStream(
       trackNumber: 1,
     },
   ],
-  { duration: 1000 * 60 * 60 * 24 }
+  { duration: 1000 * 60 * 60 * 24 },
 );
 
 const transform = new TransformStream<DepacketizerInput, DepacketizerOutput>({
