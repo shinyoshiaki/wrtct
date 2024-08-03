@@ -1,5 +1,5 @@
-import { MediaRecorderOptions } from "..";
-import { MediaStreamTrack } from "../../..";
+import type { MediaRecorderOptions } from "..";
+import type { MediaStreamTrack } from "../../..";
 
 export abstract class MediaWriter {
   constructor(

@@ -2,8 +2,8 @@ import debug from "debug";
 import { Event } from "rx.mini";
 
 import { EventTarget } from "./helper";
-import { RTCSctpTransport } from "./transport/sctp";
-import { Callback, CallbackWithValue } from "./types/util";
+import type { RTCSctpTransport } from "./transport/sctp";
+import type { Callback, CallbackWithValue } from "./types/util";
 
 const log = debug("werift:packages/webrtc/src/dataChannel.ts");
 

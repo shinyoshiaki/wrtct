@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
 
 import { int } from "../..";
-import { CodecFrame, DepacketizerOutput } from "./depacketizer";
-import { Processor } from "./interface";
+import type { CodecFrame, DepacketizerOutput } from "./depacketizer";
+import type { Processor } from "./interface";
 
 export type MuteInput = DepacketizerOutput;
 

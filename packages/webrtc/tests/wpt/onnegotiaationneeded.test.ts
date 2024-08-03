@@ -84,7 +84,8 @@ describe("onnegotiationneeded", () => {
 
       const offerPromise = generateAudioReceiveOnlyOffer(pc);
       const negotiated = awaitNegotiation(pc);
-      offerPromise.then((offer) => {
+      offerPromise
+        .then((offer) => {
           pc.setLocalDescription(offer);
           return negotiated;
         })

@@ -1,5 +1,5 @@
-import { RtcpHeader } from "../../rtcp/header";
-import { Profile } from "../const";
+import type { RtcpHeader } from "../../rtcp/header";
+import type { Profile } from "../const";
 import { Context } from "./context";
 
 export class SrtcpContext extends Context {

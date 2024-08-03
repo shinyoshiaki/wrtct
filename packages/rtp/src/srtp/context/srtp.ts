@@ -1,5 +1,5 @@
 import { RtpHeader } from "../../rtp/rtp";
-import { Profile } from "../const";
+import type { Profile } from "../const";
 import { Context } from "./context";
 
 export class SrtpContext extends Context {

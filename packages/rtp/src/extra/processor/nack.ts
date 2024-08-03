@@ -4,12 +4,12 @@ import Event from "rx.mini";
 import {
   GenericNack,
   RtcpTransportLayerFeedback,
-  RtpPacket,
+  type RtpPacket,
   timer,
   uint16Add,
 } from "../..";
-import { Processor } from "./interface";
-import { RtpOutput } from "./rtpCallback";
+import type { Processor } from "./interface";
+import type { RtpOutput } from "./rtpCallback";
 
 const log = debug("werift-rtp : packages/rtp/src/processor/nack.ts");
 
@@ -127,10 +127,13 @@ export class NackHandlerBase
     if (this.lostSeqNumbers.length > LOST_SIZE) {
       this._lost = Object.entries(this._lost)
         .slice(-LOST_SIZE)
-        .reduce((acc, [key, v]) => {
-          acc[key] = v;
-          return acc;
-        }, {} as { [seqNum: number]: number });
+        .reduce(
+          (acc, [key, v]) => {
+            acc[key] = v;
+            return acc;
+          },
+          {} as { [seqNum: number]: number },
+        );
     }
   }
 

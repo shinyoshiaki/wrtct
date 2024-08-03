@@ -3,31 +3,39 @@ import Event from "rx.mini";
 import { setTimeout } from "timers/promises";
 import { v4 as uuid } from "uuid";
 
-import { PeerConfig, codecParametersFromString, usePLI, useTWCC } from "..";
+import {
+  type PeerConfig,
+  codecParametersFromString,
+  usePLI,
+  useTWCC,
+} from "..";
 import { int } from "../../../common/src";
 import {
   PictureLossIndication,
   RTP_EXTENSION_URI,
   Red,
   RedHandler,
-  RtcpPacket,
+  type RtcpPacket,
   RtcpPayloadSpecificFeedback,
   RtcpReceiverInfo,
   RtcpRrPacket,
   RtcpSrPacket,
-  RtpPacket,
-  TransportWideCCPayload,
+  type RtpPacket,
+  type TransportWideCCPayload,
   unwrapRtx,
 } from "../../../rtp/src";
-import { RTCDtlsTransport } from "../transport/dtls";
-import { Kind } from "../types/domain";
+import type { RTCDtlsTransport } from "../transport/dtls";
+import type { Kind } from "../types/domain";
 import { compactNtp, timestampSeconds } from "../utils";
-import { RTCRtpCodecParameters, RTCRtpReceiveParameters } from "./parameters";
+import type {
+  RTCRtpCodecParameters,
+  RTCRtpReceiveParameters,
+} from "./parameters";
 import { NackHandler } from "./receiver/nack";
 import { ReceiverTWCC } from "./receiver/receiverTwcc";
 import { StreamStatistics } from "./receiver/statistics";
-import { Extensions } from "./router";
-import { MediaStreamTrack } from "./track";
+import type { Extensions } from "./router";
+import type { MediaStreamTrack } from "./track";
 
 const log = debug("werift:packages/webrtc/src/media/rtpReceiver.ts");
 
@@ -236,17 +244,20 @@ export class RTCRtpReceiver {
 
   handleRtcpPacket(packet: RtcpPacket) {
     switch (packet.type) {
-      case RtcpSrPacket.type: {
-        const sr = packet as RtcpSrPacket;
-        this.lastSRtimestamp[sr.ssrc] = compactNtp(sr.senderInfo.ntpTimestamp);
-        this.receiveLastSRTimestamp[sr.ssrc] = timestampSeconds();
+      case RtcpSrPacket.type:
+        {
+          const sr = packet as RtcpSrPacket;
+          this.lastSRtimestamp[sr.ssrc] = compactNtp(
+            sr.senderInfo.ntpTimestamp,
+          );
+          this.receiveLastSRTimestamp[sr.ssrc] = timestampSeconds();
 
-        const track = this.trackBySSRC[packet.ssrc];
-        if (track) {
-          track.onReceiveRtcp.execute(packet);
+          const track = this.trackBySSRC[packet.ssrc];
+          if (track) {
+            track.onReceiveRtcp.execute(packet);
+          }
         }
-      }
-      break;
+        break;
     }
     this.onRtcp.execute(packet);
   }

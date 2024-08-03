@@ -1,4 +1,4 @@
-import { ChildProcess, exec } from "child_process";
+import { type ChildProcess, exec } from "child_process";
 import { createSocket } from "dgram";
 import { setImmediate } from "timers/promises";
 import { v4 } from "uuid";

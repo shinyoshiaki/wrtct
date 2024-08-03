@@ -1,5 +1,5 @@
 import {
-  MediaDescription,
+  type MediaDescription,
   MediaStreamTrack,
   RTCPeerConnection,
   RTCRtpCodecParameters,

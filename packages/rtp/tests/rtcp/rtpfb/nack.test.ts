@@ -3,7 +3,7 @@ import {
   RtcpHeader,
   RtcpPacketConverter,
 } from "../../../src";
-import { RtcpTransportLayerFeedback } from "../../../src/rtcp/rtpfb";
+import type { RtcpTransportLayerFeedback } from "../../../src/rtcp/rtpfb";
 import { GenericNack } from "../../../src/rtcp/rtpfb/nack";
 import { load } from "../../utils";
 

@@ -1,6 +1,6 @@
 import { getBit, paddingByte } from "../../../common/src";
-import { RtpHeader } from "../rtp/rtp";
-import { DePacketizerBase } from "./base";
+import type { RtpHeader } from "../rtp/rtp";
+import type { DePacketizerBase } from "./base";
 
 // RFC 7741 - RTP Payload Format for VP8 Video
 
@@ -79,7 +79,7 @@ export class Vp8RtpPayload implements DePacketizerBase {
       if (p.mBit) {
         const _7 = paddingByte(getBit(buf[offset], 1, 7));
         const _8 = paddingByte(buf[offset + 1]);
-        p.pictureId = parseInt(_7 + _8, 2);
+        p.pictureId = Number.parseInt(_7 + _8, 2);
         offset += 2;
       } else {
         p.pictureId = getBit(buf[offset], 1, 7);

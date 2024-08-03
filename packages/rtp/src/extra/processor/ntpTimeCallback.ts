@@ -1,5 +1,5 @@
 import { SimpleProcessorCallbackBase } from "./interface";
-import { NtpTimeBase, NtpTimeInput, NtpTimeOutput } from "./ntpTime";
+import { NtpTimeBase, type NtpTimeInput, type NtpTimeOutput } from "./ntpTime";
 
 export class NtpTimeCallback extends SimpleProcessorCallbackBase<
   NtpTimeInput,

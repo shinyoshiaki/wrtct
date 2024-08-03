@@ -180,12 +180,18 @@ export type AttributeKey = (typeof AttributeKeys)[number];
 
 export type AttributePair = [AttributeKey, any];
 
-export const ATTRIBUTES_BY_TYPE = ATTRIBUTES.reduce((acc, cur) => {
-  acc[cur[0]] = cur;
-  return acc;
-}, {} as { [key: string]: ATTRIBUTE });
+export const ATTRIBUTES_BY_TYPE = ATTRIBUTES.reduce(
+  (acc, cur) => {
+    acc[cur[0]] = cur;
+    return acc;
+  },
+  {} as { [key: string]: ATTRIBUTE },
+);
 
-export const ATTRIBUTES_BY_NAME = ATTRIBUTES.reduce((acc, cur) => {
-  acc[cur[1]] = cur;
-  return acc;
-}, {} as { [key: string]: ATTRIBUTE });
+export const ATTRIBUTES_BY_NAME = ATTRIBUTES.reduce(
+  (acc, cur) => {
+    acc[cur[1]] = cur;
+    return acc;
+  },
+  {} as { [key: string]: ATTRIBUTE },
+);

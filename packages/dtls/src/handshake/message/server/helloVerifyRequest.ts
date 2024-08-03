@@ -1,7 +1,7 @@
 import { decode, encode, types } from "@shinyoshiaki/binary-data";
 
 import { FragmentedHandshake } from "../../../record/message/fragment";
-import { Handshake } from "../../../typings/domain";
+import type { Handshake } from "../../../typings/domain";
 import { ProtocolVersion } from "../../binary";
 import { HandshakeType } from "../../const";
 

@@ -1,7 +1,7 @@
 import { decode, encode, types } from "@shinyoshiaki/binary-data";
 
 import { FragmentedHandshake } from "../../../record/message/fragment";
-import { Extension } from "../../../typings/domain";
+import type { Extension } from "../../../typings/domain";
 import { ExtensionList } from "../../binary";
 import { HandshakeType } from "../../const";
 import { DtlsRandom } from "../../random";

@@ -1,4 +1,4 @@
-import { RemoteInfo, Socket } from "dgram";
+import type { RemoteInfo, Socket } from "dgram";
 
 export interface Transport {
   onData?: (buf: Buffer) => void;
@@ -7,7 +7,10 @@ export interface Transport {
 }
 
 export class UdpTransport implements Transport {
-  constructor(private upd: Socket, private rinfo: Partial<RemoteInfo>) {
+  constructor(
+    private upd: Socket,
+    private rinfo: Partial<RemoteInfo>,
+  ) {
     upd.on("message", (buf, target) => {
       this.rinfo = target;
       if (this.onData) this.onData(buf);

@@ -2,7 +2,7 @@ import inRange from "lodash/inRange";
 
 import { HashAlgorithm } from "../../../dtls/src/cipher/const";
 import {
-  RTCDataChannel,
+  type RTCDataChannel,
   RTCPeerConnection,
   createSelfSignedCertificate,
 } from "../../src";

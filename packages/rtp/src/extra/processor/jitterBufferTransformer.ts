@@ -2,9 +2,9 @@ import { TransformStream } from "stream/web";
 
 import {
   JitterBufferBase,
-  JitterBufferInput,
-  JitterBufferOptions,
-  JitterBufferOutput,
+  type JitterBufferInput,
+  type JitterBufferOptions,
+  type JitterBufferOutput,
 } from "./jitterBuffer";
 
 export const jitterBufferTransformer = (

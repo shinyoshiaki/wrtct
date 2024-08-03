@@ -3,14 +3,14 @@ import { setTimeout } from "timers/promises";
 
 import { uint8Add, uint16Add, uint24 } from "../../../../common/src";
 import {
-  PacketStatus,
+  type PacketStatus,
   RecvDelta,
   RtcpTransportLayerFeedback,
   RunLengthChunk,
-  StatusVectorChunk,
+  type StatusVectorChunk,
   TransportWideCC,
 } from "../../../../rtp/src";
-import { RTCDtlsTransport } from "../../transport/dtls";
+import type { RTCDtlsTransport } from "../../transport/dtls";
 import { microTime } from "../../utils";
 
 const log = debug("werift:packages/webrtc/media/receiver/receiverTwcc");

@@ -1,7 +1,7 @@
 import { RtpHeader, RtpPacket } from "../../src/rtp/rtp";
-import { Config } from "../../src/srtp/session";
+import type { Config } from "../../src/srtp/session";
 import { SrtpSession } from "../../src/srtp/srtp";
-import { Transport } from "../../src/transport";
+import type { Transport } from "../../src/transport";
 import { createMockTransportPair } from "../utils";
 
 function buildSessionSRTPPair(): [

@@ -2,15 +2,15 @@ import debug from "debug";
 import Event from "rx.mini";
 
 import {
-  DepacketizerCodec,
-  RtpHeader,
-  RtpPacket,
+  type DepacketizerCodec,
+  type RtpHeader,
+  type RtpPacket,
   dePacketizeRtpPackets,
   enumerate,
   uint16Add,
   uint16Gt,
 } from "../..";
-import { Processor } from "./interface";
+import type { Processor } from "./interface";
 
 const path = `werift-rtp : packages/rtp/src/processor/depacketizer.ts`;
 const log = debug(path);

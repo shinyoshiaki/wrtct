@@ -1,6 +1,6 @@
-import { RtpPacket } from "../rtp/rtp";
+import type { RtpPacket } from "../rtp/rtp";
 import { AV1RtpPayload } from "./av1";
-import { DePacketizerBase } from "./base";
+import type { DePacketizerBase } from "./base";
 import { H264RtpPayload } from "./h264";
 import { OpusRtpPayload } from "./opus";
 import { Vp8RtpPayload } from "./vp8";

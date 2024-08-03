@@ -1,7 +1,7 @@
 import Event from "rx.mini";
 
-import { RtcpPacket } from "../..";
-import { SimpleProcessorCallback } from "./interface";
+import type { RtcpPacket } from "../..";
+import type { SimpleProcessorCallback } from "./interface";
 
 export type RtcpInput = RtcpPacket;
 

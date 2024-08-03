@@ -104,7 +104,7 @@ export function getBit(bits: number, startIndex: number, length: number = 1) {
   let bin = bits.toString(2).split("");
   bin = [...Array(8 - bin.length).fill("0"), ...bin];
   const s = bin.slice(startIndex, startIndex + length).join("");
-  const v = parseInt(s, 2);
+  const v = Number.parseInt(s, 2);
   return v;
 }
 

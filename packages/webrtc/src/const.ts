@@ -6,7 +6,7 @@ import {
   ProtectionProfileAeadAes128Gcm,
   ProtectionProfileAes128CmHmacSha1_80,
 } from "../../dtls/src/context/srtp";
-import { DtlsRole } from "./transport/dtls";
+import type { DtlsRole } from "./transport/dtls";
 
 // data channel export constants
 export const DATA_CHANNEL_ACK = 2;

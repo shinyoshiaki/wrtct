@@ -2,8 +2,8 @@
 // pion/rtp
 
 import { BitStream, getBit } from "../../../common/src";
-import { RtpHeader } from "../rtp/rtp";
-import { DePacketizerBase } from "./base";
+import type { RtpHeader } from "../rtp/rtp";
+import type { DePacketizerBase } from "./base";
 
 // FU indicator octet
 // +---------------+

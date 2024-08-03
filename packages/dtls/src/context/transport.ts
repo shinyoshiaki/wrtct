@@ -1,4 +1,4 @@
-import { Transport } from "../transport";
+import type { Transport } from "../transport";
 
 export class TransportContext {
   constructor(public socket: Transport) {}

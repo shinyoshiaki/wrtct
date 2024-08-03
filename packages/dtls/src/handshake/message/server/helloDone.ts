@@ -1,7 +1,7 @@
 import { decode, encode } from "@shinyoshiaki/binary-data";
 
 import { FragmentedHandshake } from "../../../record/message/fragment";
-import { Handshake } from "../../../typings/domain";
+import type { Handshake } from "../../../typings/domain";
 import { HandshakeType } from "../../const";
 
 // 7.4.5.  Server Hello Done

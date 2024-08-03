@@ -1,10 +1,10 @@
 import { debug } from "debug";
 
-import { HashAlgorithms, SignatureAlgorithms } from "../cipher/const";
-import { SessionTypes } from "../cipher/suites/abstract";
-import { FragmentedHandshake } from "../record/message/fragment";
-import { Options } from "../socket";
-import { Handshake } from "../typings/domain";
+import type { HashAlgorithms, SignatureAlgorithms } from "../cipher/const";
+import type { SessionTypes } from "../cipher/suites/abstract";
+import type { FragmentedHandshake } from "../record/message/fragment";
+import type { Options } from "../socket";
+import type { Handshake } from "../typings/domain";
 
 const log = debug("werift-dtls : packages/dtls/src/context/dtls.ts : log");
 
@@ -32,7 +32,10 @@ export class DtlsContext {
   }[] = [];
   remoteExtendedMasterSecret = false;
 
-  constructor(public options: Options, public sessionType: SessionTypes) {}
+  constructor(
+    public options: Options,
+    public sessionType: SessionTypes,
+  ) {}
 
   get sessionId() {
     return this.cookie ? this.cookie.toString("hex").slice(0, 10) : "";
@@ -41,8 +44,9 @@ export class DtlsContext {
   get sortedHandshakeCache() {
     return Object.entries(this.handshakeCache)
       .sort(([a], [b]) => Number(a) - Number(b))
-      .map(([, { data }]) => data.sort((a, b) => a.message_seq - b.message_seq))
-      .flatMap((v) => v);
+      .flatMap(([, { data }]) =>
+        data.sort((a, b) => a.message_seq - b.message_seq),
+      );
   }
 
   checkHandshakesExist = (handshakes: number[]) =>

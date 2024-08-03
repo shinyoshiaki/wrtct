@@ -1,4 +1,4 @@
-import { Direction } from "./rtpTransceiver";
+import type { Direction } from "./rtpTransceiver";
 
 export interface RTCRtpParameters {
   codecs: RTCRtpCodecParameters[];

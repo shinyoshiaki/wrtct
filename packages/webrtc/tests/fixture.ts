@@ -5,7 +5,7 @@ import {
   RTCIceGatherer,
   RTCIceTransport,
   RTCPeerConnection,
-  RTCSessionDescription,
+  type RTCSessionDescription,
   RtpHeader,
   RtpPacket,
   defaultPeerConfig,

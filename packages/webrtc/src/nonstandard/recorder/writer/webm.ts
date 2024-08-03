@@ -2,7 +2,7 @@ import { unlink } from "fs/promises";
 import { EventDisposer } from "rx.mini";
 
 import { MediaWriter } from ".";
-import { MediaStreamTrack, WeriftError } from "../../..";
+import { type MediaStreamTrack, WeriftError } from "../../..";
 import {
   DepacketizeCallback,
   JitterBufferCallback,
@@ -10,7 +10,7 @@ import {
   NtpTimeCallback,
   RtcpSourceCallback,
   RtpSourceCallback,
-  SupportedCodec,
+  type SupportedCodec,
   WebmCallback,
   saveToFileSystem,
 } from "../../../../../rtp/src/extra";

@@ -1,5 +1,5 @@
 import { SimpleProcessorCallbackBase } from "./interface";
-import { RtpTimeBase, RtpTimeInput, RtpTimeOutput } from "./rtpTime";
+import { RtpTimeBase, type RtpTimeInput, type RtpTimeOutput } from "./rtpTime";
 
 export class RtpTimeCallback extends SimpleProcessorCallbackBase<
   RtpTimeInput,

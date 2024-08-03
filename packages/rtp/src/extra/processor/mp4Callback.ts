@@ -1,8 +1,8 @@
 import { appendFile } from "fs/promises";
 
 import { PromiseQueue } from "../..";
-import { MP4Base, Mp4Input, Mp4Output, Track } from "./mp4";
-import { WebmOption } from "./webm";
+import { MP4Base, type Mp4Input, type Mp4Output, type Track } from "./mp4";
+import type { WebmOption } from "./webm";
 
 export class MP4Callback extends MP4Base {
   private cb?: (input: Mp4Output) => Promise<void>;

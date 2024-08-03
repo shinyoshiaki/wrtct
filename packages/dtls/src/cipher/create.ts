@@ -1,5 +1,5 @@
 import {
-  KeyExchange,
+  type KeyExchange,
   createECDHEECDSAKeyExchange,
   createECDHEPSKKeyExchange,
   createECDHERSAKeyExchange,

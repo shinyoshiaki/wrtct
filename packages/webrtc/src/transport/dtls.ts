@@ -7,22 +7,22 @@ import { v4 } from "uuid";
 import {
   DtlsClient,
   DtlsServer,
-  DtlsSocket,
-  Transport,
+  type DtlsSocket,
+  type Transport,
 } from "../../../dtls/src";
 import {
   HashAlgorithm,
   NamedCurveAlgorithm,
   SignatureAlgorithm,
-  SignatureHash,
+  type SignatureHash,
 } from "../../../dtls/src/cipher/const";
 import { CipherContext } from "../../../dtls/src/context/cipher";
-import { Profile } from "../../../dtls/src/context/srtp";
-import { Connection } from "../../../ice/src";
+import type { Profile } from "../../../dtls/src/context/srtp";
+import type { Connection } from "../../../ice/src";
 import {
-  RtcpPacket,
+  type RtcpPacket,
   RtcpPacketConverter,
-  RtpHeader,
+  type RtpHeader,
   RtpPacket,
   SrtcpSession,
   SrtpSession,
@@ -30,10 +30,10 @@ import {
   isRtcp,
 } from "../../../rtp/src";
 import { keyLength, saltLength } from "../../../rtp/src/srtp/const";
-import { RtpRouter } from "../media/router";
-import { PeerConfig } from "../peerConnection";
+import type { RtpRouter } from "../media/router";
+import type { PeerConfig } from "../peerConnection";
 import { fingerprint, isDtls } from "../utils";
-import { RTCIceTransport } from "./ice";
+import type { RTCIceTransport } from "./ice";
 
 const log = debug("werift:packages/webrtc/src/transport/dtls.ts");
 
@@ -329,7 +329,10 @@ export type DtlsKeys = {
 };
 
 export class RTCDtlsFingerprint {
-  constructor(public algorithm: string, public value: string) {}
+  constructor(
+    public algorithm: string,
+    public value: string,
+  ) {}
 }
 
 export class RTCDtlsParameters {

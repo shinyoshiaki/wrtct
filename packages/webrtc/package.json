@@ -70,7 +70,6 @@
     "@types/aes-js": "^3.1.1",
     "@types/debug": "^4.1.7",
     "@types/ip": "^1.1.0",
-    "@types/jest": "^29.2.4",
     "@types/lodash": "^4.14.191",
     "@types/node": "^18.11.18",
     "@types/uuid": "^9.0.0"

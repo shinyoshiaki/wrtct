@@ -8,10 +8,10 @@ import {
   prfMasterSecret,
   prfPreMasterSecret,
 } from "../../cipher/prf";
-import { CipherContext } from "../../context/cipher";
-import { DtlsContext } from "../../context/dtls";
-import { Profile, SrtpContext } from "../../context/srtp";
-import { TransportContext } from "../../context/transport";
+import type { CipherContext } from "../../context/cipher";
+import type { DtlsContext } from "../../context/dtls";
+import { type Profile, SrtpContext } from "../../context/srtp";
+import type { TransportContext } from "../../context/transport";
 import { HandshakeType } from "../../handshake/const";
 import { ExtendedMasterSecret } from "../../handshake/extensions/extendedMasterSecret";
 import { RenegotiationIndication } from "../../handshake/extensions/renegotiationIndication";
@@ -29,7 +29,7 @@ import { DtlsRandom } from "../../handshake/random";
 import { dumpBuffer } from "../../helper";
 import { createPlaintext } from "../../record/builder";
 import { ContentType } from "../../record/const";
-import { FragmentedHandshake } from "../../record/message/fragment";
+import type { FragmentedHandshake } from "../../record/message/fragment";
 import { Flight } from "../flight";
 
 const log = debug(
@@ -235,17 +235,18 @@ handlers[HandshakeType.server_hello_2] =
     if (message.extensions) {
       message.extensions.forEach((extension) => {
         switch (extension.type) {
-          case UseSRTP.type: {
-            const useSrtp = UseSRTP.fromData(extension.data);
-            const profile = SrtpContext.findMatchingSRTPProfile(
-              useSrtp.profiles as Profile[],
-              dtls.options.srtpProfiles || [],
-            );
-            log(dtls.sessionId, "selected srtp profile", profile);
-            if (profile == undefined) return;
-            srtp.srtpProfile = profile;
-          }
-          break;
+          case UseSRTP.type:
+            {
+              const useSrtp = UseSRTP.fromData(extension.data);
+              const profile = SrtpContext.findMatchingSRTPProfile(
+                useSrtp.profiles as Profile[],
+                dtls.options.srtpProfiles || [],
+              );
+              log(dtls.sessionId, "selected srtp profile", profile);
+              if (profile == undefined) return;
+              srtp.srtpProfile = profile;
+            }
+            break;
           case ExtendedMasterSecret.type:
             dtls.remoteExtendedMasterSecret = true;
             break;

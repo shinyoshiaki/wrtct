@@ -1,8 +1,8 @@
 import {
-  LipSyncOptions,
+  type LipSyncOptions,
   LipsyncBase,
-  LipsyncInput,
-  LipsyncOutput,
+  type LipsyncInput,
+  type LipsyncOutput,
 } from "./lipsync";
 
 export class LipsyncCallback extends LipsyncBase {

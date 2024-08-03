@@ -2,12 +2,12 @@ import Event from "rx.mini";
 
 import { OpusRtpPayload, buffer2ArrayBuffer } from "../..";
 import {
-  DataType,
+  type DataType,
   Mp4Container,
-  Mp4SupportedCodec,
+  type Mp4SupportedCodec,
   annexb2avcc,
 } from "../container/mp4";
-import { AVProcessor } from "./interface";
+import type { AVProcessor } from "./interface";
 
 export type Mp4Input = {
   frame?: {

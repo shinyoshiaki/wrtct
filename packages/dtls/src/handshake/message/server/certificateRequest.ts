@@ -1,8 +1,11 @@
 import { decode, encode, types } from "@shinyoshiaki/binary-data";
 
-import { HashAlgorithms, SignatureAlgorithms } from "../../../cipher/const";
+import type {
+  HashAlgorithms,
+  SignatureAlgorithms,
+} from "../../../cipher/const";
 import { FragmentedHandshake } from "../../../record/message/fragment";
-import { Handshake } from "../../../typings/domain";
+import type { Handshake } from "../../../typings/domain";
 import {
   ClientCertificateType,
   DistinguishedName,

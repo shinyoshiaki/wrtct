@@ -1,11 +1,11 @@
 import { TransformStream } from "stream/web";
 
-import { DepacketizerCodec } from "../../codec";
+import type { DepacketizerCodec } from "../../codec";
 import {
   DepacketizeBase,
-  DepacketizerInput,
-  DepacketizerOptions,
-  DepacketizerOutput,
+  type DepacketizerInput,
+  type DepacketizerOptions,
+  type DepacketizerOutput,
 } from "./depacketizer";
 
 export const depacketizeTransformer = (

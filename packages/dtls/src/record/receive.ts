@@ -1,7 +1,7 @@
 import debug from "debug";
 
-import { CipherContext } from "../context/cipher";
-import { DtlsContext } from "../context/dtls";
+import type { CipherContext } from "../context/cipher";
+import type { DtlsContext } from "../context/dtls";
 import { Alert } from "../handshake/message/alert";
 import { AlertDesc, ContentType } from "./const";
 import { FragmentedHandshake } from "./message/fragment";

@@ -20,7 +20,7 @@
     "client": "ts-node --files --project tsconfig.json examples/client.ts",
     "format": "biome check --apply src",
     "server": "ts-node --files --project tsconfig.json examples/server.ts",
-    "test": "npm run type && jest --forceExit",
+    "test": "npm run type && vitest run ./tests",
     "type": "tsc --noEmit -p .",
     "unused": "organize-imports-cli **/*.ts",
     "upgrade-interactive": "npx npm-check-updates -i"

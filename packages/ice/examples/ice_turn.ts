@@ -1,10 +1,10 @@
 import { setTimeout } from "timers/promises";
-import { Address, Connection } from "../src";
+import { type Address, Connection } from "../src";
 
 const url2Address = (url?: string) => {
   if (!url) return;
   const [address, port] = url.split(":");
-  return [address, parseInt(port)] as Address;
+  return [address, Number.parseInt(port)] as Address;
 };
 const address: Address = url2Address("turn.werift.com:443")!;
 const username = "";

@@ -1,7 +1,7 @@
 import {
   DepacketizeBase,
-  DepacketizerInput,
-  DepacketizerOutput,
+  type DepacketizerInput,
+  type DepacketizerOutput,
 } from "./depacketizer";
 import { SimpleProcessorCallbackBase } from "./interface";
 

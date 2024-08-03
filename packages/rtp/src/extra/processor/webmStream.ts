@@ -1,11 +1,16 @@
 import {
   ReadableStream,
-  ReadableStreamController,
+  type ReadableStreamController,
   WritableStream,
 } from "stream/web";
 
-import { SupportedCodec } from "../container/webm/container";
-import { WebmBase, WebmInput, WebmOption, WebmOutput } from "./webm";
+import type { SupportedCodec } from "../container/webm/container";
+import {
+  WebmBase,
+  type WebmInput,
+  type WebmOption,
+  type WebmOutput,
+} from "./webm";
 
 export type WebmStreamOutput = WebmOutput;
 

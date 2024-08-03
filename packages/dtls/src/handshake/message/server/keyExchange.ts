@@ -1,8 +1,8 @@
 import { decode, types } from "@shinyoshiaki/binary-data";
 
-import { CurveTypes, NamedCurveAlgorithms } from "../../../cipher/const";
+import type { CurveTypes, NamedCurveAlgorithms } from "../../../cipher/const";
 import { FragmentedHandshake } from "../../../record/message/fragment";
-import { Handshake } from "../../../typings/domain";
+import type { Handshake } from "../../../typings/domain";
 import { encodeBuffer } from "../../../util/binary";
 import { HandshakeType } from "../../const";
 

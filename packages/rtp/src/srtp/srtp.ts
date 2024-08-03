@@ -1,6 +1,6 @@
-import { RtpHeader } from "../rtp/rtp";
+import type { RtpHeader } from "../rtp/rtp";
 import { SrtpContext } from "./context/srtp";
-import { Config, Session } from "./session";
+import { type Config, Session } from "./session";
 
 export class SrtpSession extends Session<SrtpContext> {
   constructor(public config: Config) {

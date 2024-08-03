@@ -1,16 +1,16 @@
 import Event from "rx.mini";
 import * as uuid from "uuid";
 
-import { RTCDtlsTransport } from "..";
+import type { RTCDtlsTransport } from "..";
 import { SenderDirections } from "../const";
-import { Kind } from "../types/domain";
-import {
+import type { Kind } from "../types/domain";
+import type {
   RTCRtpCodecParameters,
   RTCRtpHeaderExtensionParameters,
 } from "./parameters";
-import { RTCRtpReceiver } from "./rtpReceiver";
-import { RTCRtpSender } from "./rtpSender";
-import { MediaStreamTrack } from "./track";
+import type { RTCRtpReceiver } from "./rtpReceiver";
+import type { RTCRtpSender } from "./rtpSender";
+import type { MediaStreamTrack } from "./track";
 
 export class RTCRtpTransceiver {
   readonly id = uuid.v4();

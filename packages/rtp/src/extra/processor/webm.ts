@@ -6,8 +6,8 @@ import {
   numberToByteArray,
   vintEncode,
 } from "../container";
-import { SupportedCodec } from "../container/webm";
-import { AVProcessor } from "./interface";
+import type { SupportedCodec } from "../container/webm";
+import type { AVProcessor } from "./interface";
 
 export type WebmInput = {
   frame?: {

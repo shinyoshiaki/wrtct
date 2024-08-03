@@ -5,24 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Jest Target Test",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceRoot}/node_modules/.bin/jest",
-      "protocol": "inspector",
-      "args": [
-        "--runInBand",
-        "--forceExit",
-        "--detectOpenHandles",
-        "./packages/webrtc/tests"
-      ],
-      "windows": {
-        "program": "${workspaceRoot}/node_modules/jest/bin/jest.js"
-      },
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
-    },
-    {
       "name": "ts-node",
       "type": "node",
       "request": "launch",

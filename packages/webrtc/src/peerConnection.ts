@@ -5,24 +5,24 @@ import Event from "rx.mini";
 import * as uuid from "uuid";
 
 import {
-  Address,
-  CandidatePair,
-  InterfaceAddresses,
+  type Address,
+  type CandidatePair,
+  type InterfaceAddresses,
   Recvonly,
   Sendonly,
   Sendrecv,
   deepMerge,
 } from ".";
 import {
-  DtlsKeys,
+  type DtlsKeys,
   codecParametersFromString,
   useNACK,
   usePLI,
   useREMB,
 } from ".";
-import { Profile } from "../../dtls/src/context/srtp";
-import { Message } from "../../ice/src/stun/message";
-import { Protocol } from "../../ice/src/types/model";
+import type { Profile } from "../../dtls/src/context/srtp";
+import type { Message } from "../../ice/src/stun/message";
+import type { Protocol } from "../../ice/src/types/model";
 import {
   DISCARD_HOST,
   DISCARD_PORT,
@@ -35,9 +35,9 @@ import { EventTarget, enumerate } from "./helper";
 import {
   RTCRtpCodecParameters,
   RTCRtpCodingParameters,
-  RTCRtpHeaderExtensionParameters,
-  RTCRtpParameters,
-  RTCRtpReceiveParameters,
+  type RTCRtpHeaderExtensionParameters,
+  type RTCRtpParameters,
+  type RTCRtpReceiveParameters,
   RTCRtpRtxParameters,
   RTCRtpSimulcastParameters,
 } from "./media/parameters";
@@ -45,11 +45,11 @@ import { RtpRouter } from "./media/router";
 import { RTCRtpReceiver } from "./media/rtpReceiver";
 import { RTCRtpSender } from "./media/rtpSender";
 import {
-  Direction,
+  type Direction,
   RTCRtpTransceiver,
-  TransceiverOptions,
+  type TransceiverOptions,
 } from "./media/rtpTransceiver";
-import { MediaStream, MediaStreamTrack } from "./media/track";
+import { MediaStream, type MediaStreamTrack } from "./media/track";
 import {
   GroupDescription,
   MediaDescription,
@@ -60,15 +60,15 @@ import {
 import { RTCCertificate, RTCDtlsTransport } from "./transport/dtls";
 import {
   IceCandidate,
-  IceGathererState,
-  RTCIceCandidate,
-  RTCIceConnectionState,
+  type IceGathererState,
+  type RTCIceCandidate,
+  type RTCIceConnectionState,
   RTCIceGatherer,
   RTCIceTransport,
 } from "./transport/ice";
 import { RTCSctpTransport } from "./transport/sctp";
-import { ConnectionState, Kind, RTCSignalingState } from "./types/domain";
-import { Callback, CallbackWithValue } from "./types/util";
+import type { ConnectionState, Kind, RTCSignalingState } from "./types/domain";
+import type { Callback, CallbackWithValue } from "./types/util";
 import {
   andDirection,
   parseIceServers,
@@ -168,18 +168,20 @@ export class RTCPeerConnection extends EventTarget {
 
       codecParams.payloadType = 96 + i;
       switch (codecParams.name.toLowerCase()) {
-        case "rtx": {
-          codecParams.parameters = `apt=${codecParams.payloadType - 1}`;
-        }
-        break;
-        case "red": {
-          if (codecParams.contentType === "audio") {
-            const redundant = codecParams.payloadType + 1;
-            codecParams.parameters = `${redundant}/${redundant}`;
-            codecParams.payloadType = 63;
+        case "rtx":
+          {
+            codecParams.parameters = `apt=${codecParams.payloadType - 1}`;
           }
-        }
-        break;
+          break;
+        case "red":
+          {
+            if (codecParams.contentType === "audio") {
+              const redundant = codecParams.payloadType + 1;
+              codecParams.parameters = `${redundant}/${redundant}`;
+              codecParams.payloadType = 63;
+            }
+          }
+          break;
       }
     }
 

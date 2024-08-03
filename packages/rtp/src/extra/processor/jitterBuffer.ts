@@ -1,13 +1,13 @@
 import {
-  RequireAtLeastOne,
-  RtpPacket,
+  type RequireAtLeastOne,
+  type RtpPacket,
   uint16Add,
   uint16Gte,
   uint32Add,
   uint32Gt,
 } from "../..";
-import { Processor } from "./interface";
-import { RtpOutput } from "./rtpCallback";
+import type { Processor } from "./interface";
+import type { RtpOutput } from "./rtpCallback";
 
 export type JitterBufferInput = RtpOutput;
 

@@ -91,64 +91,67 @@ export class RtpHeader {
 
       switch (h.extensionProfile) {
         // RFC 8285 RTP One Byte Header Extension
-        case ExtensionProfiles.OneByte: {
-          const end = currOffset + extensionLength;
-          while (currOffset < end) {
-            if (rawPacket[currOffset] === 0x00) {
-              currOffset++;
-              continue;
-            }
+        case ExtensionProfiles.OneByte:
+          {
+            const end = currOffset + extensionLength;
+            while (currOffset < end) {
+              if (rawPacket[currOffset] === 0x00) {
+                currOffset++;
+                continue;
+              }
 
-            const extId = rawPacket[currOffset] >> 4;
-            const len =
-              (rawPacket[currOffset] & (rawPacket[currOffset] ^ 0xf0)) + 1; // and not &^
-            currOffset++;
-            if (extId === 0xf) {
-              break;
+              const extId = rawPacket[currOffset] >> 4;
+              const len =
+                (rawPacket[currOffset] & (rawPacket[currOffset] ^ 0xf0)) + 1; // and not &^
+              currOffset++;
+              if (extId === 0xf) {
+                break;
+              }
+              const extension: Extension = {
+                id: extId,
+                payload: rawPacket.subarray(currOffset, currOffset + len),
+              };
+              h.extensions = [...h.extensions, extension];
+              currOffset += len;
             }
-            const extension: Extension = {
-              id: extId,
-              payload: rawPacket.subarray(currOffset, currOffset + len),
-            };
-            h.extensions = [...h.extensions, extension];
-            currOffset += len;
           }
-        }
-        break;
+          break;
         // RFC 8285 RTP Two Byte Header Extension
-        case ExtensionProfiles.TwoByte: {
-          const end = currOffset + extensionLength;
-          while (currOffset < end) {
-            if (rawPacket[currOffset] === 0x00) {
+        case ExtensionProfiles.TwoByte:
+          {
+            const end = currOffset + extensionLength;
+            while (currOffset < end) {
+              if (rawPacket[currOffset] === 0x00) {
+                currOffset++;
+                continue;
+              }
+              const extId = rawPacket[currOffset];
               currOffset++;
-              continue;
-            }
-            const extId = rawPacket[currOffset];
-            currOffset++;
-            const len = rawPacket[currOffset];
-            currOffset++;
+              const len = rawPacket[currOffset];
+              currOffset++;
 
+              const extension: Extension = {
+                id: extId,
+                payload: rawPacket.subarray(currOffset, currOffset + len),
+              };
+              h.extensions = [...h.extensions, extension];
+              currOffset += len;
+            }
+          }
+          break;
+        default:
+          {
             const extension: Extension = {
-              id: extId,
-              payload: rawPacket.subarray(currOffset, currOffset + len),
+              id: 0,
+              payload: rawPacket.subarray(
+                currOffset,
+                currOffset + extensionLength,
+              ),
             };
             h.extensions = [...h.extensions, extension];
-            currOffset += len;
+            currOffset += h.extensions[0].payload.length;
           }
-        }
-        break;
-        default: {
-          const extension: Extension = {
-            id: 0,
-            payload: rawPacket.subarray(
-              currOffset,
-              currOffset + extensionLength,
-            ),
-          };
-          h.extensions = [...h.extensions, extension];
-          currOffset += h.extensions[0].payload.length;
-        }
-        break;
+          break;
       }
     }
     h.payloadOffset = currOffset;
@@ -266,7 +269,10 @@ export class RtpHeader {
 }
 
 export class RtpPacket {
-  constructor(public header: RtpHeader, public payload: Buffer) {}
+  constructor(
+    public header: RtpHeader,
+    public payload: Buffer,
+  ) {}
 
   get serializeSize() {
     return this.header.serializeSize + this.payload.length;

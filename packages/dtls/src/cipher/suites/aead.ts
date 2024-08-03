@@ -4,7 +4,11 @@ import debug from "debug";
 import { createDecode, encode, types } from "@shinyoshiaki/binary-data";
 import { dumpBuffer, getObjectSummary } from "../../helper";
 import { prfEncryptionKeys } from "../prf";
-import Cipher, { CipherHeader, SessionType, SessionTypes } from "./abstract";
+import Cipher, {
+  type CipherHeader,
+  SessionType,
+  type SessionTypes,
+} from "./abstract";
 
 const { uint8, uint16be, uint48be } = types;
 

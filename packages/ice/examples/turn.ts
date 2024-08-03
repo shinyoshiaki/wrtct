@@ -2,7 +2,7 @@ import { createSocket } from "dgram";
 import { randomPort } from "../../common/src";
 import { getGlobalIp } from "../src";
 import { createTurnEndpoint } from "../src/turn/protocol";
-import { Address } from "../src/types/model";
+import type { Address } from "../src/types/model";
 
 const address: Address = ["turn.com", 443];
 const username = "";

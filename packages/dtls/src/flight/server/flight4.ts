@@ -1,10 +1,10 @@
 import debug from "debug";
 
 import { CurveType, certificateTypes, signatures } from "../../cipher/const";
-import { CipherContext } from "../../context/cipher";
-import { DtlsContext } from "../../context/dtls";
-import { SrtpContext } from "../../context/srtp";
-import { TransportContext } from "../../context/transport";
+import type { CipherContext } from "../../context/cipher";
+import type { DtlsContext } from "../../context/dtls";
+import type { SrtpContext } from "../../context/srtp";
+import type { TransportContext } from "../../context/transport";
 import { ExtendedMasterSecret } from "../../handshake/extensions/extendedMasterSecret";
 import { RenegotiationIndication } from "../../handshake/extensions/renegotiationIndication";
 import { UseSRTP } from "../../handshake/extensions/useSrtp";
@@ -13,8 +13,8 @@ import { ServerCertificateRequest } from "../../handshake/message/server/certifi
 import { ServerHello } from "../../handshake/message/server/hello";
 import { ServerHelloDone } from "../../handshake/message/server/helloDone";
 import { ServerKeyExchange } from "../../handshake/message/server/keyExchange";
-import { FragmentedHandshake } from "../../record/message/fragment";
-import { Extension } from "../../typings/domain";
+import type { FragmentedHandshake } from "../../record/message/fragment";
+import type { Extension } from "../../typings/domain";
 import { Flight } from "../flight";
 
 const log = debug("werift-dtls : packages/dtls/flight/server/flight4.ts : log");

@@ -1,5 +1,5 @@
 import { bufferWriter } from "../../../common/src";
-import { RtcpHeader } from "./header";
+import type { RtcpHeader } from "./header";
 import { RtcpPacketConverter } from "./rtcp";
 
 export class RtcpSourceDescriptionPacket {

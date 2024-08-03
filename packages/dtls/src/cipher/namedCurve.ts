@@ -1,6 +1,6 @@
 import nacl from "tweetnacl";
 
-import { NamedCurveAlgorithm, NamedCurveAlgorithms } from "./const";
+import { NamedCurveAlgorithm, type NamedCurveAlgorithms } from "./const";
 import { p256Keypair } from "./ec";
 
 export interface NamedCurveKeyPair {

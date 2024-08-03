@@ -71,7 +71,10 @@ export class OutgoingSSNResetRequestParam {
 export class StreamAddOutgoingParam {
   static type = 17; // Add Outgoing Streams Request Parameter
 
-  constructor(public requestSequence: number, public newStreams: number) {}
+  constructor(
+    public requestSequence: number,
+    public newStreams: number,
+  ) {}
 
   get type() {
     return StreamAddOutgoingParam.type;
@@ -114,7 +117,10 @@ type ReconfigResult = (typeof reconfigResult)[keyof typeof reconfigResult];
 
 export class ReconfigResponseParam {
   static type = 16; // Re-configuration Response Parameter
-  constructor(public responseSequence: number, public result: ReconfigResult) {}
+  constructor(
+    public responseSequence: number,
+    public result: ReconfigResult,
+  ) {}
 
   get type() {
     return ReconfigResponseParam.type;

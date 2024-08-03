@@ -2,7 +2,7 @@ import debug from "debug";
 import Event from "rx.mini";
 import { v4 } from "uuid";
 
-import { Candidate, Connection, IceOptions } from "../../../ice/src";
+import { Candidate, Connection, type IceOptions } from "../../../ice/src";
 import { candidateFromSdp, candidateToSdp } from "../sdp";
 
 const log = debug("werift:packages/webrtc/src/transport/ice.ts");

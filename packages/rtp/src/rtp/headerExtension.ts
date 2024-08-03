@@ -1,5 +1,5 @@
 import { BitStream, bufferReader, bufferWriter } from "../../../common/src";
-import { Extension } from "./rtp";
+import type { Extension } from "./rtp";
 
 export const RTP_EXTENSION_URI = {
   sdesMid: "urn:ietf:params:rtp-hdrext:sdes:mid",

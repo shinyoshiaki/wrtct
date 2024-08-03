@@ -58,7 +58,10 @@ export class Connection {
   private queryConsentHandle?: Future;
   private promiseGatherCandidates?: Event<[]>;
 
-  constructor(public iceControlling: boolean, options?: Partial<IceOptions>) {
+  constructor(
+    public iceControlling: boolean,
+    options?: Partial<IceOptions>,
+  ) {
     this.options = {
       ...defaultOptions,
       ...options,
@@ -982,7 +985,10 @@ export class CandidatePair {
     };
   }
 
-  constructor(public protocol: Protocol, public remoteCandidate: Candidate) {}
+  constructor(
+    public protocol: Protocol,
+    public remoteCandidate: Candidate,
+  ) {}
 
   updateState(state: CandidatePairState) {
     this._state = state;

@@ -1,6 +1,6 @@
 import { bufferWriter, bufferWriterLE } from "../../../common/src";
-import { RtpHeader } from "../rtp/rtp";
-import { DePacketizerBase } from "./base";
+import type { RtpHeader } from "../rtp/rtp";
+import type { DePacketizerBase } from "./base";
 
 export class OpusRtpPayload implements DePacketizerBase {
   payload!: Buffer;

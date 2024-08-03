@@ -1,7 +1,7 @@
-import { ReadableStream, ReadableStreamController } from "stream/web";
+import { ReadableStream, type ReadableStreamController } from "stream/web";
 
 import { RtpPacket } from "../../rtp/rtp";
-import { RtpOutput } from "./rtpCallback";
+import type { RtpOutput } from "./rtpCallback";
 
 export class RtpSourceStream {
   readable: ReadableStream<RtpOutput>;

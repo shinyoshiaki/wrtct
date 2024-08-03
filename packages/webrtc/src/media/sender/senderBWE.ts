@@ -1,6 +1,6 @@
 import Event from "rx.mini";
 
-import { TransportWideCC } from "../../../../rtp/src";
+import type { TransportWideCC } from "../../../../rtp/src";
 import { Int } from "../../../../rtp/src/helper";
 import { milliTime } from "../../utils";
 import { CumulativeResult } from "./cumulativeResult";

@@ -1,6 +1,6 @@
 import debug from "debug";
 
-import { RtcpHeader } from "../header";
+import type { RtcpHeader } from "../header";
 import { GenericNack } from "./nack";
 import { TransportWideCC } from "./twcc";
 

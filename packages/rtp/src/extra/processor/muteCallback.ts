@@ -1,5 +1,5 @@
-import { SimpleProcessorCallback } from "./interface";
-import { MuteHandlerBase, MuteInput, MuteOutput } from "./mute";
+import type { SimpleProcessorCallback } from "./interface";
+import { MuteHandlerBase, type MuteInput, type MuteOutput } from "./mute";
 
 export class MuteCallback
   extends MuteHandlerBase

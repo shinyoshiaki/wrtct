@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 
-import { CodecFrame, DepacketizerOutput } from "./depacketizer";
-import { Processor } from "./interface";
+import type { CodecFrame, DepacketizerOutput } from "./depacketizer";
+import type { Processor } from "./interface";
 
 export type DtxInput = DepacketizerOutput;
 
@@ -12,7 +12,10 @@ export class DtxBase implements Processor<DtxInput, DtxOutput> {
   previousTimestamp?: number;
   private fillCount = 0;
   private internalStats = {};
-  constructor(public ptime: number, private dummyPacket: Buffer) {}
+  constructor(
+    public ptime: number,
+    private dummyPacket: Buffer,
+  ) {}
 
   toJSON(): Record<string, any> {
     return { ...this.internalStats, id: this.id, fillCount: this.fillCount };

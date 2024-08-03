@@ -9,7 +9,7 @@ export function growBufferSize(buf: Buffer, size: number) {
 }
 
 export function Int(v: number) {
-  return parseInt(v.toString(), 10);
+  return Number.parseInt(v.toString(), 10);
 }
 
 export const timer = {

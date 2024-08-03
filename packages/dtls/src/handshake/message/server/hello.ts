@@ -1,8 +1,13 @@
 import { decode, encode, types } from "@shinyoshiaki/binary-data";
 
-import { CipherSuites } from "../../../cipher/const";
+import type { CipherSuites } from "../../../cipher/const";
 import { FragmentedHandshake } from "../../../record/message/fragment";
-import { Extension, Handshake, Random, Version } from "../../../typings/domain";
+import type {
+  Extension,
+  Handshake,
+  Random,
+  Version,
+} from "../../../typings/domain";
 import { ExtensionList, ProtocolVersion } from "../../binary";
 import { HandshakeType } from "../../const";
 import { DtlsRandom } from "../../random";

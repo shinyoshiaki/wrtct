@@ -1,11 +1,11 @@
-import { Hmac, createHmac } from "crypto";
+import { type Hmac, createHmac } from "crypto";
 import { AES } from "aes-js";
 
-import { CipherAesBase } from "../cipher";
+import type { CipherAesBase } from "../cipher";
 import { CipherAesCtr } from "../cipher/ctr";
 import { CipherAesGcm } from "../cipher/gcm";
 import {
-  Profile,
+  type Profile,
   ProtectionProfileAeadAes128Gcm,
   ProtectionProfileAes128CmHmacSha1_80,
 } from "../const";

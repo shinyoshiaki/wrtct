@@ -17,7 +17,10 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "noImplicitAny": false,
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "types": [
+      "vitest/globals"
+    ]
   },
   "include": [
     "src",

@@ -30,20 +30,20 @@ import * as uuid from "uuid";
 import { codecParametersFromString } from "..";
 import { random16, uint16Add, uint32Add } from "../../../common/src";
 import {
-  Extension,
+  type Extension,
   GenericNack,
   PictureLossIndication,
   RTP_EXTENSION_URI,
   ReceiverEstimatedMaxBitrate,
   RedEncoder,
-  RtcpPacket,
+  type RtcpPacket,
   RtcpPayloadSpecificFeedback,
   RtcpRrPacket,
   RtcpSenderInfo,
   RtcpSourceDescriptionPacket,
   RtcpSrPacket,
   RtcpTransportLayerFeedback,
-  RtpHeader,
+  type RtpHeader,
   RtpPacket,
   SourceDescriptionChunk,
   SourceDescriptionItem,
@@ -55,16 +55,16 @@ import {
   serializeTransportWideCC,
   wrapRtx,
 } from "../../../rtp/src";
-import { RTCDtlsTransport } from "../transport/dtls";
-import { Kind } from "../types/domain";
+import type { RTCDtlsTransport } from "../transport/dtls";
+import type { Kind } from "../types/domain";
 import { compactNtp, milliTime, ntpTime, timestampSeconds } from "../utils";
-import {
+import type {
   RTCRtpCodecParameters,
   RTCRtpHeaderExtensionParameters,
   RTCRtpSendParameters,
 } from "./parameters";
-import { SenderBandwidthEstimator, SentInfo } from "./sender/senderBWE";
-import { MediaStreamTrack } from "./track";
+import { SenderBandwidthEstimator, type SentInfo } from "./sender/senderBWE";
+import type { MediaStreamTrack } from "./track";
 
 const log = debug("werift:packages/webrtc/src/media/rtpSender.ts");
 
@@ -410,77 +410,90 @@ export class RTCRtpSender {
   handleRtcpPacket(rtcpPacket: RtcpPacket) {
     switch (rtcpPacket.type) {
       case RtcpSrPacket.type:
-      case RtcpRrPacket.type: {
-        const packet = rtcpPacket as RtcpSrPacket | RtcpRrPacket;
-        packet.reports
-          .filter((report) => report.ssrc === this.ssrc)
-          .forEach((report) => {
-            if (this.lastSRtimestamp === report.lsr && report.dlsr) {
-              if (this.lastSentSRTimestamp) {
-                const rtt =
-                  timestampSeconds() -
-                  this.lastSentSRTimestamp -
-                  report.dlsr / 65536;
-                if (this.rtt === undefined) {
-                  this.rtt = rtt;
-                } else {
-                  this.rtt = RTT_ALPHA * this.rtt + (1 - RTT_ALPHA) * rtt;
+      case RtcpRrPacket.type:
+        {
+          const packet = rtcpPacket as RtcpSrPacket | RtcpRrPacket;
+          packet.reports
+            .filter((report) => report.ssrc === this.ssrc)
+            .forEach((report) => {
+              if (this.lastSRtimestamp === report.lsr && report.dlsr) {
+                if (this.lastSentSRTimestamp) {
+                  const rtt =
+                    timestampSeconds() -
+                    this.lastSentSRTimestamp -
+                    report.dlsr / 65536;
+                  if (this.rtt === undefined) {
+                    this.rtt = rtt;
+                  } else {
+                    this.rtt = RTT_ALPHA * this.rtt + (1 - RTT_ALPHA) * rtt;
+                  }
                 }
-              }
-            }
-          });
-      }
-      break;
-      case RtcpTransportLayerFeedback.type: {
-        const packet = rtcpPacket as RtcpTransportLayerFeedback;
-        switch (packet.feedback.count) {
-          case TransportWideCC.count: {
-            const feedback = packet.feedback as TransportWideCC;
-            this.senderBWE.receiveTWCC(feedback);
-          }
-          break;
-          case GenericNack.count: {
-            const feedback = packet.feedback as GenericNack;
-            feedback.lost.forEach(async (seqNum) => {
-              let packet: RtpPacket | undefined =
-                this.rtpCache[seqNum % RTP_HISTORY_SIZE];
-              if (packet && packet.header.sequenceNumber !== seqNum) {
-                packet = undefined;
-              }
-              if (packet) {
-                if (this.rtxPayloadType != undefined) {
-                  packet = wrapRtx(
-                    packet,
-                    this.rtxPayloadType,
-                    this.rtxSequenceNumber,
-                    this.rtxSsrc,
-                  );
-                  this.rtxSequenceNumber = uint16Add(this.rtxSequenceNumber, 1);
-                }
-                await this.dtlsTransport.sendRtp(packet.payload, packet.header);
               }
             });
-            this.onGenericNack.execute(feedback);
-          }
-          break;
         }
-      }
-      break;
-      case RtcpPayloadSpecificFeedback.type: {
-        const packet = rtcpPacket as RtcpPayloadSpecificFeedback;
-        switch (packet.feedback.count) {
-          case ReceiverEstimatedMaxBitrate.count: {
-            const feedback = packet.feedback as ReceiverEstimatedMaxBitrate;
-            this.receiverEstimatedMaxBitrate = feedback.bitrate;
+        break;
+      case RtcpTransportLayerFeedback.type:
+        {
+          const packet = rtcpPacket as RtcpTransportLayerFeedback;
+          switch (packet.feedback.count) {
+            case TransportWideCC.count:
+              {
+                const feedback = packet.feedback as TransportWideCC;
+                this.senderBWE.receiveTWCC(feedback);
+              }
+              break;
+            case GenericNack.count:
+              {
+                const feedback = packet.feedback as GenericNack;
+                feedback.lost.forEach(async (seqNum) => {
+                  let packet: RtpPacket | undefined =
+                    this.rtpCache[seqNum % RTP_HISTORY_SIZE];
+                  if (packet && packet.header.sequenceNumber !== seqNum) {
+                    packet = undefined;
+                  }
+                  if (packet) {
+                    if (this.rtxPayloadType != undefined) {
+                      packet = wrapRtx(
+                        packet,
+                        this.rtxPayloadType,
+                        this.rtxSequenceNumber,
+                        this.rtxSsrc,
+                      );
+                      this.rtxSequenceNumber = uint16Add(
+                        this.rtxSequenceNumber,
+                        1,
+                      );
+                    }
+                    await this.dtlsTransport.sendRtp(
+                      packet.payload,
+                      packet.header,
+                    );
+                  }
+                });
+                this.onGenericNack.execute(feedback);
+              }
+              break;
           }
-          break;
-          case PictureLossIndication.count: {
-            this.onPictureLossIndication.execute();
-          }
-          break;
         }
-      }
-      break;
+        break;
+      case RtcpPayloadSpecificFeedback.type:
+        {
+          const packet = rtcpPacket as RtcpPayloadSpecificFeedback;
+          switch (packet.feedback.count) {
+            case ReceiverEstimatedMaxBitrate.count:
+              {
+                const feedback = packet.feedback as ReceiverEstimatedMaxBitrate;
+                this.receiverEstimatedMaxBitrate = feedback.bitrate;
+              }
+              break;
+            case PictureLossIndication.count:
+              {
+                this.onPictureLossIndication.execute();
+              }
+              break;
+          }
+        }
+        break;
     }
     this.onRtcp.execute(rtcpPacket);
   }

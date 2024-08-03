@@ -20,10 +20,10 @@ export {
 
 import {
   BoxParser,
-  DataStream,
-  MP4AudioTrack,
-  MP4Track,
-  MP4VideoTrack,
+  type DataStream,
+  type MP4AudioTrack,
+  type MP4Track,
+  type MP4VideoTrack,
 } from "mp4box";
 
 export function isAudioTrack(track: MP4Track): track is MP4AudioTrack {

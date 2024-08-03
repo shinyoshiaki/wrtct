@@ -1,7 +1,7 @@
 import Event from "rx.mini";
 
-import { MediaStreamTrack } from "../../media/track";
-import { MediaWriter } from "./writer";
+import type { MediaStreamTrack } from "../../media/track";
+import type { MediaWriter } from "./writer";
 import { WebmFactory } from "./writer/webm";
 
 export class MediaRecorder {

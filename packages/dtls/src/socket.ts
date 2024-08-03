@@ -5,14 +5,14 @@ import { setTimeout } from "timers/promises";
 
 import {
   NamedCurveAlgorithmList,
-  SignatureHash,
+  type SignatureHash,
   signatures,
 } from "./cipher/const";
 import { exportKeyingMaterial } from "./cipher/prf";
-import { SessionType, SessionTypes } from "./cipher/suites/abstract";
+import { SessionType, type SessionTypes } from "./cipher/suites/abstract";
 import { CipherContext } from "./context/cipher";
 import { DtlsContext } from "./context/dtls";
-import { Profile, SrtpContext } from "./context/srtp";
+import { type Profile, SrtpContext } from "./context/srtp";
 import { TransportContext } from "./context/transport";
 import { EllipticCurves } from "./handshake/extensions/ellipticCurves";
 import { ExtendedMasterSecret } from "./handshake/extensions/extendedMasterSecret";
@@ -23,8 +23,8 @@ import { createPlaintext } from "./record/builder";
 import { ContentType } from "./record/const";
 import { FragmentedHandshake } from "./record/message/fragment";
 import { parsePacket, parsePlainText } from "./record/receive";
-import { Transport } from "./transport";
-import { Extension } from "./typings/domain";
+import type { Transport } from "./transport";
+import type { Extension } from "./typings/domain";
 
 const log = debug("werift-dtls : packages/dtls/src/socket.ts : log");
 const err = debug("werift-dtls : packages/dtls/src/socket.ts : err");
@@ -45,7 +45,10 @@ export class DtlsSocket {
 
   private bufferFragmentedHandshakes: FragmentedHandshake[] = [];
 
-  constructor(public options: Options, public sessionType: SessionTypes) {
+  constructor(
+    public options: Options,
+    public sessionType: SessionTypes,
+  ) {
     this.dtls = new DtlsContext(this.options, this.sessionType);
     this.cipher = new CipherContext(
       this.sessionType,
@@ -80,32 +83,34 @@ export class DtlsSocket {
       try {
         const message = parsePlainText(this.dtls, this.cipher)(packet);
         switch (message.type) {
-          case ContentType.handshake: {
-            const handshake = message.data as FragmentedHandshake;
-            const handshakes = this.handleFragmentHandshake([handshake]);
-            const assembled = Object.values(
-              handshakes.reduce(
-                (acc: { [type: string]: FragmentedHandshake[] }, cur) => {
-                  if (!acc[cur.msg_type]) acc[cur.msg_type] = [];
-                  acc[cur.msg_type].push(cur);
-                  return acc;
-                },
-                {},
-              ),
-            )
-              .map((v) => FragmentedHandshake.assemble(v))
-              .sort((a, b) => a.msg_type - b.msg_type);
+          case ContentType.handshake:
+            {
+              const handshake = message.data as FragmentedHandshake;
+              const handshakes = this.handleFragmentHandshake([handshake]);
+              const assembled = Object.values(
+                handshakes.reduce(
+                  (acc: { [type: string]: FragmentedHandshake[] }, cur) => {
+                    if (!acc[cur.msg_type]) acc[cur.msg_type] = [];
+                    acc[cur.msg_type].push(cur);
+                    return acc;
+                  },
+                  {},
+                ),
+              )
+                .map((v) => FragmentedHandshake.assemble(v))
+                .sort((a, b) => a.msg_type - b.msg_type);
 
-            this.onHandleHandshakes(assembled).catch((error) => {
-              err(this.dtls.sessionId, "onHandleHandshakes error", error);
-              this.onError.execute(error);
-            });
-          }
-          break;
-          case ContentType.applicationData: {
-            this.onData.execute(message.data as Buffer);
-          }
-          break;
+              this.onHandleHandshakes(assembled).catch((error) => {
+                err(this.dtls.sessionId, "onHandleHandshakes error", error);
+                this.onError.execute(error);
+              });
+            }
+            break;
+          case ContentType.applicationData:
+            {
+              this.onData.execute(message.data as Buffer);
+            }
+            break;
           case ContentType.alert:
             this.onClose.execute();
             break;
@@ -117,19 +122,13 @@ export class DtlsSocket {
   };
 
   private setupExtensions() {
-    {
-      log(
-        this.dtls.sessionId,
-        "support srtpProfiles",
+    log(this.dtls.sessionId, "support srtpProfiles", this.options.srtpProfiles);
+    if (this.options.srtpProfiles && this.options.srtpProfiles.length > 0) {
+      const useSrtp = UseSRTP.create(
         this.options.srtpProfiles,
+        Buffer.from([0x00]),
       );
-      if (this.options.srtpProfiles && this.options.srtpProfiles.length > 0) {
-        const useSrtp = UseSRTP.create(
-          this.options.srtpProfiles,
-          Buffer.from([0x00]),
-        );
-        this.extensions.push(useSrtp.extension);
-      }
+      this.extensions.push(useSrtp.extension);
     }
 
     {
@@ -144,14 +143,11 @@ export class DtlsSocket {
       signature.data = signatures;
       this.extensions.push(signature.extension);
     }
-
-    {
-      if (this.options.extendedMasterSecret) {
-        this.extensions.push({
-          type: ExtendedMasterSecret.type,
-          data: Buffer.alloc(0),
-        });
-      }
+    if (this.options.extendedMasterSecret) {
+      this.extensions.push({
+        type: ExtendedMasterSecret.type,
+        data: Buffer.alloc(0),
+      });
     }
 
     {
@@ -162,17 +158,15 @@ export class DtlsSocket {
 
   protected waitForReady = (condition: () => boolean) =>
     new Promise<void>(async (r, f) => {
-      {
-        for (let i = 0; i < 10; i++) {
-          if (condition()) {
-            r();
-            break;
-          } else {
-            await setTimeout(100 * i);
-          }
+      for (let i = 0; i < 10; i++) {
+        if (condition()) {
+          r();
+          break;
+        } else {
+          await setTimeout(100 * i);
         }
-        f("waitForReady timeout");
       }
+      f("waitForReady timeout");
     });
 
   handleFragmentHandshake(messages: FragmentedHandshake[]) {

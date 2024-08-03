@@ -1,4 +1,4 @@
-import { DtxBase, DtxInput, DtxOutput } from "./dtx";
+import { DtxBase, type DtxInput, type DtxOutput } from "./dtx";
 import { SimpleProcessorCallbackBase } from "./interface";
 
 export class DtxCallback extends SimpleProcessorCallbackBase<

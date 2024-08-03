@@ -5,21 +5,21 @@ import { decode, encode, types } from "@shinyoshiaki/binary-data";
 import addYears from "date-fns/addYears";
 
 import {
-  CipherSuites,
+  type CipherSuites,
   CurveType,
   HashAlgorithm,
   NamedCurveAlgorithm,
-  NamedCurveAlgorithms,
+  type NamedCurveAlgorithms,
   SignatureAlgorithm,
-  SignatureHash,
+  type SignatureHash,
 } from "../cipher/const";
-import { NamedCurveKeyPair } from "../cipher/namedCurve";
+import type { NamedCurveKeyPair } from "../cipher/namedCurve";
 import { prfVerifyDataClient, prfVerifyDataServer } from "../cipher/prf";
-import { SessionType, SessionTypes } from "../cipher/suites/abstract";
-import AEADCipher from "../cipher/suites/aead";
+import { SessionType, type SessionTypes } from "../cipher/suites/abstract";
+import type AEADCipher from "../cipher/suites/aead";
 import { ProtocolVersion } from "../handshake/binary";
-import { DtlsRandom } from "../handshake/random";
-import { DtlsPlaintext } from "../record/message/plaintext";
+import type { DtlsRandom } from "../handshake/random";
+import type { DtlsPlaintext } from "../record/message/plaintext";
 
 const crypto = nodeCrypto.webcrypto;
 x509.cryptoProvider.set(crypto as any);
@@ -102,7 +102,10 @@ export class CipherContext {
       }
     })();
 
-    const keys = await crypto.subtle.generateKey(alg, true, ["sign", "verify"]) as nodeCrypto.webcrypto.CryptoKeyPair;
+    const keys = (await crypto.subtle.generateKey(alg, true, [
+      "sign",
+      "verify",
+    ])) as nodeCrypto.webcrypto.CryptoKeyPair;
 
     const cert = await x509.X509CertificateGenerator.createSelfSigned({
       serialNumber: nodeCrypto.randomBytes(8).toString("hex"),

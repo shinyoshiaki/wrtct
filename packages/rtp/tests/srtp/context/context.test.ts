@@ -1,6 +1,6 @@
-import { CipherAesCtr } from "../../../src/srtp/cipher/ctr";
+import type { CipherAesCtr } from "../../../src/srtp/cipher/ctr";
 import { ProtectionProfileAes128CmHmacSha1_80 } from "../../../src/srtp/const";
-import { Context, SrtpSsrcState } from "../../../src/srtp/context/context";
+import { Context, type SrtpSsrcState } from "../../../src/srtp/context/context";
 
 describe("srtp/context", () => {
   test("TestValidSessionKeys", () => {

@@ -88,63 +88,65 @@ export class TransportWideCC {
       );
       let iPacketStatus: RunLengthChunk | StatusVectorChunk | undefined;
       switch (type) {
-        case PacketChunk.TypeTCCRunLengthChunk: {
-          const packetStatus = RunLengthChunk.deSerialize(
-            data.slice(packetStatusPos, packetStatusPos + 2),
-          );
-          iPacketStatus = packetStatus;
-          const packetNumberToProcess = Math.min(
-            packetStatusCount - processedPacketNum,
-            packetStatus.runLength,
-          );
-          if (
-            packetStatus.packetStatus ===
-              PacketStatus.TypeTCCPacketReceivedSmallDelta ||
-            packetStatus.packetStatus ===
-              PacketStatus.TypeTCCPacketReceivedLargeDelta
-          ) {
-            for (let _ = 0; _ < packetNumberToProcess; _++) {
-              recvDeltas.push(
-                new RecvDelta({ type: packetStatus.packetStatus as any }),
-              );
+        case PacketChunk.TypeTCCRunLengthChunk:
+          {
+            const packetStatus = RunLengthChunk.deSerialize(
+              data.slice(packetStatusPos, packetStatusPos + 2),
+            );
+            iPacketStatus = packetStatus;
+            const packetNumberToProcess = Math.min(
+              packetStatusCount - processedPacketNum,
+              packetStatus.runLength,
+            );
+            if (
+              packetStatus.packetStatus ===
+                PacketStatus.TypeTCCPacketReceivedSmallDelta ||
+              packetStatus.packetStatus ===
+                PacketStatus.TypeTCCPacketReceivedLargeDelta
+            ) {
+              for (let _ = 0; _ < packetNumberToProcess; _++) {
+                recvDeltas.push(
+                  new RecvDelta({ type: packetStatus.packetStatus as any }),
+                );
+              }
             }
+            processedPacketNum += packetNumberToProcess;
           }
-          processedPacketNum += packetNumberToProcess;
-        }
-        break;
-        case PacketChunk.TypeTCCStatusVectorChunk: {
-          const packetStatus = StatusVectorChunk.deSerialize(
-            data.slice(packetStatusPos, packetStatusPos + 2),
-          );
-          iPacketStatus = packetStatus;
-          if (packetStatus.symbolSize === 0) {
-            packetStatus.symbolList.forEach((v) => {
-              if (v === PacketStatus.TypeTCCPacketReceivedSmallDelta) {
-                recvDeltas.push(
-                  new RecvDelta({
-                    type: PacketStatus.TypeTCCPacketReceivedSmallDelta,
-                  }),
-                );
-              }
-            });
+          break;
+        case PacketChunk.TypeTCCStatusVectorChunk:
+          {
+            const packetStatus = StatusVectorChunk.deSerialize(
+              data.slice(packetStatusPos, packetStatusPos + 2),
+            );
+            iPacketStatus = packetStatus;
+            if (packetStatus.symbolSize === 0) {
+              packetStatus.symbolList.forEach((v) => {
+                if (v === PacketStatus.TypeTCCPacketReceivedSmallDelta) {
+                  recvDeltas.push(
+                    new RecvDelta({
+                      type: PacketStatus.TypeTCCPacketReceivedSmallDelta,
+                    }),
+                  );
+                }
+              });
+            }
+            if (packetStatus.symbolSize === 1) {
+              packetStatus.symbolList.forEach((v) => {
+                if (
+                  v === PacketStatus.TypeTCCPacketReceivedSmallDelta ||
+                  v === PacketStatus.TypeTCCPacketReceivedLargeDelta
+                ) {
+                  recvDeltas.push(
+                    new RecvDelta({
+                      type: v,
+                    }),
+                  );
+                }
+              });
+            }
+            processedPacketNum += packetStatus.symbolList.length;
           }
-          if (packetStatus.symbolSize === 1) {
-            packetStatus.symbolList.forEach((v) => {
-              if (
-                v === PacketStatus.TypeTCCPacketReceivedSmallDelta ||
-                v === PacketStatus.TypeTCCPacketReceivedLargeDelta
-              ) {
-                recvDeltas.push(
-                  new RecvDelta({
-                    type: v,
-                  }),
-                );
-              }
-            });
-          }
-          processedPacketNum += packetStatus.symbolList.length;
-        }
-        break;
+          break;
       }
       if (!iPacketStatus) throw new Error();
       packetStatusPos += 2;
@@ -225,8 +227,9 @@ export class TransportWideCC {
     const currentSequenceNumber = this.baseSequenceNumber - 1;
     const results = this.packetChunks
       .filter((v) => v instanceof RunLengthChunk)
-      .map((chunk) => (chunk as RunLengthChunk).results(currentSequenceNumber))
-      .flatMap((v) => v);
+      .flatMap((chunk) =>
+        (chunk as RunLengthChunk).results(currentSequenceNumber),
+      );
 
     let deltaIdx = 0;
     const referenceTime = BigInt(this.referenceTime) * 64n;

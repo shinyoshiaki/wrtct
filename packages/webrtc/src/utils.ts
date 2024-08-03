@@ -7,10 +7,10 @@ import { performance } from "perf_hooks";
 
 import { bufferReader, bufferWriter, randomPort } from "../../common/src";
 import { CipherContext } from "../../dtls/src/context/cipher";
-import { Address } from "../../ice/src";
-import { Direction, Directions } from "./media/rtpTransceiver";
+import type { Address } from "../../ice/src";
+import { type Direction, Directions } from "./media/rtpTransceiver";
 import { MediaStreamTrack } from "./media/track";
-import { RTCIceServer } from "./peerConnection";
+import type { RTCIceServer } from "./peerConnection";
 const now = require("nano-time");
 
 const log = debug("werift:packages/webrtc/src/utils.ts");
@@ -76,7 +76,7 @@ export function parseIceServers(iceServers: RTCIceServer[]) {
   const url2Address = (url?: string) => {
     if (!url) return;
     const [address, port] = url.split(":");
-    return [address, parseInt(port)] as Address;
+    return [address, Number.parseInt(port)] as Address;
   };
 
   const stunServer = url2Address(

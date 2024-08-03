@@ -1,9 +1,9 @@
 import { randomUUID } from "crypto";
 
 import { int } from "../..";
-import { CodecFrame } from "./depacketizer";
-import { AVProcessor } from "./interface";
-import { MediaKind } from "./webm";
+import type { CodecFrame } from "./depacketizer";
+import type { AVProcessor } from "./interface";
+import type { MediaKind } from "./webm";
 
 export type LipsyncInput = {
   frame?: CodecFrame;
@@ -58,8 +58,8 @@ export class LipsyncBase implements AVProcessor<LipsyncInput> {
     return {
       ...this.internalStats,
       id: this.id,
-      audioBufferLength: this.audioBuffer.flatMap((v) => v).length,
-      videoBufferLength: this.videoBuffer.flatMap((v) => v).length,
+      audioBufferLength: this.audioBuffer.flat().length,
+      videoBufferLength: this.videoBuffer.flat().length,
       baseTime: this.baseTime,
       lastCommittedTimeSec: this.lastCommittedTime / 1000,
     };

@@ -14,7 +14,8 @@
         "useSingleVarDeclarator": "off",
         "useDefaultParameterLast": "off",
         "noVar": "off",
-        "noInferrableTypes": "off"
+        "noInferrableTypes": "off",
+        "useNodejsImportProtocol": "off"
       },
       "complexity": {
         "noStaticOnlyClass": "off",
@@ -38,7 +39,8 @@
         "noConfusingVoidType": "off"
       },
       "correctness": {
-        "noSwitchDeclarations": "error"
+        "noSwitchDeclarations": "error",
+        "noInvalidUseBeforeDeclaration": "off"
       }
     }
   }

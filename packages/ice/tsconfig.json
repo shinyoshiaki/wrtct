@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "declaration": true,
     "outDir": "lib",
     "strict": true,
@@ -15,7 +17,13 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "noImplicitAny": false,
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "types": [
+      "vitest/globals"
+    ]
   },
-  "include": ["src", "tests"]
+  "include": [
+    "src",
+    "tests"
+  ]
 }

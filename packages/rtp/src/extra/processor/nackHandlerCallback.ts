@@ -1,5 +1,9 @@
 import { SimpleProcessorCallbackBase } from "./interface";
-import { NackHandlerBase, NackHandlerInput, NackHandlerOutput } from "./nack";
+import {
+  NackHandlerBase,
+  type NackHandlerInput,
+  type NackHandlerOutput,
+} from "./nack";
 
 export class NackHandlerCallback extends SimpleProcessorCallbackBase<
   NackHandlerInput,

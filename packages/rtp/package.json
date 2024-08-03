@@ -31,7 +31,7 @@
     "deploy:alpha": "npm run build && npm publish --tag alpha",
     "doc": "rm -rf doc && typedoc --excludePrivate --disableSources --excludeInternal --plugin typedoc-plugin-markdown --out doc ./src/index.ts",
     "format": "biome check --apply src tests",
-    "test": "npm run type && jest --forceExit",
+    "test": "npm run type && vitest run ./tests",
     "type": "tsc --noEmit -p .",
     "unused": "organize-imports-cli src/**/*.ts",
     "upgrade-interactive": "npx npm-check-updates -i"
