@@ -2,8 +2,8 @@ import { Server } from "ws";
 import {
   RTCPeerConnection,
   RTCRtpCodecParameters,
-  getUserMedia,
 } from "../../../packages/webrtc/src";
+import { getUserMedia } from "../../../packages/webrtc/src/nonstandard";
 
 const server = new Server({ port: 8881 });
 console.log("start");

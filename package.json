@@ -33,9 +33,9 @@
     "media": "DEBUG=werift* ts-node-dev examples/mediachannel/pubsub/offer.ts",
     "test": "run-s test:small e2e",
     "test:small": "npm run test --workspaces --if-present",
-    "type": "npm run type --workspaces --if-present",
-    "type:all": "npm run type:example && npm run type",
-    "type:example": "tsc --noEmit -p ./tsconfig.json",
+    "type": "run-s type:packages type:extra",
+    "type:extra": "tsc --noEmit -p ./tsconfig.json",
+    "type:packages": "npm run type --workspaces --if-present",
     "upgrade-interactive": "npx npm-check-updates -i"
   },
   "devDependencies": {

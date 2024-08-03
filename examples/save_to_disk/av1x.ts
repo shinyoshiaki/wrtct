@@ -1,9 +1,9 @@
 import { Server } from "ws";
 import {
-  MediaRecorder,
   RTCPeerConnection,
   RTCRtpCodecParameters,
 } from "../../packages/webrtc/src";
+import { MediaRecorder } from "../../packages/webrtc/src/nonstandard";
 
 // open ./answer.html
 
@@ -11,7 +11,7 @@ const server = new Server({ port: 8878 });
 console.log("start");
 
 server.on("connection", async (socket) => {
-  const recorder = new MediaRecorder([], "./test.webm", {
+  const recorder = new MediaRecorder("./test.webm", 2, {
     width: 640,
     height: 360,
   });
@@ -39,9 +39,6 @@ server.on("connection", async (socket) => {
       transceiver.sender.replaceTrack(track);
 
       recorder.addTrack(track);
-      if (recorder.tracks.length === 2) {
-        recorder.start();
-      }
 
       setInterval(() => {
         transceiver.receiver.sendRtcpPLI(track.ssrc);
@@ -54,9 +51,6 @@ server.on("connection", async (socket) => {
       transceiver.sender.replaceTrack(track);
 
       recorder.addTrack(track);
-      if (recorder.tracks.length === 2) {
-        recorder.start();
-      }
     });
   }
 
