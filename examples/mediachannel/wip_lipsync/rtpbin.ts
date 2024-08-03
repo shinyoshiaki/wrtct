@@ -6,9 +6,9 @@ import {
   RTCPeerConnection,
   RTCRtpCodecParameters,
   RtcpSrPacket,
-  getUserMedia,
   randomPorts,
 } from "../../../packages/webrtc/src";
+import { getUserMedia } from "../../../packages/webrtc/src/nonstandard";
 
 console.log("start", __dirname);
 

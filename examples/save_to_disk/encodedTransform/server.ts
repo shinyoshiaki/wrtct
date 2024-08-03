@@ -4,15 +4,14 @@ import {
   TransformStream,
 } from "stream/web";
 import { Server } from "ws";
+import { RTCPeerConnection, RtpPacket } from "../../../packages/webrtc/src";
 import {
   type DepacketizerInput,
   type DepacketizerOutput,
-  RTCPeerConnection,
-  RtpPacket,
   RtpSourceStream,
   WebmStream,
   type WebmStreamOutput,
-} from "../../../packages/webrtc/src";
+} from "../../../packages/webrtc/src/nonstandard";
 
 const server = new Server({ port: 8888 });
 console.log("start");
@@ -49,7 +48,7 @@ const webm = new WebmStream(
       trackNumber: 1,
     },
   ],
-  { duration: 1000 * 60 * 60 * 24 },
+  { duration: 1000 * 60 * 60 * 24 }
 );
 
 const transform = new TransformStream<DepacketizerInput, DepacketizerOutput>({

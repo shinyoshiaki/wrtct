@@ -23,7 +23,6 @@ console.log("start");
               { type: "nack", parameter: "pli" },
               { type: "goog-remb" },
             ],
-            parameters: {},
           }),
         ],
       },
