@@ -42,7 +42,7 @@ signalingServer.on("connection", async (socket) => {
       track.onReceiveRtcp.subscribe((rtcp) => {
         audioRtcp.input(rtcp);
       });
-    }
+    },
   );
 
   pc.addTransceiver("video", { direction: "recvonly" }).onTrack.subscribe(
@@ -58,7 +58,7 @@ signalingServer.on("connection", async (socket) => {
       setInterval(() => {
         transceiver.receiver.sendRtcpPLI(track.ssrc!);
       }, 5_000);
-    }
+    },
   );
 
   const sdp = await pc.setLocalDescription(await pc.createOffer());
@@ -96,7 +96,7 @@ async function recorder() {
         trackNumber: 2,
       },
     ],
-    { duration: 1000 * 60 * 60 * 24, strictTimestamp: true }
+    { duration: 1000 * 60 * 60 * 24, strictTimestamp: true },
   );
   const lipsync = new LipsyncCallback();
 
@@ -157,12 +157,12 @@ async function recorder() {
                 // ファイル名はMPDで定義したとおりにする。
                 await rename(
                   dir + "/cluster.webm",
-                  dir + `/media${timestamp}.webm`
+                  dir + `/media${timestamp}.webm`,
                 );
                 console.log(
                   new Date().toISOString(),
                   "cluster",
-                  `media${timestamp}.webm`
+                  `media${timestamp}.webm`,
                 );
                 timestamp += value.previousDuration!;
               }

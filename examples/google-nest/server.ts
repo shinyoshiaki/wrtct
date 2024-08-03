@@ -4,6 +4,7 @@ import {
   RTCPeerConnection,
   RTCRtpCodecParameters,
 } from "../../packages/webrtc/src";
+import { MediaRecorder } from "../../packages/webrtc/src/nonstandard";
 
 config({ path: __dirname + "/../../credential.env" });
 
@@ -35,7 +36,7 @@ async function main() {
 }
 
 const session = async (
-  device: google.smartdevicemanagement_v1.Schema$GoogleHomeEnterpriseSdmV1Device
+  device: google.smartdevicemanagement_v1.Schema$GoogleHomeEnterpriseSdmV1Device,
 ) => {
   {
     const pc = new RTCPeerConnection({
@@ -65,6 +66,10 @@ const session = async (
         ],
       },
     });
+    const recorder = new MediaRecorder(
+      `./${device.name.split("/").at(-1)}.webm`,
+      2,
+    );
 
     const audioTransceiver = pc.addTransceiver("audio", {
       direction: "recvonly",
@@ -73,6 +78,7 @@ const session = async (
       track.onReceiveRtp.subscribe((rtp) => {
         console.log("audio", rtp.header.sequenceNumber);
       });
+      recorder.addTrack(track);
     });
 
     const videoTransceiver = pc.addTransceiver("video", {
@@ -85,9 +91,10 @@ const session = async (
       track.onReceiveRtp.once(() => {
         setInterval(
           () => videoTransceiver.receiver.sendRtcpPLI(track.ssrc!),
-          2000
+          2000,
         );
       });
+      recorder.addTrack(track);
     });
 
     pc.createDataChannel("dataSendChannel", { id: 1 });
@@ -119,8 +126,9 @@ const session = async (
 
     console.log("answer applied");
 
-    process.on("SIGINT", () => {
+    process.on("SIGINT", async () => {
       pc.close();
+      await recorder.stop();
     });
   }
 };
