@@ -508,8 +508,6 @@ export class RTCPeerConnection extends EventTarget {
     });
 
     iceTransport.iceGather.onIceCandidate = (candidate) => {
-      if (!this.localDescription) return;
-
       if (this.config.bundlePolicy === "max-bundle" || this.remoteIsBundled) {
         candidate.sdpMLineIndex = 0;
         const media = this._localDescription?.media[0];
