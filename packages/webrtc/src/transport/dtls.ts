@@ -52,6 +52,7 @@ export class RTCDtlsTransport {
   readonly onStateChange = new Event<[DtlsState]>();
 
   localCertificate?: RTCCertificate;
+  localCertificatePromise?: Promise<RTCCertificate>;
   private remoteParameters?: RTCDtlsParameters;
 
   constructor(
@@ -72,7 +73,15 @@ export class RTCDtlsTransport {
   }
 
   async setupCertificate() {
-    if (!this.localCertificate) {
+    if (this.localCertificate) {
+      return this.localCertificate;
+    }
+
+    if (this.localCertificatePromise) {
+      return this.localCertificatePromise;
+    }
+
+    this.localCertificatePromise = (async () => {
       const { certPem, keyPem, signatureHash } =
         await CipherContext.createSelfSignedCertificateWithKey(
           {
@@ -86,8 +95,10 @@ export class RTCDtlsTransport {
         certPem,
         signatureHash,
       );
-    }
-    return this.localCertificate;
+      return this.localCertificate;
+    })();
+
+    return this.localCertificatePromise;
   }
 
   setRemoteParams(remoteParameters: RTCDtlsParameters) {
