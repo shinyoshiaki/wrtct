@@ -29,7 +29,7 @@ server.on("connection", async (socket) => {
     },
   });
   pc.iceConnectionStateChange.subscribe((v) =>
-    console.log("pc.iceConnectionStateChange", v)
+    console.log("pc.iceConnectionStateChange", v),
   );
 
   const transceiverA = pc.addTransceiver("video", {
