@@ -100,8 +100,7 @@ class TurnClient implements Protocol {
   addrByChannel: { [channel: number]: Address } = {};
   localCandidate!: Candidate;
   /**sec */
-  channelRefreshTime =
-    this.options.channelRefreshTime ?? DEFAULT_CHANNEL_REFRESH_TIME;
+  channelRefreshTime: number;
 
   onDatagramReceived: (data: Buffer, addr: Address) => void = () => {};
 
@@ -118,7 +117,10 @@ class TurnClient implements Protocol {
       /**sec */
       channelRefreshTime?: number;
     } = {},
-  ) {}
+  ) {
+    this.channelRefreshTime =
+      this.options.channelRefreshTime ?? DEFAULT_CHANNEL_REFRESH_TIME;
+  }
 
   async connectionMade() {
     this.transport.onData = (data, addr) => {
