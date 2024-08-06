@@ -508,6 +508,10 @@ export class RTCPeerConnection extends EventTarget {
     });
 
     iceTransport.iceGather.onIceCandidate = (candidate) => {
+      if (!this.localDescription) {
+        console.warn("localDescription not found when ice candidate was gathered");
+        return;
+      }
       if (this.config.bundlePolicy === "max-bundle" || this.remoteIsBundled) {
         candidate.sdpMLineIndex = 0;
         const media = this._localDescription?.media[0];
@@ -651,14 +655,6 @@ export class RTCPeerConnection extends EventTarget {
     // for trickle ice
     this.setLocal(description);
 
-    // connect transports
-    if (description.type === "answer") {
-      this.connect().catch((err) => {
-        log("connect failed", err);
-        this.setConnectionState("failed");
-      });
-    }
-
     // # gather candidates
     const connected = this.iceTransports.find(
       (transport) => transport.state === "connected",
@@ -672,6 +668,14 @@ export class RTCPeerConnection extends EventTarget {
           iceTransport.iceGather.gather(),
         ),
       );
+    }
+
+    // connect transports
+    if (description.type === "answer") {
+      this.connect().catch((err) => {
+        console.log("connect failed", err);
+        this.setConnectionState("failed");
+      });
     }
 
     description.media
@@ -994,18 +998,6 @@ export class RTCPeerConnection extends EventTarget {
         log("connect failed", err);
         this.setConnectionState("failed");
       });
-    }
-
-    const connected = this.iceTransports.find(
-      (transport) => transport.state === "connected",
-    );
-    if (this.remoteIsBundled && connected) {
-      // no need to gather ice candidates on an existing bundled connection
-      await connected.iceGather.gather();
-    } else {
-      await Promise.allSettled(
-        transports.map((iceTransport) => iceTransport.iceGather.gather()),
-      );
     }
 
     this.negotiationneeded = false;

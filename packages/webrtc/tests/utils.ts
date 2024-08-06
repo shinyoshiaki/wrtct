@@ -100,12 +100,21 @@ async function exchangeAnswer(
   caller: RTCPeerConnection,
   callee: RTCPeerConnection,
 ) {
+  // @koush: This note below does not seem correct. The answer should be
+  // applied to setLocalDescription first.
+  // Only after setLocalDescription is applied should ice candidates
+  // be generated. This should happen on next tick.
+  // I have reversed the order
+  const answer = await callee.createAnswer();
+  await callee.setLocalDescription(answer);
+  await caller.setRemoteDescription(answer);
+
   // Note that caller's remote description must be set first; if not,
   // there's a chance that candidates from callee arrive at caller before
   // it has a remote description to apply them to.
-  const answer = await callee.createAnswer();
-  await caller.setRemoteDescription(answer);
-  await callee.setLocalDescription(answer);
+  // const answer = await callee.createAnswer();
+  // await caller.setRemoteDescription(answer);
+  // await callee.setLocalDescription(answer);
 }
 
 export function awaitMessage(channel: RTCDataChannel) {
