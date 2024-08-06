@@ -509,7 +509,7 @@ export class RTCPeerConnection extends EventTarget {
 
     iceTransport.iceGather.onIceCandidate = (candidate) => {
       if (!this.localDescription) {
-        console.warn("localDescription not found when ice candidate was gathered");
+        log("localDescription not found when ice candidate was gathered");
         return;
       }
       if (this.config.bundlePolicy === "max-bundle" || this.remoteIsBundled) {
@@ -673,7 +673,7 @@ export class RTCPeerConnection extends EventTarget {
     // connect transports
     if (description.type === "answer") {
       this.connect().catch((err) => {
-        console.log("connect failed", err);
+        log("connect failed", err);
         this.setConnectionState("failed");
       });
     }
