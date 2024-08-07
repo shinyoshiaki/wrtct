@@ -157,6 +157,7 @@ export class Connection {
           "host",
         );
 
+        this.pairLocalProtocol(protocol)
         candidates.push(protocol.localCandidate);
         if (cb) {
           cb(protocol.localCandidate);
@@ -911,22 +912,32 @@ export class Connection {
     }
   }
 
+  private tryPair(protocol: Protocol, remoteCandidate: Candidate) {
+    if (
+      protocol.localCandidate?.canPairWith(remoteCandidate) &&
+      !this.findPair(protocol, remoteCandidate)
+    ) {
+      const pair = new CandidatePair(protocol, remoteCandidate);
+      if (
+        this.options.filterCandidatePair &&
+        !this.options.filterCandidatePair(pair)
+      ) {
+        return;
+      }
+      this.checkList.push(pair);
+      this.setPairState(pair, CandidatePairState.WAITING);
+    }
+  }
+
+  private pairLocalProtocol(protocol: Protocol) {
+    for (const remoteCandidate of this.remoteCandidates) {
+      this.tryPair(protocol, remoteCandidate);
+    }
+  }
+
   private pairRemoteCandidate = (remoteCandidate: Candidate) => {
     for (const protocol of this.protocols) {
-      if (
-        protocol.localCandidate?.canPairWith(remoteCandidate) &&
-        !this.findPair(protocol, remoteCandidate)
-      ) {
-        const pair = new CandidatePair(protocol, remoteCandidate);
-        if (
-          this.options.filterCandidatePair &&
-          !this.options.filterCandidatePair(pair)
-        ) {
-          continue;
-        }
-        this.checkList.push(pair);
-        this.setPairState(pair, CandidatePairState.WAITING);
-      }
+      this.tryPair(protocol, remoteCandidate);
     }
   };
 
