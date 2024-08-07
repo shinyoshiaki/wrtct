@@ -157,7 +157,7 @@ export class Connection {
           "host",
         );
 
-        this.pairLocalProtocol(protocol)
+        this.pairLocalProtocol(protocol);
         candidates.push(protocol.localCandidate);
         if (cb) {
           cb(protocol.localCandidate);
