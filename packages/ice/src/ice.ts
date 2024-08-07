@@ -48,7 +48,7 @@ export class Connection {
 
   private _remoteCandidates: Candidate[] = [];
   // P2P接続完了したソケット
-  private nominated?: CandidatePair;
+  nominated?: CandidatePair;
   private nominating = false;
   private checkListDone = false;
   private checkListState = new PQueue<number>();
