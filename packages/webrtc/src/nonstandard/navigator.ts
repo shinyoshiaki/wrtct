@@ -14,7 +14,9 @@ export class MediaDevices extends EventTarget {
   video?: MediaStreamTrack;
   audio?: MediaStreamTrack;
 
-  constructor(props: { video?: MediaStreamTrack; audio?: MediaStreamTrack }) {
+  constructor(
+    readonly props: { video?: MediaStreamTrack; audio?: MediaStreamTrack },
+  ) {
     super();
     this.video = props.video;
     this.audio = props.audio;
