@@ -10,6 +10,7 @@ import {
   NtpTimeCallback,
   RtcpSourceCallback,
   RtpSourceCallback,
+  RtpTimeCallback,
   type SupportedCodec,
   WebmCallback,
   saveToFileSystem,
@@ -23,7 +24,9 @@ export class WebmFactory extends MediaWriter {
   unSubscribers = new EventDisposer();
 
   async start(tracks: MediaStreamTrack[]) {
-    await unlink(this.path).catch((e) => e);
+    if (this.props.path) {
+      await unlink(this.props.path).catch((e) => e);
+    }
 
     const inputTracks = tracks.map((track, i) => {
       const trackNumber = i + 1;
@@ -52,8 +55,8 @@ export class WebmFactory extends MediaWriter {
           codec,
           clockRate: 90000,
           trackNumber,
-          width: this.options.width,
-          height: this.options.height,
+          width: this.props.width ?? 640,
+          height: this.props.height ?? 360,
           payloadType,
           track,
         };
@@ -70,7 +73,7 @@ export class WebmFactory extends MediaWriter {
     });
 
     const webm = new WebmCallback(inputTracks, {
-      duration: this.options.defaultDuration ?? 1000 * 60 * 60 * 24,
+      duration: this.props.defaultDuration ?? 1000 * 60 * 60 * 24,
     });
     const lipsync = new LipsyncCallback();
 
@@ -87,7 +90,9 @@ export class WebmFactory extends MediaWriter {
           rtcpSource.input(rtcp);
         })
         .disposer(this.unSubscribers);
-      const ntpTime = new NtpTimeCallback(clockRate);
+      const time = this.props.disableNtp
+        ? new RtpTimeCallback(clockRate)
+        : new NtpTimeCallback(clockRate);
 
       if (track.kind === "video") {
         const depacketizer = new DepacketizeCallback(codec, {
@@ -96,26 +101,32 @@ export class WebmFactory extends MediaWriter {
         const jitterBuffer = new JitterBufferCallback(clockRate);
 
         rtpSource.pipe(jitterBuffer.input);
-        rtcpSource.pipe(ntpTime.input);
+        rtcpSource.pipe(time.input);
 
-        jitterBuffer.pipe(ntpTime.input);
-        ntpTime.pipe(depacketizer.input);
+        jitterBuffer.pipe(time.input);
+        time.pipe(depacketizer.input);
         depacketizer.pipe(lipsync.inputVideo);
         lipsync.pipeVideo(webm.inputVideo);
       } else {
         const depacketizer = new DepacketizeCallback(codec);
 
-        rtpSource.pipe(ntpTime.input);
-        rtcpSource.pipe(ntpTime.input);
+        rtpSource.pipe(time.input);
+        rtcpSource.pipe(time.input);
 
-        ntpTime.pipe(depacketizer.input);
+        time.pipe(depacketizer.input);
         depacketizer.pipe(lipsync.inputAudio);
         lipsync.pipeAudio(webm.inputAudio);
       }
 
       return rtpSource;
     });
-    webm.pipe(saveToFileSystem(this.path));
+    if (this.props.path) {
+      webm.pipe(saveToFileSystem(this.props.path));
+    } else if (this.props.stream) {
+      webm.pipe(async (o) => {
+        this.props.stream.write(o);
+      });
+    }
   }
 
   async stop() {

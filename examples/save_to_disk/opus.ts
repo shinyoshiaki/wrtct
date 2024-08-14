@@ -9,10 +9,8 @@ console.log("start");
 
 server.on("connection", async (socket) => {
   const recorder = new MediaRecorder({
-    path: `./vp8-${Date.now()}.webm`,
-    numOfTracks: 2,
-    width: 640,
-    height: 360,
+    path: `./opus-${Date.now()}.webm`,
+    numOfTracks: 1,
   });
 
   const pc = new RTCPeerConnection();
@@ -22,7 +20,6 @@ server.on("connection", async (socket) => {
     setInterval(() => {
       transceiver.receiver.sendRtcpPLI(track.ssrc);
     }, 3_000);
-    await recorder.addTrack(track);
   });
 
   pc.addTransceiver("audio").onTrack.subscribe(async (track, transceiver) => {
