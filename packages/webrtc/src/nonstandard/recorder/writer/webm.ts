@@ -10,6 +10,7 @@ import {
   NtpTimeCallback,
   RtcpSourceCallback,
   RtpSourceCallback,
+  RtpTimeCallback,
   type SupportedCodec,
   WebmCallback,
   saveToFileSystem,
@@ -89,7 +90,9 @@ export class WebmFactory extends MediaWriter {
           rtcpSource.input(rtcp);
         })
         .disposer(this.unSubscribers);
-      const ntpTime = new NtpTimeCallback(clockRate);
+      const time = this.props.disableNtp
+        ? new RtpTimeCallback(clockRate)
+        : new NtpTimeCallback(clockRate);
 
       if (track.kind === "video") {
         const depacketizer = new DepacketizeCallback(codec, {
@@ -98,19 +101,19 @@ export class WebmFactory extends MediaWriter {
         const jitterBuffer = new JitterBufferCallback(clockRate);
 
         rtpSource.pipe(jitterBuffer.input);
-        rtcpSource.pipe(ntpTime.input);
+        rtcpSource.pipe(time.input);
 
-        jitterBuffer.pipe(ntpTime.input);
-        ntpTime.pipe(depacketizer.input);
+        jitterBuffer.pipe(time.input);
+        time.pipe(depacketizer.input);
         depacketizer.pipe(lipsync.inputVideo);
         lipsync.pipeVideo(webm.inputVideo);
       } else {
         const depacketizer = new DepacketizeCallback(codec);
 
-        rtpSource.pipe(ntpTime.input);
-        rtcpSource.pipe(ntpTime.input);
+        rtpSource.pipe(time.input);
+        rtcpSource.pipe(time.input);
 
-        ntpTime.pipe(depacketizer.input);
+        time.pipe(depacketizer.input);
         depacketizer.pipe(lipsync.inputAudio);
         lipsync.pipeAudio(webm.inputAudio);
       }

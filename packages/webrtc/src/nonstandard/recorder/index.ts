@@ -86,4 +86,5 @@ export interface MediaRecorderOptions {
   waitForKeyframe: boolean;
   defaultDuration: number;
   tracks: MediaStreamTrack[];
+  disableNtp: boolean;
 }
