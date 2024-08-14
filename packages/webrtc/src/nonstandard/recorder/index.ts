@@ -27,11 +27,6 @@ export class MediaRecorder {
       ),
   ) {
     this.tracks = props.tracks ?? this.tracks;
-    if (this.tracks.length === props.numOfTracks) {
-      this.start().catch((error) => {
-        this.onError.execute(error);
-      });
-    }
 
     const { path, stream } = props;
 
@@ -54,6 +49,12 @@ export class MediaRecorder {
         ...props,
         path: path!,
         stream: stream!,
+      });
+    }
+
+    if (this.tracks.length === props.numOfTracks) {
+      this.start().catch((error) => {
+        this.onError.execute(error);
       });
     }
   }
