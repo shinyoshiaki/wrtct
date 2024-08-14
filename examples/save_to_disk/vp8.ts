@@ -8,7 +8,9 @@ const server = new Server({ port: 8878 });
 console.log("start");
 
 server.on("connection", async (socket) => {
-  const recorder = new MediaRecorder(`./vp8-${Date.now()}.webm`, 2, {
+  const recorder = new MediaRecorder({
+    path: `./vp8-${Date.now()}.webm`,
+    numOfTracks: 2,
     width: 640,
     height: 360,
   });

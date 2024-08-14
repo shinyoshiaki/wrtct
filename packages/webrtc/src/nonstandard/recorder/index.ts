@@ -1,35 +1,59 @@
 import Event from "rx.mini";
 
+import type { PassThrough } from "stream";
 import type { MediaStreamTrack } from "../../media/track";
 import type { MediaWriter } from "./writer";
 import { WebmFactory } from "./writer/webm";
 
 export class MediaRecorder {
   writer: MediaWriter;
-  ext: string;
+  ext?: string;
   tracks: MediaStreamTrack[] = [];
   started = false;
   onError = new Event<[Error]>();
 
   constructor(
-    public path: string,
-    public numOfTracks = 1,
-    public options: Partial<MediaRecorderOptions> = {},
+    public props: Partial<MediaRecorderOptions> & {
+      numOfTracks: number;
+    } & (
+        | {
+            path: string;
+            stream?: PassThrough;
+          }
+        | {
+            path?: string;
+            stream: PassThrough;
+          }
+      ),
   ) {
-    this.ext = path.split(".").slice(-1)[0];
-    this.writer = (() => {
-      switch (this.ext) {
-        case "webm":
-          return new WebmFactory(path, options);
-        default:
-          throw new Error();
-      }
-    })();
-
-    this.tracks = options.tracks ?? this.tracks;
-    if (this.tracks.length === numOfTracks) {
+    this.tracks = props.tracks ?? this.tracks;
+    if (this.tracks.length === props.numOfTracks) {
       this.start().catch((error) => {
         this.onError.execute(error);
+      });
+    }
+
+    const { path, stream } = props;
+
+    if (path) {
+      this.ext = path.split(".").slice(-1)[0];
+      this.writer = (() => {
+        switch (this.ext) {
+          case "webm":
+            return new WebmFactory({
+              ...props,
+              path: path!,
+              stream: stream!,
+            });
+          default:
+            throw new Error();
+        }
+      })();
+    } else {
+      this.writer = new WebmFactory({
+        ...props,
+        path: path!,
+        stream: stream!,
       });
     }
   }
@@ -40,7 +64,10 @@ export class MediaRecorder {
   }
 
   private async start() {
-    if (this.tracks.length === this.numOfTracks && this.started === false) {
+    if (
+      this.tracks.length === this.props.numOfTracks &&
+      this.started === false
+    ) {
       this.started = true;
       await this.writer.start(this.tracks);
     }
