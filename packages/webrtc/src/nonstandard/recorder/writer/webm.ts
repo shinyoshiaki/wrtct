@@ -124,7 +124,7 @@ export class WebmFactory extends MediaWriter {
       webm.pipe(saveToFileSystem(this.props.path));
     } else if (this.props.stream) {
       webm.pipe(async (o) => {
-        this.props.stream.write(o);
+        this.props.stream.execute(o);
       });
     }
   }

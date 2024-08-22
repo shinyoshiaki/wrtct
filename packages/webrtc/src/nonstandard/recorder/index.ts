@@ -1,8 +1,6 @@
 import Event from "rx.mini";
-
-import type { PassThrough } from "stream";
 import type { MediaStreamTrack } from "../../media/track";
-import type { MediaWriter } from "./writer";
+import type { MediaWriter, StreamEvent } from "./writer";
 import { WebmFactory } from "./writer/webm";
 
 export class MediaRecorder {
@@ -27,11 +25,11 @@ export class MediaRecorder {
       (
         | {
             path: string;
-            stream?: PassThrough;
+            stream?: StreamEvent;
           }
         | {
             path?: string;
-            stream: PassThrough;
+            stream: StreamEvent;
           }
       ),
   ) {
