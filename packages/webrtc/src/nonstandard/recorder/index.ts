@@ -92,6 +92,7 @@ export interface MediaRecorderOptions {
   height: number;
   jitterBufferLatency: number;
   jitterBufferSize: number;
+  disableLipSync: boolean;
   waitForKeyframe: boolean;
   defaultDuration: number;
   tracks: MediaStreamTrack[];

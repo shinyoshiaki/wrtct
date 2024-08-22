@@ -98,15 +98,22 @@ export class WebmFactory extends MediaWriter {
         const depacketizer = new DepacketizeCallback(codec, {
           isFinalPacketInSequence: (h) => h.marker,
         });
-        const jitterBuffer = new JitterBufferCallback(clockRate);
+        const jitterBuffer = new JitterBufferCallback(clockRate, {
+          bufferSize: this.props.jitterBufferSize,
+          latency: this.props.jitterBufferLatency,
+        });
 
         rtpSource.pipe(jitterBuffer.input);
         rtcpSource.pipe(time.input);
 
         jitterBuffer.pipe(time.input);
         time.pipe(depacketizer.input);
-        depacketizer.pipe(lipsync.inputVideo);
-        lipsync.pipeVideo(webm.inputVideo);
+        if (this.props.disableLipSync) {
+          depacketizer.pipe(webm.inputVideo);
+        } else {
+          depacketizer.pipe(lipsync.inputVideo);
+          lipsync.pipeVideo(webm.inputVideo);
+        }
       } else {
         const depacketizer = new DepacketizeCallback(codec);
 
@@ -114,8 +121,12 @@ export class WebmFactory extends MediaWriter {
         rtcpSource.pipe(time.input);
 
         time.pipe(depacketizer.input);
-        depacketizer.pipe(lipsync.inputAudio);
-        lipsync.pipeAudio(webm.inputAudio);
+        if (this.props.disableLipSync) {
+          depacketizer.pipe(webm.inputAudio);
+        } else {
+          depacketizer.pipe(lipsync.inputAudio);
+          lipsync.pipeAudio(webm.inputAudio);
+        }
       }
 
       return rtpSource;
