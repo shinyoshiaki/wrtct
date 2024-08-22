@@ -13,9 +13,18 @@ export class MediaRecorder {
   onError = new Event<[Error]>();
 
   constructor(
-    public props: Partial<MediaRecorderOptions> & {
-      numOfTracks: number;
-    } & (
+    public props: Partial<MediaRecorderOptions> &
+      (
+        | {
+            numOfTracks: number;
+            tracks?: MediaStreamTrack[];
+          }
+        | {
+            numOfTracks?: number;
+            tracks: MediaStreamTrack[];
+          }
+      ) &
+      (
         | {
             path: string;
             stream?: PassThrough;
@@ -52,7 +61,8 @@ export class MediaRecorder {
       });
     }
 
-    if (this.tracks.length === props.numOfTracks) {
+    if (this.tracks.length > 0) {
+      this.props.numOfTracks = this.tracks.length;
       this.start().catch((error) => {
         this.onError.execute(error);
       });

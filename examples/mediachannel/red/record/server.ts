@@ -31,7 +31,6 @@ server.on("connection", async (socket) => {
     audio.sender.replaceTrack(track);
     const recorder = new MediaRecorder({
       path: "./audio.webm",
-      numOfTracks: 1,
       tracks: [track],
     });
     setTimeout(() => {

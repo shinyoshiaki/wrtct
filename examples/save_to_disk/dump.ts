@@ -14,7 +14,6 @@ import { MediaRecorder } from "../../packages/webrtc/src/nonstandard";
   const track = new MediaStreamTrack({ kind: "video" });
   const recorder = new MediaRecorder({
     path: "./test.webm",
-    numOfTracks: 1,
     width: 640,
     height: 360,
     tracks: [track],
