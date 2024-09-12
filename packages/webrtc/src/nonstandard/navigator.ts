@@ -1,6 +1,8 @@
 import { randomBytes } from "crypto";
 import { jspack } from "@shinyoshiaki/jspack";
 import { MediaStream, MediaStreamTrack } from "../media/track";
+import { createSocket } from "dgram";
+import { RTCRtpCodecParameters } from "..";
 
 export class Navigator {
   mediaDevices: MediaDevices;
@@ -58,6 +60,31 @@ export class MediaDevices extends EventTarget {
   };
 
   readonly getDisplayMedia = this.getUserMedia;
+
+  readonly getUdpMedia = ({
+    port,
+    codec,
+  }: {
+    port: number;
+    codec: ConstructorParameters<typeof RTCRtpCodecParameters>[0];
+  }) => {
+    const track = new MediaStreamTrack({
+      kind: "audio",
+      codec: new RTCRtpCodecParameters(codec),
+    });
+
+    const udp = createSocket("udp4");
+    udp.bind(port);
+    udp.on("message", (data) => {
+      track.writeRtp(data);
+    });
+
+    const disposer = () => {
+      udp.close();
+    };
+
+    return { track, disposer };
+  };
 }
 
 interface MediaStreamConstraints {

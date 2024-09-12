@@ -77,6 +77,10 @@ export class WebmFactory extends MediaWriter {
     });
     const lipsync = new LipsyncCallback();
 
+    if (inputTracks.length === 1) {
+      this.props.disableLipSync = true;
+    }
+
     this.rtpSources = inputTracks.map(({ track, clockRate, codec }) => {
       const rtpSource = new RtpSourceCallback();
       const rtcpSource = new RtcpSourceCallback();
