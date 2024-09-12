@@ -77,7 +77,7 @@ export class WebmFactory extends MediaWriter {
     });
     const lipsync = new LipsyncCallback();
 
-    if (inputTracks.length === 1) {
+    if (inputTracks.length === 1 || this.props.disableNtp) {
       this.props.disableLipSync = true;
     }
 
