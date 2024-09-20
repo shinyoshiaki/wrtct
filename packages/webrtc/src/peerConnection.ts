@@ -105,7 +105,7 @@ export class RTCPeerConnection extends EventTarget {
   readonly onDataChannel = new Event<[RTCDataChannel]>();
   readonly onRemoteTransceiverAdded = new Event<[RTCRtpTransceiver]>();
   readonly onTransceiverAdded = new Event<[RTCRtpTransceiver]>();
-  readonly onIceCandidate = new Event<[RTCIceCandidate]>();
+  readonly onIceCandidate = new Event<[RTCIceCandidate | undefined]>();
   readonly onNegotiationneeded = new Event<[]>();
   readonly onTrack = new Event<[MediaStreamTrack]>();
 
@@ -227,11 +227,13 @@ export class RTCPeerConnection extends EventTarget {
     return this._remoteDescription.toJSON();
   }
 
-  private get _localDescription() {
+  /**@private */
+  get _localDescription() {
     return this.pendingLocalDescription || this.currentLocalDescription;
   }
 
-  private get _remoteDescription() {
+  /**@private */
+  get _remoteDescription() {
     return this.pendingRemoteDescription || this.currentRemoteDescription;
   }
 
@@ -512,6 +514,16 @@ export class RTCPeerConnection extends EventTarget {
         log("localDescription not found when ice candidate was gathered");
         return;
       }
+      if (!candidate) {
+        this.setLocal(this._localDescription!);
+        this.onIceCandidate.execute(undefined);
+        if (this.onicecandidate) {
+          this.onicecandidate({ candidate: undefined });
+        }
+        this.emit("icecandidate", { candidate: undefined });
+        return;
+      }
+
       if (this.config.bundlePolicy === "max-bundle" || this.remoteIsBundled) {
         candidate.sdpMLineIndex = 0;
         const media = this._localDescription?.media[0];
@@ -678,16 +690,6 @@ export class RTCPeerConnection extends EventTarget {
       });
     }
 
-    description.media
-      .filter((m) => ["audio", "video"].includes(m.kind))
-      .forEach((m, i) => {
-        addTransportDescription(m, this.transceivers[i].dtlsTransport);
-      });
-    const sctpMedia = description.media.find((m) => m.kind === "application");
-    if (this.sctpTransport && sctpMedia) {
-      addTransportDescription(sctpMedia, this.sctpTransport.dtlsTransport);
-    }
-
     this.setLocal(description);
 
     if (this.shouldNegotiationneeded) {
@@ -698,6 +700,16 @@ export class RTCPeerConnection extends EventTarget {
   }
 
   private setLocal(description: SessionDescription) {
+    description.media
+      .filter((m) => ["audio", "video"].includes(m.kind))
+      .forEach((m, i) => {
+        addTransportDescription(m, this.transceivers[i].dtlsTransport);
+      });
+    const sctpMedia = description.media.find((m) => m.kind === "application");
+    if (this.sctpTransport && sctpMedia) {
+      addTransportDescription(sctpMedia, this.sctpTransport.dtlsTransport);
+    }
+
     if (description.type === "answer") {
       this.currentLocalDescription = description;
       this.pendingLocalDescription = undefined;
@@ -1743,7 +1755,7 @@ export interface RTCDataChannelEvent {
 }
 
 export interface RTCPeerConnectionIceEvent {
-  candidate: RTCIceCandidate;
+  candidate?: RTCIceCandidate;
 }
 
 type Media = "audio" | "video";

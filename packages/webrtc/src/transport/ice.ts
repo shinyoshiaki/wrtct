@@ -113,7 +113,7 @@ export const IceGathererStates = ["new", "gathering", "complete"] as const;
 export type IceGathererState = (typeof IceGathererStates)[number];
 
 export class RTCIceGatherer {
-  onIceCandidate: (candidate: IceCandidate) => void = () => {};
+  onIceCandidate: (candidate: IceCandidate | undefined) => void = () => {};
   gatheringState: IceGathererState = "new";
 
   readonly onGatheringStateChange = new Event<[IceGathererState]>();
@@ -126,9 +126,10 @@ export class RTCIceGatherer {
   async gather() {
     if (this.gatheringState === "new") {
       this.setState("gathering");
-      await this.connection.gatherCandidates((candidate) =>
-        this.onIceCandidate(candidateFromIce(candidate)),
-      );
+      await this.connection.gatherCandidates((candidate) => {
+        this.onIceCandidate(candidateFromIce(candidate));
+      });
+      this.onIceCandidate(undefined);
       this.setState("complete");
     }
   }
