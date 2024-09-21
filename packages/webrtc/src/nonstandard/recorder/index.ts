@@ -3,6 +3,8 @@ import type { MediaStreamTrack } from "../../media/track";
 import type { MediaWriter, StreamEvent } from "./writer";
 import { WebmFactory } from "./writer/webm";
 
+export type { StreamEvent };
+
 export class MediaRecorder {
   writer: MediaWriter;
   ext?: string;
