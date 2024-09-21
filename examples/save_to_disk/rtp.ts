@@ -1,10 +1,10 @@
 import { randomUUID } from "crypto";
+import { $ } from "zx";
+import { randomPort } from "../../packages/webrtc/src";
 import {
   MediaRecorder,
   Navigator,
 } from "../../packages/webrtc/src/nonstandard";
-import { randomPort } from "../../packages/webrtc/src";
-import { $ } from "zx";
 
 (async () => {
   const path = `${__dirname}/tmp${randomUUID()}.webm`;

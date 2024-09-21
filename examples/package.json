@@ -2,10 +2,7 @@
   "name": "example",
   "version": "0.0.31",
   "description": "WebRTC Implementation for TypeScript (Node.js)",
-  "keywords": [
-    "WebRTC",
-    "node.js"
-  ],
+  "keywords": ["WebRTC", "node.js"],
   "homepage": "https://github.com/shinyoshiaki/werift-webrtc",
   "repository": {
     "type": "git",
@@ -16,10 +13,7 @@
     "name": "shinyoshiaki"
   },
   "main": "lib/index.js",
-  "files": [
-    "lib",
-    "src"
-  ],
+  "files": ["lib", "src"],
   "scripts": {
     "format": "biome check --write ../examples"
   },
