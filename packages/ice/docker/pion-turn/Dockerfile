@@ -49,7 +49,7 @@ EXPOSE 3478
 USER nobody
 
 # Copy the executable
-COPY --from=builder /build/turn/examples/turn-server/simple/turn-server /usr/bin/
+COPY --from=builder /build/turn/examples/turn-server/tcp/turn-server /usr/bin/
 
 # Run the executable
 CMD turn-server -public-ip $PUBLIC_IP -users $USERS -realm $REALM -port $UDP_PORT

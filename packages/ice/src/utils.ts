@@ -89,3 +89,9 @@ export function getHostAddresses(useIpv4: boolean, useIpv6: boolean) {
   if (useIpv6) address.push(...nodeIpAddress(6));
   return address;
 }
+
+export const url2Address = (url?: string) => {
+  if (!url) return;
+  const [address, port] = url.split(":");
+  return [address, Number.parseInt(port)] as Address;
+};

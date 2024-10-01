@@ -5,23 +5,22 @@ import PCancelable from "p-cancelable";
 import Event from "rx.mini";
 import { setTimeout } from "timers/promises";
 
-import { int } from "../../../common/src";
+import { bufferReader, int } from "../../../common/src";
 import type { InterfaceAddresses } from "../../../common/src/network";
 import type { Candidate } from "../candidate";
 import { TransactionFailed } from "../exceptions";
 import { type Future, future, randomTransactionId } from "../helper";
 import type { Connection } from "../ice";
 import { classes, methods } from "../stun/const";
-import { Message, parseMessage } from "../stun/message";
+import { Message, paddingLength, parseMessage } from "../stun/message";
 import { Transaction } from "../stun/transaction";
-import { type Transport, UdpTransport } from "../transport";
+import { TcpTransport, type Transport, UdpTransport } from "../transport";
 import type { Address, Protocol } from "../types/model";
 
 const log = debug("werift-ice:packages/ice/src/turn/protocol.ts");
 
 const DEFAULT_CHANNEL_REFRESH_TIME = 500;
 const DEFAULT_ALLOCATION_LIFETIME = 600;
-const TCP_TRANSPORT = 0x06000000;
 const UDP_TRANSPORT = 0x11000000;
 
 class TurnTransport implements Protocol {
@@ -105,7 +104,10 @@ class TurnClient implements Protocol {
   onDatagramReceived: (data: Buffer, addr: Address) => void = () => {};
 
   private channelBinding?: Promise<void>;
-  channelRefreshAt = 0;
+  private channelRefreshAt = 0;
+  private tcpBuffer: Buffer = Buffer.alloc(0);
+  private permissionByAddr: { [addr: string]: boolean } = {};
+  private creatingPermission: Promise<void> = Promise.resolve();
 
   constructor(
     public server: Address,
@@ -124,7 +126,7 @@ class TurnClient implements Protocol {
 
   async connectionMade() {
     this.transport.onData = (data, addr) => {
-      this.datagramReceived(data, addr);
+      this.dataReceived(data, addr);
     };
   }
 
@@ -165,11 +167,44 @@ class TurnClient implements Protocol {
     }
   }
 
-  private datagramReceived(data: Buffer, addr: Address) {
-    if (data.length >= 4 && isChannelData(data)) {
-      this.handleChannelData(data);
+  private dataReceived(data: Buffer, addr: Address) {
+    const datagramReceived = (data: Buffer, addr: Address) => {
+      if (data.length >= 4 && isChannelData(data)) {
+        this.handleChannelData(data);
+      } else {
+        this.handleSTUNMessage(data, addr);
+      }
+    };
+
+    if (this.transport.type === "tcp") {
+      this.tcpBuffer = Buffer.concat([this.tcpBuffer, data]);
+      while (this.tcpBuffer.length >= 4) {
+        let [, length] = bufferReader(this.tcpBuffer.subarray(0, 4), [2, 2]);
+        length += paddingLength(length);
+        const fullLength = isChannelData(this.tcpBuffer)
+          ? 4 + length
+          : 20 + length;
+        if (this.tcpBuffer.length < fullLength) {
+          break;
+        }
+
+        datagramReceived(this.tcpBuffer.subarray(0, fullLength), addr);
+        this.tcpBuffer = this.tcpBuffer.subarray(fullLength);
+      }
     } else {
-      this.handleSTUNMessage(data, addr);
+      datagramReceived(data, addr);
+    }
+  }
+
+  private async send(data: Buffer, addr: Address) {
+    if (this.transport.type === "tcp") {
+      const padding = paddingLength(data.length);
+      await this.transport.send(
+        padding > 0 ? Buffer.concat([data, Buffer.alloc(padding)]) : data,
+        addr,
+      );
+    } else {
+      await this.transport.send(data, addr);
     }
   }
 
@@ -200,11 +235,10 @@ class TurnClient implements Protocol {
       .setAttribute("USERNAME", this.username)
       .setAttribute("REALM", this.realm)
       .setAttribute("NONCE", this.nonce);
-    const [response] = await this.request(request, this.server).catch((e) => {
+    await this.request(request, this.server).catch((e) => {
       request;
       throw e;
     });
-    return response;
   }
 
   refresh = (exp: number) =>
@@ -305,13 +339,36 @@ class TurnClient implements Protocol {
   }
 
   async sendData(data: Buffer, addr: Address) {
-    const channel = await this.getChannel(addr);
+    const channel = await this.getChannel(addr).catch((e) => {
+      return new Error("channelBind error");
+    });
+
+    if (channel instanceof Error) {
+      await this.getPermission(addr);
+      const indicate = new Message(methods.SEND, classes.INDICATION)
+        .setAttribute("DATA", data)
+        .setAttribute("XOR-PEER-ADDRESS", addr);
+
+      await this.sendStun(indicate, this.server);
+      return;
+    }
 
     const header = jspack.Pack("!HH", [channel.number, data.length]);
-    this.transport.send(
-      Buffer.concat([Buffer.from(header), data]),
-      this.server,
-    );
+    await this.send(Buffer.concat([Buffer.from(header), data]), this.server);
+  }
+
+  async getPermission(addr: Address) {
+    await this.creatingPermission;
+
+    const permitted = this.permissionByAddr[addr.join(":")];
+    if (!permitted) {
+      this.creatingPermission = this.createPermission(addr);
+      this.permissionByAddr[addr.join(":")] = true;
+      await this.creatingPermission.catch((e) => {
+        log("createPermission error", e);
+        throw e;
+      });
+    }
   }
 
   async getChannel(addr: Address) {
@@ -319,14 +376,14 @@ class TurnClient implements Protocol {
       await this.channelBinding;
     }
 
-    let channel = this.channelByAddr[addr.join("")];
+    let channel = this.channelByAddr[addr.join(":")];
 
     if (!channel) {
-      this.channelByAddr[addr.join("")] = {
+      this.channelByAddr[addr.join(":")] = {
         number: this.channelNumber++,
         address: addr,
       };
-      channel = this.channelByAddr[addr.join("")];
+      channel = this.channelByAddr[addr.join(":")];
       this.addrByChannel[channel.number] = addr;
 
       this.channelBinding = this.channelBind(channel.number, addr);
@@ -362,7 +419,7 @@ class TurnClient implements Protocol {
   }
 
   async sendStun(message: Message, addr: Address) {
-    await this.transport.send(message.bytes, addr);
+    await this.send(message.bytes, addr);
   }
 }
 
@@ -374,23 +431,22 @@ export async function createTurnEndpoint(
     lifetime,
     portRange,
     interfaceAddresses,
+    transport: transportType,
   }: {
     lifetime?: number;
     ssl?: boolean;
-    transport?: "udp";
+    transport?: "udp" | "tcp";
     portRange?: [number, number];
     interfaceAddresses?: InterfaceAddresses;
   },
 ) {
-  if (lifetime == undefined) {
-    lifetime = DEFAULT_ALLOCATION_LIFETIME;
-  }
+  lifetime ??= DEFAULT_ALLOCATION_LIFETIME;
+  transportType ??= "udp";
 
-  const transport = await UdpTransport.init(
-    "udp4",
-    portRange,
-    interfaceAddresses,
-  );
+  const transport =
+    transportType === "udp"
+      ? await UdpTransport.init("udp4", portRange, interfaceAddresses)
+      : await TcpTransport.init(serverAddr);
 
   const turnClient = new TurnClient(
     serverAddr,

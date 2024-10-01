@@ -31,11 +31,11 @@ export function parseMessage(
   }
   const [messageType, length] = jspack.Unpack(
     "!HHI",
-    data.slice(0, HEADER_LENGTH),
+    data.subarray(0, HEADER_LENGTH),
   );
 
   const transactionId = Buffer.from(
-    data.slice(HEADER_LENGTH - 12, HEADER_LENGTH),
+    data.subarray(HEADER_LENGTH - 12, HEADER_LENGTH),
   );
 
   if (data.length !== HEADER_LENGTH + length) {
@@ -45,9 +45,12 @@ export function parseMessage(
   const attributeRepository = new AttributeRepository();
 
   for (let pos = HEADER_LENGTH; pos <= data.length - 4; ) {
-    const [attrType, attrLen] = jspack.Unpack("!HH", data.slice(pos, pos + 4));
-    const payload = data.slice(pos + 4, pos + 4 + attrLen);
-    const padLen = 4 * Math.floor((attrLen + 3) / 4) - attrLen;
+    const [attrType, attrLen] = jspack.Unpack(
+      "!HH",
+      data.subarray(pos, pos + 4),
+    );
+    const payload = data.subarray(pos + 4, pos + 4 + attrLen);
+    const padLen = paddingLength(attrLen);
     const attributesTypes = Object.keys(ATTRIBUTES_BY_TYPE);
     if (attributesTypes.includes(attrType.toString())) {
       const [, attrName, , attrUnpack] = ATTRIBUTES_BY_TYPE[attrType];
@@ -125,7 +128,7 @@ export class Message extends AttributeRepository {
           ? attrPack(attrValue, this.transactionId)
           : attrPack(attrValue);
       const attrLen = v.length;
-      const padLen = 4 * Math.floor((attrLen + 3) / 4) - attrLen;
+      const padLen = paddingLength(attrLen);
       data = Buffer.concat([
         data,
         Buffer.from(jspack.Pack("!HH", [attrType, attrLen])),
@@ -194,4 +197,13 @@ function messageIntegrity(data: Buffer, key: Buffer) {
     createHmac("sha1", key).update(checkData).digest("hex"),
     "hex",
   );
+}
+
+export function paddingLength(length: number) {
+  const rest = length % 4;
+  if (rest === 0) {
+    return 0;
+  } else {
+    return 4 - rest;
+  }
 }
