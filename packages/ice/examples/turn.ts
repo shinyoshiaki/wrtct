@@ -1,15 +1,17 @@
 import { createSocket } from "dgram";
 import { randomPort } from "../../common/src";
-import { getGlobalIp } from "../src";
+import { getGlobalIp, url2Address } from "../src";
 import { createTurnEndpoint } from "../src/turn/protocol";
 import type { Address } from "../src/types/model";
 
-const address: Address = ["turn.com", 443];
-const username = "";
-const password = "";
+const address: Address = url2Address("127.0.0.1:3478")!;
+const username = "username";
+const password = "password";
 
 (async () => {
-  const turn1 = await createTurnEndpoint(address, username, password, {});
+  const turn1 = await createTurnEndpoint(address, username, password, {
+    transport: "tcp",
+  });
   turn1.turn.onData.subscribe((data, addr) => {
     console.log("turn1 onData", data.toString(), addr);
   });
@@ -24,7 +26,6 @@ const password = "";
   await turn1.turn.getChannel([ip, port]);
 
   setInterval(() => {
-    console.log("send ping");
     socket.send(
       Buffer.from("ping"),
       turn1.turn.relayedAddress[1],
