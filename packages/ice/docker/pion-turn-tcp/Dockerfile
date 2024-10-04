@@ -11,7 +11,7 @@ WORKDIR /build
 # Clone Source using GIT
 RUN git clone --branch=$VERSION --depth=1 https://github.com/pion/turn.git turn && rm -rf turn/.git
 
-WORKDIR /build/turn/examples/turn-server/simple
+WORKDIR /build/turn/examples/turn-server/tcp
 
 # Download all the dependencies
 RUN go get -d -v ./...
@@ -39,7 +39,7 @@ LABEL org.label-schema.build-date="${BUILD_DATE}" \
 
 ENV REALM localhost
 ENV USERS username=password
-ENV UDP_PORT 3478
+ENV TCP_PORT 3478
 ENV PUBLIC_IP 127.0.0.1
 
 EXPOSE 3478
@@ -49,10 +49,7 @@ EXPOSE 3478
 USER nobody
 
 # Copy the executable
-COPY --from=builder /build/turn/examples/turn-server/simple/turn-server /usr/bin/
+COPY --from=builder /build/turn/examples/turn-server/tcp/turn-server /usr/bin/
 
 # Run the executable
-CMD turn-server -public-ip $PUBLIC_IP -users $USERS -realm $REALM -port $UDP_PORT
-
-# docker build -t pion-turn -f Dockerfile .
-# docker run --rm -e REALM="localhost" -e USERS="username=password" -e UDP_PORT="3478" -e PUBLIC_IP="127.0.0.1" -p 3478:3478 pion-turn
+CMD turn-server -public-ip $PUBLIC_IP -users $USERS -realm $REALM -port $TCP_PORT

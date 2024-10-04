@@ -149,7 +149,7 @@ export class TcpTransport implements Transport {
     });
   };
 
-  close = () => {
+  close = async () => {
     this.closed = true;
     this.client.destroy();
   };
@@ -159,4 +159,5 @@ export interface Transport {
   type: string;
   onData: (data: Buffer, addr: Address) => void;
   send: (data: Buffer, addr: Address) => Promise<void>;
+  close: () => Promise<void>;
 }

@@ -13,7 +13,8 @@ import { Transaction } from "./transaction";
 const log = debug("packages/ice/src/stun/protocol.ts");
 
 export class StunProtocol implements Protocol {
-  readonly type = "stun";
+  static readonly type = "stun";
+  readonly type = StunProtocol.type;
   transport!: UdpTransport;
   transactions: { [key: string]: Transaction } = {};
   get transactionsKeys() {
