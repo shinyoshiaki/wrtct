@@ -29,6 +29,7 @@ class ProtocolMock implements Protocol {
   };
   async connectionMade() {}
   async sendData() {}
+  async close() {}
 }
 
 describe("ice", () => {
