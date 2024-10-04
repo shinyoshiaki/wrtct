@@ -105,7 +105,6 @@ describe("bundle_max_bundle", () => {
         peer.on("notification", (e) => {
           if (e.method === "candidate") {
             if (pc.signalingState === "closed") return;
-            console.log(e.data);
             pc.addIceCandidate(e.data!);
           }
         });
