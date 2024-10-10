@@ -1,5 +1,5 @@
 export { randomPort } from "../../common/src";
-
+export * from "./stun/protocol";
 export * from "./turn/protocol";
 export * from "./candidate";
 export * from "./ice";

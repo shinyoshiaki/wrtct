@@ -1,10 +1,10 @@
 import os from "os";
 import * as nodeIp from "ip";
 import type { InterfaceAddresses } from "../../common/src/network";
+import { classes, methods } from "./stun/const";
+import { Message } from "./stun/message";
 import { StunProtocol } from "./stun/protocol";
 import type { Address } from "./types/model";
-import { Message } from "./stun/message";
-import { classes, methods } from "./stun/const";
 
 export async function getGlobalIp(
   stunServer?: Address,
