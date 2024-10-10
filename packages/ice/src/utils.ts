@@ -1,35 +1,26 @@
 import os from "os";
 import * as nodeIp from "ip";
 import type { InterfaceAddresses } from "../../common/src/network";
-import { Connection, serverReflexiveCandidate } from "./ice";
 import { StunProtocol } from "./stun/protocol";
 import type { Address } from "./types/model";
+import { Message } from "./stun/message";
+import { classes, methods } from "./stun/const";
 
 export async function getGlobalIp(
   stunServer?: Address,
   interfaceAddresses?: InterfaceAddresses,
 ) {
-  const connection = new Connection(true, {
-    stunServer: stunServer ?? ["stun.l.google.com", 19302],
-  });
-  await connection.gatherCandidates();
-
-  const protocol = new StunProtocol(connection);
-  protocol.localCandidate = connection.localCandidates[0];
+  const protocol = new StunProtocol();
   await protocol.connectionMade(true, undefined, interfaceAddresses);
-  const candidate = await serverReflexiveCandidate(protocol, [
-    "stun.l.google.com",
-    19302,
-  ]);
-
-  await connection.close();
+  const request = new Message(methods.BINDING, classes.REQUEST);
+  const [response] = await protocol.request(
+    request,
+    stunServer ?? ["stun.l.google.com", 19302],
+  );
   await protocol.close();
 
-  if (!candidate?.host) {
-    throw new Error("host not exist");
-  }
-
-  return candidate?.host;
+  const address = response.getAttributeValue("XOR-MAPPED-ADDRESS");
+  return address[0];
 }
 
 export function normalizeFamilyNodeV18(family: string | number): 4 | 6 {

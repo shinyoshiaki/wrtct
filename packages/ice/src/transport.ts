@@ -1,6 +1,7 @@
 import { type Socket, type SocketType, createSocket } from "dgram";
 import debug from "debug";
 
+import { type Socket as TcpSocket, connect } from "net";
 import {
   type InterfaceAddresses,
   findPort,
@@ -8,7 +9,6 @@ import {
 } from "../../common/src";
 import type { Address } from "./types/model";
 import { normalizeFamilyNodeV18 } from "./utils";
-import { connect, type Socket as TcpSocket } from "net";
 
 const log = debug("werift-ice:packages/ice/src/transport.ts");
 

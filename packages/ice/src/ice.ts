@@ -1122,9 +1122,11 @@ export async function serverReflexiveCandidate(
     const [response] = await protocol.request(request, stunServer);
 
     const localCandidate = protocol.localCandidate;
-    if (!localCandidate) throw new Error("not exist");
+    if (!localCandidate) {
+      throw new Error("not exist");
+    }
 
-    return new Candidate(
+    const candidate = new Candidate(
       candidateFoundation("srflx", "udp", localCandidate.host),
       localCandidate.component,
       localCandidate.transport,
@@ -1135,6 +1137,7 @@ export async function serverReflexiveCandidate(
       localCandidate.host,
       localCandidate.port,
     );
+    return candidate;
   } catch (error) {
     // todo fix
     log("error serverReflexiveCandidate", error);

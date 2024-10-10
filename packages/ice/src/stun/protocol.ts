@@ -26,7 +26,7 @@ export class StunProtocol implements Protocol {
 
   private readonly closed = new Event();
 
-  constructor(public receiver: Connection) {}
+  constructor(public receiver?: Connection) {}
 
   connectionLost() {
     this.closed.execute();
@@ -57,11 +57,11 @@ export class StunProtocol implements Protocol {
 
   private datagramReceived(data: Buffer, addr: Address) {
     try {
-      if (!this.localCandidate) throw new Error("not exist");
-
       const message = parseMessage(data);
       if (!message) {
-        this.receiver.dataReceived(data, this.localCandidate.component);
+        if (this.localCandidate) {
+          this.receiver?.dataReceived?.(data, this.localCandidate.component);
+        }
         return;
       }
       // log("parseMessage", addr, message);
@@ -73,7 +73,7 @@ export class StunProtocol implements Protocol {
         const transaction = this.transactions[message.transactionIdHex];
         transaction.responseReceived(message, addr);
       } else if (message.messageClass === classes.REQUEST) {
-        this.receiver.requestReceived(message, addr, this, data);
+        this.receiver?.requestReceived?.(message, addr, this, data);
       }
     } catch (error) {
       log("datagramReceived error", error);
