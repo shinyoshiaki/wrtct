@@ -20,7 +20,7 @@ export async function getGlobalIp(
   await protocol.close();
 
   const address = response.getAttributeValue("XOR-MAPPED-ADDRESS");
-  return address[0];
+  return address[0] as string;
 }
 
 export function normalizeFamilyNodeV18(family: string | number): 4 | 6 {
