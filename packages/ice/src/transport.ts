@@ -14,7 +14,7 @@ const log = debug("werift-ice:packages/ice/src/transport.ts");
 
 export class UdpTransport implements Transport {
   readonly type = "udp";
-  private socket: Socket;
+  readonly socket: Socket;
   onData: (data: Buffer, addr: Address) => void = () => {};
 
   private constructor(
