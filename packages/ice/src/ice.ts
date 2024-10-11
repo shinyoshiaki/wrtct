@@ -67,7 +67,10 @@ export class Connection {
       ...options,
     };
     const { stunServer, turnServer, useIpv4, useIpv6 } = this.options;
-    this.stunServer = validateAddress(stunServer);
+    this.stunServer = validateAddress(stunServer) ?? [
+      "stun.l.google.com",
+      19302,
+    ];
     this.turnServer = validateAddress(turnServer);
     this.useIpv4 = useIpv4;
     this.useIpv6 = useIpv6;
@@ -193,6 +196,7 @@ export class Connection {
           log("query STUN server", error);
         }),
       );
+
       candidatePromises.push(...stunPromises);
     }
 
