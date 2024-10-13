@@ -1,7 +1,12 @@
 import { setTimeout } from "timers/promises";
 
-import { Candidate } from "../../src/candidate";
-import { CandidatePair, CandidatePairState, Connection } from "../../src/ice";
+import { Candidate, candidatePriority } from "../../src/candidate";
+import {
+  CandidatePair,
+  CandidatePairState,
+  Connection,
+  sortCandidatePairs,
+} from "../../src/ice";
 import { classes, methods } from "../../src/stun/const";
 import { Message } from "../../src/stun/message";
 import type { Address, Protocol } from "../../src/types/model";
@@ -611,5 +616,41 @@ describe("ice", () => {
 
     await a.close();
     await b.close();
+  });
+});
+
+describe("sortCandidatePairs", () => {
+  it("controlling", () => {
+    const host = {
+      type: "host",
+      localCandidate: { priority: candidatePriority("host") },
+      remoteCandidate: { priority: candidatePriority("host") },
+    };
+
+    const relay = {
+      type: "relay",
+      localCandidate: { priority: candidatePriority("relay") },
+      remoteCandidate: { priority: candidatePriority("relay") },
+    };
+
+    const res = sortCandidatePairs([host, relay], true);
+    expect(res).toEqual([host, relay]);
+  });
+
+  it("controlled", () => {
+    const host = {
+      type: "host",
+      localCandidate: { priority: candidatePriority("host") },
+      remoteCandidate: { priority: candidatePriority("host") },
+    };
+
+    const relay = {
+      type: "relay",
+      localCandidate: { priority: candidatePriority("relay") },
+      remoteCandidate: { priority: candidatePriority("relay") },
+    };
+
+    const res = sortCandidatePairs([host, relay], true);
+    expect(res).toEqual([host, relay]);
   });
 });
