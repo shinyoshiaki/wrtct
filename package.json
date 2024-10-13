@@ -52,7 +52,7 @@
     "typescript": "5.5.4",
     "vitest": "2.0.5"
   },
-  "packageManager": "npm@10.8.1",
+  "packageManager": "npm@10.9.0",
   "engines": {
     "node": ">=18"
   },
