@@ -213,8 +213,27 @@ export class Connection {
           {
             portRange: this.options.portRange,
             interfaceAddresses: this.options.interfaceAddresses,
+            transport: this.options.turnTransport === "tcp" ? "tcp" : "udp",
           },
-        );
+        ).catch(async (e) => {
+          if (this.options.turnTransport !== "tcp") {
+            return await createStunOverTurnClient(
+              {
+                address: turnServer,
+                username: turnUsername,
+                password: turnPassword,
+                ice: this,
+              },
+              {
+                portRange: this.options.portRange,
+                interfaceAddresses: this.options.interfaceAddresses,
+                transport: "tcp",
+              },
+            );
+          } else {
+            throw e;
+          }
+        });
         this.protocols.push(protocol);
 
         const candidateAddress = protocol.turn.relayedAddress;
@@ -1051,8 +1070,7 @@ export interface IceOptions {
   turnServer?: Address;
   turnUsername?: string;
   turnPassword?: string;
-  turnSsl?: boolean;
-  turnTransport?: string;
+  turnTransport?: "udp" | "tcp";
   forceTurn?: boolean;
   useIpv4: boolean;
   useIpv6: boolean;

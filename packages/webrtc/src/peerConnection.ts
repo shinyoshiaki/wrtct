@@ -495,6 +495,7 @@ export class RTCPeerConnection extends EventTarget {
       filterCandidatePair: this.config.iceFilterCandidatePair,
       useIpv4: this.config.iceUseIpv4,
       useIpv6: this.config.iceUseIpv6,
+      turnTransport: this.config.forceTurnTCP === true ? "tcp" : "udp",
     });
     if (existing) {
       iceGatherer.connection.localUserName = existing.connection.localUserName;
@@ -1661,6 +1662,7 @@ export interface PeerConfig {
   iceAdditionalHostAddresses: string[] | undefined;
   iceUseIpv4: boolean;
   iceUseIpv6: boolean;
+  forceTurnTCP: boolean;
   /** If provided, is called on each STUN request.
    * Return `true` if a STUN response should be sent, false if it should be skipped. */
   iceFilterStunResponse:
@@ -1741,6 +1743,7 @@ export const defaultPeerConfig: PeerConfig = {
   bundlePolicy: "max-compat",
   debug: {},
   midSuffix: false,
+  forceTurnTCP: false,
 };
 
 export interface RTCTrackEvent {
