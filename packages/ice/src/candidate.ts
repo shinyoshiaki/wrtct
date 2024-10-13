@@ -108,11 +108,8 @@ export function candidateFoundation(
 }
 
 // priorityを決める
-export function candidatePriority(
-  candidateComponent: number,
-  candidateType: string,
-  localPref = 65535,
-) {
+export function candidatePriority(candidateType: string, localPref = 65535) {
+  const candidateComponent: number = 1;
   // See RFC 5245 - 4.1.2.1. Recommended Formula
   let typePref = 0;
   if (candidateType === "host") {

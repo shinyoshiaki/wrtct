@@ -154,7 +154,7 @@ export class Connection {
           candidateFoundation("host", "udp", candidateAddress[0]),
           1,
           "udp",
-          candidatePriority(1, "host"),
+          candidatePriority("host"),
           candidateAddress[0],
           candidateAddress[1],
           "host",
@@ -226,7 +226,7 @@ export class Connection {
           candidateFoundation("relay", "udp", candidateAddress[0]),
           1,
           "udp",
-          candidatePriority(1, "relay"),
+          candidatePriority("relay"),
           candidateAddress[0],
           candidateAddress[1],
           "relay",
@@ -955,7 +955,7 @@ export class Connection {
     const request = new Message(methods.BINDING, classes.REQUEST);
     request
       .setAttribute("USERNAME", txUsername)
-      .setAttribute("PRIORITY", candidatePriority(pair.component, "prflx"));
+      .setAttribute("PRIORITY", candidatePriority("prflx"));
     if (this.iceControlling) {
       request.setAttribute("ICE-CONTROLLING", this._tieBreaker);
       if (nominate) {
@@ -1015,8 +1015,9 @@ export class CandidatePair {
   }
 
   get localCandidate() {
-    if (!this.protocol.localCandidate)
+    if (!this.protocol.localCandidate) {
       throw new Error("localCandidate not exist");
+    }
     return this.protocol.localCandidate;
   }
 
@@ -1083,28 +1084,33 @@ export function validateRemoteCandidate(candidate: Candidate) {
 }
 
 export function sortCandidatePairs(
-  pairs: CandidatePair[],
+  pairs: {
+    localCandidate: Pick<Candidate, "priority">;
+    remoteCandidate: Pick<Candidate, "priority">;
+  }[],
   iceControlling: boolean,
 ) {
-  pairs.sort(
-    (a, b) =>
-      candidatePairPriority(
-        a.localCandidate,
-        a.remoteCandidate,
-        iceControlling,
-      ) -
-      candidatePairPriority(
-        b.localCandidate,
-        b.remoteCandidate,
-        iceControlling,
-      ),
-  );
+  return pairs
+    .sort(
+      (a, b) =>
+        candidatePairPriority(
+          a.localCandidate,
+          a.remoteCandidate,
+          iceControlling,
+        ) -
+        candidatePairPriority(
+          b.localCandidate,
+          b.remoteCandidate,
+          iceControlling,
+        ),
+    )
+    .reverse();
 }
 
 // 5.7.2.  Computing Pair Priority and Ordering Pairs
 export function candidatePairPriority(
-  local: Candidate,
-  remote: Candidate,
+  local: Pick<Candidate, "priority">,
+  remote: Pick<Candidate, "priority">,
   iceControlling: boolean,
 ) {
   const G = (iceControlling && local.priority) || remote.priority;
@@ -1134,7 +1140,7 @@ export async function serverReflexiveCandidate(
       candidateFoundation("srflx", "udp", localCandidate.host),
       localCandidate.component,
       localCandidate.transport,
-      candidatePriority(localCandidate.component, "srflx"),
+      candidatePriority("srflx"),
       response.getAttributeValue("XOR-MAPPED-ADDRESS")[0],
       response.getAttributeValue("XOR-MAPPED-ADDRESS")[1],
       "srflx",
