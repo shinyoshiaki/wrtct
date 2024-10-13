@@ -23,9 +23,9 @@ Figure 2: Example for round-trip time computation
 import { randomBytes } from "crypto";
 import { jspack } from "@shinyoshiaki/jspack";
 import debug from "debug";
-import Event from "rx.mini";
 import { setTimeout } from "timers/promises";
 import * as uuid from "uuid";
+import { Event } from "../imports/common";
 
 import { codecParametersFromString } from "..";
 import { random16, uint16Add, uint32Add } from "../../../common/src";

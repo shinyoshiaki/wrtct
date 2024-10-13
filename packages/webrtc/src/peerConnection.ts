@@ -1,8 +1,8 @@
 import debug from "debug";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
-import Event from "rx.mini";
 import * as uuid from "uuid";
+import { Event } from "./imports/common";
 
 import {
   type Address,

@@ -1,4 +1,4 @@
-import Event from "rx.mini";
+import { Event } from "../../imports/common";
 
 import type { TransportWideCC } from "../../../../rtp/src";
 import { Int } from "../../../../rtp/src/helper";

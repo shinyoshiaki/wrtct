@@ -1,6 +1,6 @@
 import debug from "debug";
-import Event from "rx.mini";
 import { v4 } from "uuid";
+import { Event } from "../imports/common";
 
 import { Candidate, Connection, type IceOptions } from "../../../ice/src";
 import { candidateFromSdp, candidateToSdp } from "../sdp";

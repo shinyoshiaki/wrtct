@@ -1,6 +1,6 @@
 import debug from "debug";
 import range from "lodash/range";
-import Event from "rx.mini";
+import { Event } from "../../imports/common";
 
 import { uint16Add } from "../../../../common/src";
 import {

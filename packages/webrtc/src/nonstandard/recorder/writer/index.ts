@@ -1,7 +1,7 @@
-import type { Event } from "rx.mini";
 import type { MediaRecorderOptions } from "..";
 import type { MediaStreamTrack } from "../../..";
 import type { WebmOutput } from "../../../../../rtp/src/extra";
+import type { Event } from "../../../imports/common";
 
 export abstract class MediaWriter {
   constructor(

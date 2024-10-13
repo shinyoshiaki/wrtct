@@ -2,8 +2,8 @@ import { createHash } from "crypto";
 import { jspack } from "@shinyoshiaki/jspack";
 import debug from "debug";
 import PCancelable from "p-cancelable";
-import Event, { EventDisposer } from "rx.mini";
 import { setTimeout } from "timers/promises";
+import { Event, EventDisposer } from "../imports/common";
 
 import { bufferReader, int } from "../../../common/src";
 import type { InterfaceAddresses } from "../../../common/src/network";

@@ -6,8 +6,8 @@ import { Uint64BE } from "int64-buffer";
 
 import isEqual from "lodash/isEqual";
 import PCancelable from "p-cancelable";
-import { Event } from "rx.mini";
 import timers from "timers/promises";
+import { Event } from "./imports/common";
 
 import type { InterfaceAddresses } from "../../common/src/network";
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";

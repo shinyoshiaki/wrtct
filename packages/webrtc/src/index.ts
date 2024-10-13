@@ -1,4 +1,3 @@
-export * from "rx.mini";
 export * from "../../common/src";
 export * from "../../dtls/src/cipher/const";
 export * from "../../ice/src";

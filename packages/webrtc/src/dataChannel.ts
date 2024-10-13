@@ -1,5 +1,5 @@
 import debug from "debug";
-import { Event } from "rx.mini";
+import { Event } from "./imports/common";
 
 import { EventTarget } from "./helper";
 import type { RTCSctpTransport } from "./transport/sctp";

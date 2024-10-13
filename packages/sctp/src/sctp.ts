@@ -2,7 +2,7 @@ import { createHmac, randomBytes } from "crypto";
 import { jspack } from "@shinyoshiaki/jspack";
 import debug from "debug";
 import range from "lodash/range";
-import { Event } from "rx.mini";
+import { Event } from "./imports/common";
 
 import {
   random32,

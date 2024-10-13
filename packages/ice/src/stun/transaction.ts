@@ -1,5 +1,5 @@
 import debug from "debug";
-import { Event } from "rx.mini";
+import { Event } from "../imports/common";
 
 import { TransactionFailed, TransactionTimeout } from "../exceptions";
 import type { Address, Protocol } from "../types/model";
