@@ -1,4 +1,4 @@
-import Event from "rx.mini";
+import { Event } from "../../../imports/common";
 
 import * as MP4 from "./mp4box";
 

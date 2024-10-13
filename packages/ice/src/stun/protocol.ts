@@ -1,5 +1,5 @@
 import debug from "debug";
-import { Event } from "rx.mini";
+import { Event } from "../imports/common";
 
 import type { InterfaceAddresses } from "../../../common/src/network";
 import type { Candidate } from "../candidate";

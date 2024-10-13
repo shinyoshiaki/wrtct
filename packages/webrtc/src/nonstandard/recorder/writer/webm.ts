@@ -1,5 +1,5 @@
 import { unlink } from "fs/promises";
-import { EventDisposer } from "rx.mini";
+import { EventDisposer } from "../../../imports/common";
 
 import { MediaWriter } from ".";
 import { type MediaStreamTrack, WeriftError } from "../../..";

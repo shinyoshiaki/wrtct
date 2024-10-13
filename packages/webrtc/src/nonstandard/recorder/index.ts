@@ -1,4 +1,4 @@
-import Event from "rx.mini";
+import { Event } from "../../imports/common";
 import type { MediaStreamTrack } from "../../media/track";
 import type { MediaWriter, StreamEvent } from "./writer";
 import { WebmFactory } from "./writer/webm";

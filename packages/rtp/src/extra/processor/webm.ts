@@ -1,4 +1,4 @@
-import Event from "rx.mini";
+import { Event } from "../../imports/common";
 
 import {
   WEBMContainer,

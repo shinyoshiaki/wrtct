@@ -1,5 +1,5 @@
-import Event from "rx.mini";
 import { v4 } from "uuid";
+import { Event } from "../imports/common";
 
 import { type RtcpPacket, type RtpHeader, RtpPacket } from "../../../rtp/src";
 import { EventTarget } from "../helper";
