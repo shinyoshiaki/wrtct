@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+Pull requests are always welcome.
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
