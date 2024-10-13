@@ -38,7 +38,7 @@
     "upgrade-interactive": "npx npm-check-updates -i"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.3",
+    "@biomejs/biome": "1.9.3",
     "@types/node": "^20.10.6",
     "knip": "^3.9.0",
     "node-actionlint": "^1.2.2",

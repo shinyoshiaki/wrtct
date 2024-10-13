@@ -79,6 +79,12 @@ ms
 
 ***
 
+### forceTurnTCP
+
+> **forceTurnTCP**: `boolean`
+
+***
+
 ### headerExtensions
 
 > **headerExtensions**: `Partial`\<`object`\>

@@ -82,15 +82,9 @@
 
 ***
 
-### turnSsl?
-
-> `optional` **turnSsl**: `boolean`
-
-***
-
 ### turnTransport?
 
-> `optional` **turnTransport**: `string`
+> `optional` **turnTransport**: `"tcp"` \| `"udp"`
 
 ***
 
