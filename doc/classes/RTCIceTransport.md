@@ -1,43 +1,20 @@
-[werift](../README.md) / [Exports](../modules.md) / RTCIceTransport
+[**werift**](../README.md) • **Docs**
+
+***
+
+[werift](../globals.md) / RTCIceTransport
 
 # Class: RTCIceTransport
 
-## Table of contents
-
-### Constructors
-
-- [constructor](RTCIceTransport.md#constructor)
-
-### Properties
-
-- [connection](RTCIceTransport.md#connection)
-- [id](RTCIceTransport.md#id)
-- [onStateChange](RTCIceTransport.md#onstatechange)
-- [state](RTCIceTransport.md#state)
-
-### Accessors
-
-- [iceGather](RTCIceTransport.md#icegather)
-- [role](RTCIceTransport.md#role)
-
-### Methods
-
-- [addRemoteCandidate](RTCIceTransport.md#addremotecandidate)
-- [setRemoteParams](RTCIceTransport.md#setremoteparams)
-- [start](RTCIceTransport.md#start)
-- [stop](RTCIceTransport.md#stop)
-
 ## Constructors
 
-### constructor
+### new RTCIceTransport()
 
-• **new RTCIceTransport**(`gather`): [`RTCIceTransport`](RTCIceTransport.md)
+> **new RTCIceTransport**(`gather`): [`RTCIceTransport`](RTCIceTransport.md)
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `gather` | [`RTCIceGatherer`](RTCIceGatherer.md) |
+• **gather**: [`RTCIceGatherer`](RTCIceGatherer.md)
 
 #### Returns
 
@@ -47,93 +24,89 @@
 
 ### connection
 
-• **connection**: [`Connection`](Connection.md)
+> **connection**: [`Connection`](Connection.md)
 
-___
+***
 
 ### id
 
-• `Readonly` **id**: `string`
+> `readonly` **id**: `string`
 
-___
+***
 
 ### onStateChange
 
-• `Readonly` **onStateChange**: `Event`\<[``"disconnected"`` \| ``"closed"`` \| ``"completed"`` \| ``"new"`` \| ``"connected"`` \| ``"failed"`` \| ``"checking"``]\>
+> `readonly` **onStateChange**: [`Event`](Event.md)\<[`"disconnected"` \| `"closed"` \| `"completed"` \| `"new"` \| `"connected"` \| `"failed"` \| `"checking"`]\>
 
-___
+***
 
 ### state
 
-• **state**: ``"disconnected"`` \| ``"closed"`` \| ``"completed"`` \| ``"new"`` \| ``"connected"`` \| ``"failed"`` \| ``"checking"`` = `"new"`
+> **state**: `"disconnected"` \| `"closed"` \| `"completed"` \| `"new"` \| `"connected"` \| `"failed"` \| `"checking"` = `"new"`
 
 ## Accessors
 
 ### iceGather
 
-• `get` **iceGather**(): [`RTCIceGatherer`](RTCIceGatherer.md)
+> `get` **iceGather**(): [`RTCIceGatherer`](RTCIceGatherer.md)
 
 #### Returns
 
 [`RTCIceGatherer`](RTCIceGatherer.md)
 
-___
+***
 
 ### role
 
-• `get` **role**(): ``"controlling"`` \| ``"controlled"``
+> `get` **role**(): `"controlling"` \| `"controlled"`
 
 #### Returns
 
-``"controlling"`` \| ``"controlled"``
+`"controlling"` \| `"controlled"`
 
 ## Methods
 
-### addRemoteCandidate
+### addRemoteCandidate()
 
-▸ **addRemoteCandidate**(`candidate?`): `undefined` \| `Promise`\<`void`\>
+> **addRemoteCandidate**(`candidate`?): `undefined` \| `Promise`\<`void`\>
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `candidate?` | [`IceCandidate`](IceCandidate.md) |
+• **candidate?**: [`IceCandidate`](IceCandidate.md)
 
 #### Returns
 
 `undefined` \| `Promise`\<`void`\>
 
-___
+***
 
-### setRemoteParams
+### setRemoteParams()
 
-▸ **setRemoteParams**(`remoteParameters`): `void`
+> **setRemoteParams**(`remoteParameters`): `void`
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `remoteParameters` | [`RTCIceParameters`](RTCIceParameters.md) |
+• **remoteParameters**: [`RTCIceParameters`](RTCIceParameters.md)
 
 #### Returns
 
 `void`
 
-___
+***
 
-### start
+### start()
 
-▸ **start**(): `Promise`\<`void`\>
+> **start**(): `Promise`\<`void`\>
 
 #### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### stop
+### stop()
 
-▸ **stop**(): `Promise`\<`void`\>
+> **stop**(): `Promise`\<`void`\>
 
 #### Returns
 

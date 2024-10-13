@@ -1,69 +1,22 @@
-[werift](../README.md) / [Exports](../modules.md) / Connection
+[**werift**](../README.md) • **Docs**
+
+***
+
+[werift](../globals.md) / Connection
 
 # Class: Connection
 
-## Table of contents
-
-### Constructors
-
-- [constructor](Connection.md#constructor)
-
-### Properties
-
-- [\_components](Connection.md#_components)
-- [\_localCandidatesEnd](Connection.md#_localcandidatesend)
-- [\_tieBreaker](Connection.md#_tiebreaker)
-- [checkList](Connection.md#checklist)
-- [dnsLookup](Connection.md#dnslookup)
-- [iceControlling](Connection.md#icecontrolling)
-- [localCandidates](Connection.md#localcandidates)
-- [localPassword](Connection.md#localpassword)
-- [localUserName](Connection.md#localusername)
-- [onData](Connection.md#ondata)
-- [options](Connection.md#options)
-- [remoteCandidatesEnd](Connection.md#remotecandidatesend)
-- [remoteIsLite](Connection.md#remoteislite)
-- [remotePassword](Connection.md#remotepassword)
-- [remoteUsername](Connection.md#remoteusername)
-- [state](Connection.md#state)
-- [stateChanged](Connection.md#statechanged)
-- [stunServer](Connection.md#stunserver)
-- [turnServer](Connection.md#turnserver)
-- [useIpv4](Connection.md#useipv4)
-- [useIpv6](Connection.md#useipv6)
-
-### Accessors
-
-- [nominatedKeys](Connection.md#nominatedkeys)
-- [remoteCandidates](Connection.md#remotecandidates)
-
-### Methods
-
-- [addRemoteCandidate](Connection.md#addremotecandidate)
-- [checkIncoming](Connection.md#checkincoming)
-- [checkStart](Connection.md#checkstart)
-- [close](Connection.md#close)
-- [connect](Connection.md#connect)
-- [dataReceived](Connection.md#datareceived)
-- [gatherCandidates](Connection.md#gathercandidates)
-- [getDefaultCandidate](Connection.md#getdefaultcandidate)
-- [requestReceived](Connection.md#requestreceived)
-- [resetNominatedPair](Connection.md#resetnominatedpair)
-- [send](Connection.md#send)
-- [setRemoteParams](Connection.md#setremoteparams)
-
 ## Constructors
 
-### constructor
+### new Connection()
 
-• **new Connection**(`iceControlling`, `options?`): [`Connection`](Connection.md)
+> **new Connection**(`iceControlling`, `options`?): [`Connection`](Connection.md)
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `iceControlling` | `boolean` |
-| `options?` | `Partial`\<[`IceOptions`](../interfaces/IceOptions.md)\> |
+• **iceControlling**: `boolean`
+
+• **options?**: `Partial`\<[`IceOptions`](../interfaces/IceOptions.md)\>
 
 #### Returns
 
@@ -71,345 +24,317 @@
 
 ## Properties
 
-### \_components
-
-• **\_components**: `Set`\<`number`\>
-
-コンポーネントはデータストリームの一部です. データストリームには複数のコンポーネントが必要な場合があり、
-データストリーム全体が機能するには、それぞれが機能する必要があります.
- RTP / RTCPデータストリームの場合、RTPとRTCPが同じポートで多重化されていない限り、データストリームごとに2つのコンポーネントがあります.
-1つはRTP用、もう1つはRTCP用です. コンポーネントには候補ペアがあり、他のコンポーネントでは使用できません.
-
-___
-
 ### \_localCandidatesEnd
 
-• **\_localCandidatesEnd**: `boolean` = `false`
+> **\_localCandidatesEnd**: `boolean` = `false`
 
-___
+***
 
 ### \_tieBreaker
 
-• **\_tieBreaker**: `BigInt`
+> **\_tieBreaker**: `bigint`
 
-___
+***
 
 ### checkList
 
-• **checkList**: [`CandidatePair`](CandidatePair.md)[] = `[]`
+> **checkList**: [`CandidatePair`](CandidatePair.md)[] = `[]`
 
-___
-
-### dnsLookup
-
-• `Optional` **dnsLookup**: `DnsLookup`
-
-___
+***
 
 ### iceControlling
 
-• **iceControlling**: `boolean`
+> **iceControlling**: `boolean`
 
-___
+***
 
 ### localCandidates
 
-• **localCandidates**: [`Candidate`](Candidate.md)[] = `[]`
+> **localCandidates**: [`Candidate`](Candidate.md)[] = `[]`
 
-___
+***
 
 ### localPassword
 
-• **localPassword**: `string`
+> **localPassword**: `string`
 
-___
+***
 
 ### localUserName
 
-• **localUserName**: `string`
+> **localUserName**: `string`
 
-___
+***
+
+### lookup?
+
+> `optional` **lookup**: `MdnsLookup`
+
+***
+
+### nominated?
+
+> `optional` **nominated**: [`CandidatePair`](CandidatePair.md)
+
+***
 
 ### onData
 
-• `Readonly` **onData**: `Event`\<[`Buffer`, `number`]\>
+> `readonly` **onData**: [`Event`](Event.md)\<[`Buffer`, `number`]\>
 
-___
+***
 
 ### options
 
-• **options**: [`IceOptions`](../interfaces/IceOptions.md)
+> **options**: [`IceOptions`](../interfaces/IceOptions.md)
 
-___
+***
 
 ### remoteCandidatesEnd
 
-• **remoteCandidatesEnd**: `boolean` = `false`
+> **remoteCandidatesEnd**: `boolean` = `false`
 
-___
+***
 
 ### remoteIsLite
 
-• **remoteIsLite**: `boolean` = `false`
+> **remoteIsLite**: `boolean` = `false`
 
-___
+***
 
 ### remotePassword
 
-• **remotePassword**: `string` = `""`
+> **remotePassword**: `string` = `""`
 
-___
+***
 
 ### remoteUsername
 
-• **remoteUsername**: `string` = `""`
+> **remoteUsername**: `string` = `""`
 
-___
+***
+
+### restarted
+
+> **restarted**: `boolean` = `false`
+
+***
 
 ### state
 
-• **state**: `IceState` = `"new"`
+> **state**: `IceState` = `"new"`
 
-___
+***
 
 ### stateChanged
 
-• `Readonly` **stateChanged**: `Event`\<[`IceState`]\>
+> `readonly` **stateChanged**: [`Event`](Event.md)\<[`IceState`]\>
 
-___
+***
 
-### stunServer
+### stunServer?
 
-• `Optional` **stunServer**: readonly [`string`, `number`]
+> `optional` **stunServer**: readonly [`string`, `number`]
 
-___
+***
 
-### turnServer
+### turnServer?
 
-• `Optional` **turnServer**: readonly [`string`, `number`]
+> `optional` **turnServer**: readonly [`string`, `number`]
 
-___
+***
 
 ### useIpv4
 
-• **useIpv4**: `boolean`
+> **useIpv4**: `boolean`
 
-___
+***
 
 ### useIpv6
 
-• **useIpv6**: `boolean`
+> **useIpv6**: `boolean`
 
 ## Accessors
 
-### nominatedKeys
-
-• `get` **nominatedKeys**(): `string`[]
-
-#### Returns
-
-`string`[]
-
-___
-
 ### remoteCandidates
 
-• `get` **remoteCandidates**(): [`Candidate`](Candidate.md)[]
+> `get` **remoteCandidates**(): [`Candidate`](Candidate.md)[]
+
+> `set` **remoteCandidates**(`value`): `void`
+
+#### Parameters
+
+• **value**: [`Candidate`](Candidate.md)[]
 
 #### Returns
 
 [`Candidate`](Candidate.md)[]
 
-• `set` **remoteCandidates**(`value`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `value` | [`Candidate`](Candidate.md)[] |
-
-#### Returns
-
-`void`
-
 ## Methods
 
-### addRemoteCandidate
+### addRemoteCandidate()
 
-▸ **addRemoteCandidate**(`remoteCandidate`): `Promise`\<`void`\>
+> **addRemoteCandidate**(`remoteCandidate`): `Promise`\<`void`\>
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `remoteCandidate` | `undefined` \| [`Candidate`](Candidate.md) |
+• **remoteCandidate**: `undefined` \| [`Candidate`](Candidate.md)
 
 #### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### checkIncoming
+### checkIncoming()
 
-▸ **checkIncoming**(`message`, `addr`, `protocol`): `void`
+> **checkIncoming**(`message`, `addr`, `protocol`): `void`
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `Message` |
-| `addr` | readonly [`string`, `number`] |
-| `protocol` | [`Protocol`](../interfaces/Protocol.md) |
+• **message**: [`Message`](Message.md)
+
+• **addr**: readonly [`string`, `number`]
+
+• **protocol**: [`Protocol`](../interfaces/Protocol.md)
 
 #### Returns
 
 `void`
 
-___
+***
 
-### checkStart
+### checkStart()
 
-▸ **checkStart**(`pair`): `PCancelable`\<`unknown`\>
+> **checkStart**(`pair`): `PCancelable`\<`unknown`\>
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `pair` | [`CandidatePair`](CandidatePair.md) |
+• **pair**: [`CandidatePair`](CandidatePair.md)
 
 #### Returns
 
 `PCancelable`\<`unknown`\>
 
-___
+***
 
-### close
+### close()
 
-▸ **close**(): `Promise`\<`void`\>
-
-#### Returns
-
-`Promise`\<`void`\>
-
-___
-
-### connect
-
-▸ **connect**(): `Promise`\<`void`\>
+> **close**(): `Promise`\<`void`\>
 
 #### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### dataReceived
+### connect()
 
-▸ **dataReceived**(`data`, `component`): `void`
+> **connect**(): `Promise`\<`void`\>
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### dataReceived()
+
+> **dataReceived**(`data`, `component`): `void`
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `data` | `Buffer` |
-| `component` | `number` |
+• **data**: `Buffer`
+
+• **component**: `number`
 
 #### Returns
 
 `void`
 
-___
+***
 
-### gatherCandidates
+### gatherCandidates()
 
-▸ **gatherCandidates**(`cb?`): `Promise`\<`void`\>
+> **gatherCandidates**(`cb`?): `Promise`\<`void`\>
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `cb?` | (`candidate`: [`Candidate`](Candidate.md)) => `void` |
+• **cb?**
 
 #### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### getDefaultCandidate
+### getDefaultCandidate()
 
-▸ **getDefaultCandidate**(`component`): `undefined` \| [`Candidate`](Candidate.md)
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `component` | `number` |
+> **getDefaultCandidate**(): [`Candidate`](Candidate.md)
 
 #### Returns
 
-`undefined` \| [`Candidate`](Candidate.md)
+[`Candidate`](Candidate.md)
 
-___
+***
 
-### requestReceived
+### requestReceived()
 
-▸ **requestReceived**(`message`, `addr`, `protocol`, `rawData`): `void`
+> **requestReceived**(`message`, `addr`, `protocol`, `rawData`): `void`
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `Message` |
-| `addr` | readonly [`string`, `number`] |
-| `protocol` | [`Protocol`](../interfaces/Protocol.md) |
-| `rawData` | `Buffer` |
+• **message**: [`Message`](Message.md)
+
+• **addr**: readonly [`string`, `number`]
+
+• **protocol**: [`Protocol`](../interfaces/Protocol.md)
+
+• **rawData**: `Buffer`
 
 #### Returns
 
 `void`
 
-___
+***
 
-### resetNominatedPair
+### resetNominatedPair()
 
-▸ **resetNominatedPair**(): `void`
+> **resetNominatedPair**(): `void`
 
 #### Returns
 
 `void`
 
-___
+***
 
-### send
+### send()
 
-▸ **send**(`data`): `Promise`\<`void`\>
+> **send**(`data`): `Promise`\<`void`\>
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `data` | `Buffer` |
+• **data**: `Buffer`
 
 #### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### setRemoteParams
+### setRemoteParams()
 
-▸ **setRemoteParams**(`«destructured»`): `void`
+> **setRemoteParams**(`__namedParameters`): `void`
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `«destructured»` | `Object` |
-| › `iceLite` | `boolean` |
-| › `password` | `string` |
-| › `usernameFragment` | `string` |
+• **\_\_namedParameters**
+
+• **\_\_namedParameters.iceLite**: `boolean`
+
+• **\_\_namedParameters.password**: `string`
+
+• **\_\_namedParameters.usernameFragment**: `string`
 
 #### Returns
 

@@ -1,147 +1,113 @@
-[werift](../README.md) / [Exports](../modules.md) / Protocol
+[**werift**](../README.md) • **Docs**
+
+***
+
+[werift](../globals.md) / Protocol
 
 # Interface: Protocol
 
-## Table of contents
-
-### Properties
-
-- [close](Protocol.md#close)
-- [connectionMade](Protocol.md#connectionmade)
-- [localCandidate](Protocol.md#localcandidate)
-- [request](Protocol.md#request)
-- [responseAddr](Protocol.md#responseaddr)
-- [responseMessage](Protocol.md#responsemessage)
-- [sendData](Protocol.md#senddata)
-- [sendStun](Protocol.md#sendstun)
-- [sentMessage](Protocol.md#sentmessage)
-- [type](Protocol.md#type)
-
 ## Properties
 
-### close
+### close()
 
-• `Optional` **close**: () => `Promise`\<`void`\>
+> **close**: () => `Promise`\<`void`\>
 
-#### Type declaration
-
-▸ (): `Promise`\<`void`\>
-
-##### Returns
+#### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### connectionMade
+### connectionMade()
 
-• **connectionMade**: (...`args`: `any`) => `Promise`\<`void`\>
+> **connectionMade**: (...`args`) => `Promise`\<`void`\>
 
-#### Type declaration
+#### Parameters
 
-▸ (`...args`): `Promise`\<`void`\>
+• ...**args**: `any`
 
-##### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `...args` | `any` |
-
-##### Returns
+#### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### localCandidate
+### localCandidate?
 
-• `Optional` **localCandidate**: [`Candidate`](../classes/Candidate.md)
+> `optional` **localCandidate**: [`Candidate`](../classes/Candidate.md)
 
-___
+***
 
-### request
+### request()
 
-• **request**: (`message`: `Message`, `addr`: readonly [`string`, `number`], `integrityKey?`: `Buffer`, `retransmissions?`: `any`) => `Promise`\<[`Message`, readonly [`string`, `number`]]\>
+> **request**: (`message`, `addr`, `integrityKey`?, `retransmissions`?) => `Promise`\<[[`Message`](../classes/Message.md), readonly [`string`, `number`]]\>
 
-#### Type declaration
+#### Parameters
 
-▸ (`message`, `addr`, `integrityKey?`, `retransmissions?`): `Promise`\<[`Message`, readonly [`string`, `number`]]\>
+• **message**: [`Message`](../classes/Message.md)
 
-##### Parameters
+• **addr**: readonly [`string`, `number`]
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `Message` |
-| `addr` | readonly [`string`, `number`] |
-| `integrityKey?` | `Buffer` |
-| `retransmissions?` | `any` |
+• **integrityKey?**: `Buffer`
 
-##### Returns
+• **retransmissions?**: `any`
 
-`Promise`\<[`Message`, readonly [`string`, `number`]]\>
+#### Returns
 
-___
+`Promise`\<[[`Message`](../classes/Message.md), readonly [`string`, `number`]]\>
 
-### responseAddr
+***
 
-• `Optional` **responseAddr**: readonly [`string`, `number`]
+### responseAddr?
 
-___
+> `optional` **responseAddr**: readonly [`string`, `number`]
 
-### responseMessage
+***
 
-• `Optional` **responseMessage**: `string`
+### responseMessage?
 
-___
+> `optional` **responseMessage**: `string`
 
-### sendData
+***
 
-• **sendData**: (`data`: `Buffer`, `addr`: readonly [`string`, `number`]) => `Promise`\<`void`\>
+### sendData()
 
-#### Type declaration
+> **sendData**: (`data`, `addr`) => `Promise`\<`void`\>
 
-▸ (`data`, `addr`): `Promise`\<`void`\>
+#### Parameters
 
-##### Parameters
+• **data**: `Buffer`
 
-| Name | Type |
-| :------ | :------ |
-| `data` | `Buffer` |
-| `addr` | readonly [`string`, `number`] |
+• **addr**: readonly [`string`, `number`]
 
-##### Returns
+#### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### sendStun
+### sendStun()
 
-• **sendStun**: (`message`: `Message`, `addr`: readonly [`string`, `number`]) => `Promise`\<`void`\>
+> **sendStun**: (`message`, `addr`) => `Promise`\<`void`\>
 
-#### Type declaration
+#### Parameters
 
-▸ (`message`, `addr`): `Promise`\<`void`\>
+• **message**: [`Message`](../classes/Message.md)
 
-##### Parameters
+• **addr**: readonly [`string`, `number`]
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `Message` |
-| `addr` | readonly [`string`, `number`] |
-
-##### Returns
+#### Returns
 
 `Promise`\<`void`\>
 
-___
+***
 
-### sentMessage
+### sentMessage?
 
-• `Optional` **sentMessage**: `Message`
+> `optional` **sentMessage**: [`Message`](../classes/Message.md)
 
-___
+***
 
 ### type
 
-• **type**: `string`
+> **type**: `string`
