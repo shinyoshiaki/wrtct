@@ -106,8 +106,12 @@ export class RTCDtlsTransport {
   }
 
   async start() {
-    if (this.state !== "new") throw new Error();
-    if (this.remoteParameters?.fingerprints.length === 0) throw new Error();
+    if (this.state !== "new") {
+      throw new Error("state must be new");
+    }
+    if (this.remoteParameters?.fingerprints.length === 0) {
+      throw new Error("remote fingerprint not exist");
+    }
 
     if (this.role === "auto") {
       if (this.iceTransport.role === "controlling") {
@@ -119,7 +123,7 @@ export class RTCDtlsTransport {
 
     this.setState("connecting");
 
-    await new Promise<void>(async (r) => {
+    await new Promise<void>(async (r, f) => {
       if (this.role === "server") {
         this.dtls = new DtlsServer({
           cert: this.localCertificate?.certPem,
@@ -153,9 +157,10 @@ export class RTCDtlsTransport {
         this.setState("closed");
       });
       this.dtls.onConnect.once(r);
-      this.dtls.onError.subscribe((error) => {
+      this.dtls.onError.once((error) => {
         this.setState("failed");
         log("dtls failed", error);
+        f(error);
       });
 
       if (this.dtls instanceof DtlsClient) {
@@ -163,6 +168,7 @@ export class RTCDtlsTransport {
         this.dtls.connect().catch((error) => {
           this.setState("failed");
           log("dtls connect failed", error);
+          f(error);
         });
       }
     });
