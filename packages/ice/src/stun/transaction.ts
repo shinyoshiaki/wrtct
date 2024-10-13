@@ -39,7 +39,8 @@ export class Transaction {
   run = async () => {
     try {
       this.retry();
-      return await this.onResponse.asPromise();
+      const res = await this.onResponse.asPromise();
+      return res;
     } catch (error) {
       log(
         "transaction run failed",

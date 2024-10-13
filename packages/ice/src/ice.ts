@@ -17,9 +17,9 @@ import { type Future, PQueue, future, randomString } from "./helper";
 import { classes, methods } from "./stun/const";
 import { Message, parseMessage } from "./stun/message";
 import { StunProtocol } from "./stun/protocol";
-import { createTurnEndpoint } from "./turn/protocol";
+import { createStunOverTurnClient } from "./turn/protocol";
 import type { Address, Protocol } from "./types/model";
-import { getHostAddresses, normalizeFamilyNodeV18 } from "./utils";
+import { getHostAddresses } from "./utils";
 
 const log = debug("werift-ice : packages/ice/src/ice.ts : log");
 
@@ -67,7 +67,10 @@ export class Connection {
       ...options,
     };
     const { stunServer, turnServer, useIpv4, useIpv6 } = this.options;
-    this.stunServer = validateAddress(stunServer);
+    this.stunServer = validateAddress(stunServer) ?? [
+      "stun.l.google.com",
+      19302,
+    ];
     this.turnServer = validateAddress(turnServer);
     this.useIpv4 = useIpv4;
     this.useIpv6 = useIpv6;
@@ -193,16 +196,20 @@ export class Connection {
           log("query STUN server", error);
         }),
       );
+
       candidatePromises.push(...stunPromises);
     }
 
     const { turnUsername, turnPassword } = this.options;
     if (turnServer && turnUsername && turnPassword) {
       const turnCandidate = (async () => {
-        const protocol = await createTurnEndpoint(
-          turnServer,
-          turnUsername,
-          turnPassword,
+        const protocol = await createStunOverTurnClient(
+          {
+            address: turnServer,
+            username: turnUsername,
+            password: turnPassword,
+            ice: this,
+          },
           {
             portRange: this.options.portRange,
             interfaceAddresses: this.options.interfaceAddresses,
@@ -229,7 +236,6 @@ export class Connection {
         if (cb) {
           cb(protocol.localCandidate);
         }
-        protocol.receiver = this;
         return protocol.localCandidate;
       })().catch((error) => {
         log("query TURN server", error);
@@ -343,7 +349,10 @@ export class Connection {
       // # find the highest-priority pair that is in the waiting state
       const pair = this.checkList
         .filter((pair) => {
-          if (this.options.forceTurn && pair.protocol.type === "stun")
+          if (
+            this.options.forceTurn &&
+            pair.protocol.type === StunProtocol.type
+          )
             return false;
           return true;
         })
@@ -1117,9 +1126,11 @@ export async function serverReflexiveCandidate(
     const [response] = await protocol.request(request, stunServer);
 
     const localCandidate = protocol.localCandidate;
-    if (!localCandidate) throw new Error("not exist");
+    if (!localCandidate) {
+      throw new Error("not exist");
+    }
 
-    return new Candidate(
+    const candidate = new Candidate(
       candidateFoundation("srflx", "udp", localCandidate.host),
       localCandidate.component,
       localCandidate.transport,
@@ -1130,6 +1141,7 @@ export async function serverReflexiveCandidate(
       localCandidate.host,
       localCandidate.port,
     );
+    return candidate;
   } catch (error) {
     // todo fix
     log("error serverReflexiveCandidate", error);

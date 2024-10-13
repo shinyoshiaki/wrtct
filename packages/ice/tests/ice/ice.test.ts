@@ -29,6 +29,7 @@ class ProtocolMock implements Protocol {
   };
   async connectionMade() {}
   async sendData() {}
+  async close() {}
 }
 
 describe("ice", () => {
@@ -108,6 +109,8 @@ describe("ice", () => {
   test("test_connect", async () => {
     const a = new Connection(true, {});
     const b = new Connection(false, {});
+    a.stunServer = undefined;
+    b.stunServer = undefined;
 
     await inviteAccept(a, b);
 
@@ -508,6 +511,7 @@ describe("ice", () => {
         stunServer: ["invalid", 19302],
       });
       const b = new Connection(false, {});
+      b.stunServer = undefined;
 
       // # invite / accept
       await inviteAccept(a, b);
@@ -578,6 +582,8 @@ describe("ice", () => {
     const a = new Connection(true, {});
     a.remoteIsLite = true;
     const b = new Connection(false, {});
+    a.stunServer = undefined;
+    b.stunServer = undefined;
 
     // # invite / accept
     await inviteAccept(a, b);
