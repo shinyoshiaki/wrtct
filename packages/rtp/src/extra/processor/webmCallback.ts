@@ -1,7 +1,6 @@
 import { appendFile, open, stat } from "fs/promises";
 
 import { PromiseQueue } from "../..";
-import type { SupportedCodec } from "../container/webm";
 import {
   DurationPosition,
   SegmentSizePosition,
@@ -9,17 +8,9 @@ import {
   type WebmInput,
   type WebmOption,
   type WebmOutput,
+  type WebmTrack,
   replaceSegmentSize,
 } from "./webm";
-
-export interface WebmTrack {
-  width?: number;
-  height?: number;
-  kind: "audio" | "video";
-  codec: SupportedCodec;
-  clockRate: number;
-  trackNumber: number;
-}
 
 export class WebmCallback extends WebmBase {
   private cb?: (input: WebmOutput) => Promise<void>;

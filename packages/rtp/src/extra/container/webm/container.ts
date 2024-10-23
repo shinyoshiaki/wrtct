@@ -26,6 +26,7 @@ export class WEBMContainer {
     tracks: {
       width?: number;
       height?: number;
+      roll?: number;
       kind: "audio" | "video";
       codec: SupportedCodec;
       trackNumber: number;
@@ -35,10 +36,11 @@ export class WEBMContainer {
     this.encryptionKey = encryptionKey;
 
     this.trackEntries = tracks.map(
-      ({ width, height, kind, codec, trackNumber }) => {
+      ({ width, height, kind, codec, trackNumber, roll }) => {
         const track = this.createTrackEntry(kind, trackNumber, codec, {
           width,
           height,
+          roll,
         });
         const ivCounter = new Uint32Array(2);
         randomFillSync(ivCounter);
@@ -56,9 +58,11 @@ export class WEBMContainer {
     {
       width,
       height,
+      roll,
     }: Partial<{
       kind: string;
       width: number;
+      roll: number;
       height: number;
     }> = {},
   ) {
@@ -67,10 +71,15 @@ export class WEBMContainer {
     if (kind === "video") {
       width ??= 640;
       height ??= 360;
+      roll ??= 0;
       trackElements.push(
         EBML.element(EBML.ID.Video, [
           EBML.element(EBML.ID.PixelWidth, EBML.number(width)),
           EBML.element(EBML.ID.PixelHeight, EBML.number(height)),
+          EBML.element(EBML.ID.Projection, [
+            EBML.element(EBML.ID.ProjectionType, EBML.number(0)),
+            EBML.element(EBML.ID.ProjectionPoseRoll, EBML.float(roll)),
+          ]),
         ]),
       );
     } else {

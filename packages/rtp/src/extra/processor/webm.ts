@@ -9,6 +9,16 @@ import {
 import type { SupportedCodec } from "../container/webm";
 import type { AVProcessor } from "./interface";
 
+export interface WebmTrack {
+  width?: number;
+  height?: number;
+  roll?: number;
+  kind: MediaKind;
+  codec: SupportedCodec;
+  clockRate: number;
+  trackNumber: number;
+}
+
 export type WebmInput = {
   frame?: {
     data: Buffer;
@@ -56,14 +66,7 @@ export class WebmBase implements AVProcessor<WebmInput> {
   onStopped = new Event();
 
   constructor(
-    public tracks: {
-      width?: number;
-      height?: number;
-      kind: MediaKind;
-      codec: SupportedCodec;
-      clockRate: number;
-      trackNumber: number;
-    }[],
+    public tracks: WebmTrack[],
     private output: (output: WebmOutput) => void,
     private options: WebmOption = {},
   ) {

@@ -92,6 +92,7 @@ export class MediaRecorder {
 export interface MediaRecorderOptions {
   width: number;
   height: number;
+  roll: number;
   jitterBufferLatency: number;
   jitterBufferSize: number;
   disableLipSync: boolean;

@@ -13,6 +13,7 @@ import {
   RtpTimeCallback,
   type SupportedCodec,
   WebmCallback,
+  type WebmTrack,
   saveToFileSystem,
 } from "../../../../../rtp/src/extra";
 
@@ -28,49 +29,52 @@ export class WebmFactory extends MediaWriter {
       await unlink(this.props.path).catch((e) => e);
     }
 
-    const inputTracks = tracks.map((track, i) => {
-      const trackNumber = i + 1;
-      const payloadType = track.codec!.payloadType;
+    const inputTracks: (WebmTrack & { track: MediaStreamTrack })[] = tracks.map(
+      (track, i) => {
+        const trackNumber = i + 1;
+        const payloadType = track.codec!.payloadType;
 
-      if (track.kind === "video") {
-        const codec = ((): SupportedCodec => {
-          switch (track.codec?.name.toLowerCase() as SupportedVideoCodec) {
-            case "vp8":
-              return "VP8";
-            case "vp9":
-              return "VP9";
-            case "h264":
-              return "MPEG4/ISO/AVC";
-            case "av1x":
-              return "AV1";
-            default:
-              throw new WeriftError({
-                message: "unsupported codec",
-                payload: { track, path: sourcePath },
-              });
-          }
-        })();
-        return {
-          kind: "video" as const,
-          codec,
-          clockRate: 90000,
-          trackNumber,
-          width: this.props.width ?? 640,
-          height: this.props.height ?? 360,
-          payloadType,
-          track,
-        };
-      } else {
-        return {
-          kind: "audio" as const,
-          codec: "OPUS" as const,
-          clockRate: 48000,
-          trackNumber,
-          payloadType,
-          track,
-        };
-      }
-    });
+        if (track.kind === "video") {
+          const codec = ((): SupportedCodec => {
+            switch (track.codec?.name.toLowerCase() as SupportedVideoCodec) {
+              case "vp8":
+                return "VP8";
+              case "vp9":
+                return "VP9";
+              case "h264":
+                return "MPEG4/ISO/AVC";
+              case "av1x":
+                return "AV1";
+              default:
+                throw new WeriftError({
+                  message: "unsupported codec",
+                  payload: { track, path: sourcePath },
+                });
+            }
+          })();
+          return {
+            kind: "video" as const,
+            codec,
+            clockRate: 90000,
+            trackNumber,
+            width: this.props.width ?? 640,
+            height: this.props.height ?? 360,
+            roll: this.props.roll,
+            payloadType,
+            track,
+          };
+        } else {
+          return {
+            kind: "audio" as const,
+            codec: "OPUS" as const,
+            clockRate: 48000,
+            trackNumber,
+            payloadType,
+            track,
+          };
+        }
+      },
+    );
 
     const webm = new WebmCallback(inputTracks, {
       duration: this.props.defaultDuration ?? 1000 * 60 * 60 * 24,

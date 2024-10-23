@@ -13,6 +13,7 @@ server.on("connection", async (socket) => {
     numOfTracks: 2,
     width: 640,
     height: 360,
+    // roll: 90,
   });
 
   const pc = new RTCPeerConnection();
@@ -33,7 +34,7 @@ server.on("connection", async (socket) => {
   setTimeout(async () => {
     await recorder.stop();
     console.log("stop");
-  }, 15_000);
+  }, 5_000);
 
   await pc.setLocalDescription(await pc.createOffer());
   const sdp = JSON.stringify(pc.localDescription);
