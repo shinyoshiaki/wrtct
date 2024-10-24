@@ -11,6 +11,7 @@ import {
 } from "..";
 import { int } from "../../../common/src";
 import {
+  type Extensions,
   PictureLossIndication,
   RTP_EXTENSION_URI,
   Red,
@@ -34,7 +35,7 @@ import type {
 import { NackHandler } from "./receiver/nack";
 import { ReceiverTWCC } from "./receiver/receiverTwcc";
 import { StreamStatistics } from "./receiver/statistics";
-import type { Extensions } from "./router";
+
 import type { MediaStreamTrack } from "./track";
 
 const log = debug("werift:packages/webrtc/src/media/rtpReceiver.ts");
@@ -342,12 +343,12 @@ export class RTCRtpReceiver {
         if (track.kind === "audio") {
           const payloads = this.audioRedHandler.push(red, packet);
           for (const packet of payloads) {
-            track.onReceiveRtp.execute(packet.clone());
+            track.onReceiveRtp.execute(packet.clone(), extensions);
           }
         } else {
         }
       } else {
-        track.onReceiveRtp.execute(packet.clone());
+        track.onReceiveRtp.execute(packet.clone(), extensions);
       }
     }
 
