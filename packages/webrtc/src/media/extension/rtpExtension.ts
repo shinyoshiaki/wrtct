@@ -42,3 +42,9 @@ export function useAudioLevelIndication() {
     uri: RTP_EXTENSION_URI.audioLevelIndication,
   });
 }
+
+export function useVideoOrientation() {
+  return new RTCRtpHeaderExtensionParameters({
+    uri: RTP_EXTENSION_URI.videoOrientation,
+  });
+}
