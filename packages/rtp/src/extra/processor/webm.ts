@@ -27,6 +27,7 @@ export type WebmInput = {
     time: number;
   };
   eol?: boolean;
+  trackNumber?: number;
 };
 
 export interface WebmOutput {
@@ -72,9 +73,9 @@ export class WebmBase implements AVProcessor<WebmInput> {
   ) {
     this.builder = new WEBMContainer(tracks, options.encryptionKey);
 
-    tracks.forEach((t) => {
+    for (const t of tracks) {
       this.timestamps[t.trackNumber] = new ClusterTimestamp();
-    });
+    }
   }
 
   toJSON(): Record<string, any> {
@@ -144,7 +145,10 @@ export class WebmBase implements AVProcessor<WebmInput> {
       return;
     }
 
-    const track = this.tracks.find((t) => t.kind === "video");
+    const track =
+      input.trackNumber != undefined
+        ? this.tracks.find((t) => t.trackNumber === input.trackNumber)
+        : this.tracks.find((t) => t.kind === "video");
     if (track) {
       this.internalStats["processVideoInput"] = new Date().toISOString();
       this.processInput(input, track.trackNumber);
@@ -152,10 +156,7 @@ export class WebmBase implements AVProcessor<WebmInput> {
   };
 
   protected start() {
-    const staticPart = Buffer.concat([
-      this.builder.ebmlHeader,
-      this.builder.createSegment(this.options.duration),
-    ]);
+    const staticPart = this.createStaticPart();
     this.output({ saveToFile: staticPart, kind: "initial" });
     this.position += staticPart.length;
 
@@ -165,6 +166,18 @@ export class WebmBase implements AVProcessor<WebmInput> {
         new CuePoint(this.builder, video.trackNumber, 0.0, this.position),
       );
     }
+  }
+
+  createStaticPart() {
+    const staticPart = Buffer.concat([
+      this.builder.ebmlHeader,
+      this.builder.createSegment(this.options.duration),
+    ]);
+    return staticPart;
+  }
+
+  addTrackEntry(track: WebmTrack) {
+    this.builder.addTrackEntry(track);
   }
 
   private onFrameReceived(frame: WebmInput["frame"] & { trackNumber: number }) {

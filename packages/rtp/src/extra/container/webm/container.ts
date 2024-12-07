@@ -35,20 +35,43 @@ export class WEBMContainer {
   ) {
     this.encryptionKey = encryptionKey;
 
-    this.trackEntries = tracks.map(
-      ({ width, height, kind, codec, trackNumber, roll }) => {
-        const track = this.createTrackEntry(kind, trackNumber, codec, {
-          width,
-          height,
-          roll,
-        });
-        const ivCounter = new Uint32Array(2);
-        randomFillSync(ivCounter);
-        this.trackIvs[trackNumber] = ivCounter;
+    for (const { width, height, kind, codec, trackNumber, roll } of tracks) {
+      this.addTrackEntry({
+        width,
+        height,
+        kind,
+        codec,
+        trackNumber,
+        roll,
+      });
+    }
+  }
 
-        return track;
-      },
-    );
+  addTrackEntry({
+    kind,
+    trackNumber,
+    codec,
+    width,
+    height,
+    roll,
+  }: {
+    width?: number;
+    height?: number;
+    roll?: number;
+    kind: "audio" | "video";
+    codec: SupportedCodec;
+    trackNumber: number;
+  }) {
+    const track = this.createTrackEntry(kind, trackNumber, codec, {
+      width,
+      height,
+      roll,
+    });
+    const ivCounter = new Uint32Array(2);
+    randomFillSync(ivCounter);
+    this.trackIvs[trackNumber] = ivCounter;
+
+    this.trackEntries.push(track);
   }
 
   createTrackEntry(
