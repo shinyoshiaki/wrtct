@@ -164,7 +164,7 @@ export class RTCPeerConnection extends EventTarget {
     });
   }
 
-  private setConfiguration(config: Partial<PeerConfig>) {
+  setConfiguration(config: Partial<PeerConfig>) {
     deepMerge(this.config, config);
 
     if (this.config.icePortRange) {
