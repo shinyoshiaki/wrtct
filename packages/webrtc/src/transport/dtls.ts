@@ -51,18 +51,18 @@ export class RTCDtlsTransport {
 
   readonly onStateChange = new Event<[DtlsState]>();
 
-  localCertificate?: RTCCertificate;
-  localCertificatePromise?: Promise<RTCCertificate>;
+  static localCertificate?: RTCCertificate;
+  static localCertificatePromise?: Promise<RTCCertificate>;
   private remoteParameters?: RTCDtlsParameters;
 
   constructor(
     readonly config: PeerConfig,
     readonly iceTransport: RTCIceTransport,
     readonly router: RtpRouter,
-    readonly certificates: RTCCertificate[],
+    public localCertificate?: RTCCertificate,
     private readonly srtpProfiles: Profile[] = [],
   ) {
-    this.localCertificate = this.certificates[0];
+    this.localCertificate ??= RTCDtlsTransport.localCertificate;
   }
 
   get localParameters() {
@@ -72,7 +72,7 @@ export class RTCDtlsTransport {
     );
   }
 
-  async setupCertificate() {
+  static async SetupCertificate() {
     if (this.localCertificate) {
       return this.localCertificate;
     }

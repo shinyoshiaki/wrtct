@@ -117,7 +117,7 @@ export class RTCPeerConnection extends EventTarget {
   onconnectionstatechange?: Callback;
 
   private readonly router = new RtpRouter();
-  private readonly certificates: RTCCertificate[] = [];
+  private certificate?: RTCCertificate;
   sctpRemotePort?: number;
   private seenMid = new Set<string>();
   private currentLocalDescription?: SessionDescription;
@@ -150,6 +150,21 @@ export class RTCPeerConnection extends EventTarget {
   constructor(config: Partial<PeerConfig> = {}) {
     super();
 
+    this.setConfiguration(config);
+
+    this.iceConnectionStateChange.subscribe((state) => {
+      switch (state) {
+        case "disconnected":
+          this.setConnectionState("disconnected");
+          break;
+        case "closed":
+          this.close();
+          break;
+      }
+    });
+  }
+
+  private setConfiguration(config: Partial<PeerConfig>) {
     deepMerge(this.config, config);
 
     if (this.config.icePortRange) {
@@ -194,23 +209,15 @@ export class RTCPeerConnection extends EventTarget {
 
     if (this.config.dtls) {
       const { keys } = this.config.dtls;
+
       if (keys) {
-        this.certificates.push(
-          new RTCCertificate(keys.keyPem, keys.certPem, keys.signatureHash),
+        this.certificate = new RTCCertificate(
+          keys.keyPem,
+          keys.certPem,
+          keys.signatureHash,
         );
       }
     }
-
-    this.iceConnectionStateChange.subscribe((state) => {
-      switch (state) {
-        case "disconnected":
-          this.setConnectionState("disconnected");
-          break;
-        case "closed":
-          this.close();
-          break;
-      }
-    });
   }
 
   get localDescription() {
@@ -253,6 +260,7 @@ export class RTCPeerConnection extends EventTarget {
 
   async createOffer() {
     await this.ensureCerts();
+
     const description = this.buildOfferSdp();
     return description.toJSON();
   }
@@ -570,7 +578,7 @@ export class RTCPeerConnection extends EventTarget {
       this.config,
       iceTransport,
       this.router,
-      this.certificates,
+      this.certificate,
       srtpProfiles,
     );
 
@@ -1315,22 +1323,18 @@ export class RTCPeerConnection extends EventTarget {
   }
 
   private async ensureCerts() {
-    const ensureCert = async (dtlsTransport: RTCDtlsTransport) => {
-      if (this.certificates.length === 0) {
-        const localCertificate = await dtlsTransport.setupCertificate();
-        this.certificates.push(localCertificate);
-      } else {
-        dtlsTransport.localCertificate = this.certificates[0];
-      }
-    };
+    if (!this.certificate) {
+      this.certificate = await RTCDtlsTransport.SetupCertificate();
+    }
 
     for (const dtlsTransport of this.dtlsTransports) {
-      await ensureCert(dtlsTransport);
+      dtlsTransport.localCertificate = this.certificate;
     }
   }
 
   async createAnswer() {
     await this.ensureCerts();
+
     const description = this.buildAnswer();
     return description.toJSON();
   }
