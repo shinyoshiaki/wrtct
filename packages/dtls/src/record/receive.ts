@@ -85,8 +85,8 @@ export const parsePlainText =
         if (alert.level > 1) {
           throw new Error("alert fatal error");
         }
+        return { type: ContentType.alert, data: undefined };
       }
-      // eslint-disable-next-line no-fallthrough
       default: {
         return { type: ContentType.alert, data: undefined };
       }

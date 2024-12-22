@@ -104,9 +104,11 @@ export const flight2 =
             dtls.remoteExtendedMasterSecret = true;
           }
           break;
-        case RenegotiationIndication.type: {
-          log(dtls.sessionId, "RenegotiationIndication", extension.data);
-        }
+        case RenegotiationIndication.type:
+          {
+            log(dtls.sessionId, "RenegotiationIndication", extension.data);
+          }
+          break;
         case 43:
           {
             // todo dtls1.3

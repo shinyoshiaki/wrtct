@@ -1,5 +1,5 @@
 import {
-  HashAlgorithms,
+  type HashAlgorithms,
   SignatureAlgorithm,
 } from "../../dtls/src/cipher/const";
 import {
@@ -63,4 +63,4 @@ export const SRTP_PROFILE = {
 export const SenderDirections = ["sendonly", "sendrecv"];
 export const ReceiverDirection = ["sendrecv", "recvonly"];
 
-export { HashAlgorithms, SignatureAlgorithm };
+export { type HashAlgorithms, SignatureAlgorithm };
