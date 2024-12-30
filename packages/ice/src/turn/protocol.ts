@@ -28,6 +28,8 @@ export class StunOverTurnProtocol implements Protocol {
   readonly type = StunOverTurnProtocol.type;
   localCandidate!: Candidate;
   private disposer = new EventDisposer();
+  onRequestReceived: Event<[Message, readonly [string, number], Buffer]> =
+    new Event();
 
   constructor(
     public turn: TurnProtocol,
@@ -57,7 +59,7 @@ export class StunOverTurnProtocol implements Protocol {
           transaction.responseReceived(message, addr);
         }
       } else if (message.messageClass === classes.REQUEST) {
-        this.ice.requestReceived(message, addr, this, data);
+        this.onRequestReceived.execute(message, addr, data);
       }
     } catch (error) {
       log("datagramReceived error", error);
@@ -102,6 +104,8 @@ export class TurnProtocol implements Protocol {
   static type = "turn";
   readonly type = TurnProtocol.type;
   readonly onData = new Event<[Buffer, Address]>();
+  onRequestReceived: Event<[Message, readonly [string, number], Buffer]> =
+    new Event();
   integrityKey?: Buffer;
   nonce?: Buffer;
   realm?: string;

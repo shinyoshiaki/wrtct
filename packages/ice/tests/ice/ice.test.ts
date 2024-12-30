@@ -1,21 +1,24 @@
 import { setTimeout } from "timers/promises";
 
+import { Event } from "../../../common/src";
 import { Candidate, candidatePriority } from "../../src/candidate";
-import {
-  CandidatePair,
-  CandidatePairState,
-  Connection,
-  sortCandidatePairs,
-} from "../../src/ice";
+import { Connection } from "../../src/ice";
 import { classes, methods } from "../../src/stun/const";
 import { Message } from "../../src/stun/message";
 import type { Address, Protocol } from "../../src/types/model";
 import { assertCandidateTypes, inviteAccept } from "../utils";
+import {
+  CandidatePair,
+  CandidatePairState,
+  sortCandidatePairs,
+} from "../../src";
 
 class ProtocolMock implements Protocol {
   type = "mock";
   responseAddr?: Address;
   responseMessage?: string;
+  onRequestReceived: Event<[Message, readonly [string, number], Buffer]> =
+    new Event();
   localCandidate = new Candidate(
     "some-foundation",
     1,
@@ -78,7 +81,7 @@ describe("ice", () => {
     const protocol = new ProtocolMock();
 
     const request = new Message(methods.ALLOCATE, classes.REQUEST);
-    connection.requestReceived(
+    connection._requestReceived(
       request,
       ["2.3.4.5", 2345],
       protocol,

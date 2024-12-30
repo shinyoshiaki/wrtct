@@ -1,10 +1,12 @@
 import type { Candidate } from "../candidate";
+import type { Event } from "../imports/common";
 import type { Message } from "../stun/message";
 
 export type Address = Readonly<[string, number]>;
 
 export interface Protocol {
   type: string;
+  onRequestReceived: Event<[Message, readonly [string, number], Buffer]>;
   request: (
     message: Message,
     addr: Address,

@@ -9,11 +9,26 @@ import PCancelable from "p-cancelable";
 import timers from "timers/promises";
 import { Event } from "./imports/common";
 
-import type { InterfaceAddresses } from "../../common/src/network";
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import { MdnsLookup } from "./dns/lookup";
 import type { TransactionError } from "./exceptions";
 import { type Future, PQueue, future, randomString } from "./helper";
+import {
+  CONSENT_FAILURES,
+  CONSENT_INTERVAL,
+  CandidatePair,
+  CandidatePairState,
+  type ConnectionBase,
+  ICE_COMPLETED,
+  ICE_FAILED,
+  type IceOptions,
+  type IceState,
+  defaultOptions,
+  serverReflexiveCandidate,
+  sortCandidatePairs,
+  validateAddress,
+  validateRemoteCandidate,
+} from "./iceBase";
 import { classes, methods } from "./stun/const";
 import { Message, parseMessage } from "./stun/message";
 import { StunProtocol } from "./stun/protocol";
@@ -23,7 +38,7 @@ import { getHostAddresses } from "./utils";
 
 const log = debug("werift-ice : packages/ice/src/ice.ts : log");
 
-export class Connection {
+export class Connection implements ConnectionBase {
   localUserName = randomString(4);
   localPassword = randomString(22);
   remotePassword: string = "";
@@ -133,6 +148,9 @@ export class Connection {
       addresses.map(async (address) => {
         // # create transport
         const protocol = new StunProtocol(this);
+        protocol.onRequestReceived.subscribe((msg, addr, data) => {
+          this._requestReceived(msg, addr, protocol, data);
+        });
         try {
           await protocol.connectionMade(
             isIPv4(address),
@@ -234,6 +252,7 @@ export class Connection {
             throw e;
           }
         });
+        protocol.turn.onData;
         this.protocols.push(protocol);
 
         const candidateAddress = protocol.turn.relayedAddress;
@@ -579,7 +598,8 @@ export class Connection {
     return candidate;
   }
 
-  requestReceived(
+  /**@private */
+  _requestReceived(
     message: Message,
     addr: Address,
     protocol: Protocol,
@@ -1005,176 +1025,4 @@ export class Connection {
       log("sendStun error", e);
     });
   }
-}
-
-export class CandidatePair {
-  handle?: Future;
-  nominated = false;
-  remoteNominated = false;
-  // 5.7.4.  Computing States
-  private _state = CandidatePairState.FROZEN;
-  get state() {
-    return this._state;
-  }
-
-  toJSON() {
-    return {
-      protocol: this.protocol.type,
-      remoteAddr: this.remoteAddr,
-    };
-  }
-
-  constructor(
-    public protocol: Protocol,
-    public remoteCandidate: Candidate,
-  ) {}
-
-  updateState(state: CandidatePairState) {
-    this._state = state;
-  }
-
-  get localCandidate() {
-    if (!this.protocol.localCandidate) {
-      throw new Error("localCandidate not exist");
-    }
-    return this.protocol.localCandidate;
-  }
-
-  get remoteAddr(): Address {
-    return [this.remoteCandidate.host, this.remoteCandidate.port];
-  }
-
-  get component() {
-    return this.localCandidate.component;
-  }
-}
-
-const ICE_COMPLETED = 1 as const;
-const ICE_FAILED = 2 as const;
-
-const CONSENT_INTERVAL = 5;
-const CONSENT_FAILURES = 6;
-
-export enum CandidatePairState {
-  FROZEN = 0,
-  WAITING = 1,
-  IN_PROGRESS = 2,
-  SUCCEEDED = 3,
-  FAILED = 4,
-}
-
-type IceState = "disconnected" | "closed" | "completed" | "new" | "connected";
-
-export interface IceOptions {
-  stunServer?: Address;
-  turnServer?: Address;
-  turnUsername?: string;
-  turnPassword?: string;
-  turnTransport?: "udp" | "tcp";
-  forceTurn?: boolean;
-  useIpv4: boolean;
-  useIpv6: boolean;
-  portRange?: [number, number];
-  interfaceAddresses?: InterfaceAddresses;
-  additionalHostAddresses?: string[];
-  filterStunResponse?: (
-    message: Message,
-    addr: Address,
-    protocol: Protocol,
-  ) => boolean;
-  filterCandidatePair?: (pair: CandidatePair) => boolean;
-}
-
-const defaultOptions: IceOptions = {
-  useIpv4: true,
-  useIpv6: true,
-};
-
-export function validateRemoteCandidate(candidate: Candidate) {
-  // """
-  // Check the remote candidate is supported.
-  // """
-  if (!["host", "relay", "srflx"].includes(candidate.type))
-    throw new Error(`Unexpected candidate type "${candidate.type}"`);
-
-  // ipaddress.ip_address(candidate.host)
-  return candidate;
-}
-
-export function sortCandidatePairs(
-  pairs: {
-    localCandidate: Pick<Candidate, "priority">;
-    remoteCandidate: Pick<Candidate, "priority">;
-  }[],
-  iceControlling: boolean,
-) {
-  return pairs
-    .sort(
-      (a, b) =>
-        candidatePairPriority(
-          a.localCandidate,
-          a.remoteCandidate,
-          iceControlling,
-        ) -
-        candidatePairPriority(
-          b.localCandidate,
-          b.remoteCandidate,
-          iceControlling,
-        ),
-    )
-    .reverse();
-}
-
-// 5.7.2.  Computing Pair Priority and Ordering Pairs
-export function candidatePairPriority(
-  local: Pick<Candidate, "priority">,
-  remote: Pick<Candidate, "priority">,
-  iceControlling: boolean,
-) {
-  const G = (iceControlling && local.priority) || remote.priority;
-  const D = (iceControlling && remote.priority) || local.priority;
-  return (1 << 32) * Math.min(G, D) + 2 * Math.max(G, D) + (G > D ? 1 : 0);
-}
-
-export async function serverReflexiveCandidate(
-  protocol: Protocol,
-  stunServer: Address,
-) {
-  // """
-  // Query STUN server to obtain a server-reflexive candidate.
-  // """
-
-  // # perform STUN query
-  const request = new Message(methods.BINDING, classes.REQUEST);
-  try {
-    const [response] = await protocol.request(request, stunServer);
-
-    const localCandidate = protocol.localCandidate;
-    if (!localCandidate) {
-      throw new Error("not exist");
-    }
-
-    const candidate = new Candidate(
-      candidateFoundation("srflx", "udp", localCandidate.host),
-      localCandidate.component,
-      localCandidate.transport,
-      candidatePriority("srflx"),
-      response.getAttributeValue("XOR-MAPPED-ADDRESS")[0],
-      response.getAttributeValue("XOR-MAPPED-ADDRESS")[1],
-      "srflx",
-      localCandidate.host,
-      localCandidate.port,
-    );
-    return candidate;
-  } catch (error) {
-    // todo fix
-    log("error serverReflexiveCandidate", error);
-  }
-}
-
-export function validateAddress(addr?: Address): Address | undefined {
-  if (addr && Number.isNaN(addr[1])) {
-    return [addr[0], 443];
-  }
-  return addr;
 }

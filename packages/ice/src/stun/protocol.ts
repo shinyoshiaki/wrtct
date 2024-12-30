@@ -23,6 +23,7 @@ export class StunProtocol implements Protocol {
   localCandidate?: Candidate;
   sentMessage?: Message;
   localAddress?: string;
+  onRequestReceived = new Event<[Message, Address, Buffer]>();
 
   private readonly closed = new Event();
 
@@ -73,7 +74,7 @@ export class StunProtocol implements Protocol {
         const transaction = this.transactions[message.transactionIdHex];
         transaction.responseReceived(message, addr);
       } else if (message.messageClass === classes.REQUEST) {
-        this.receiver?.requestReceived?.(message, addr, this, data);
+        this.onRequestReceived.execute(message, addr, data);
       }
     } catch (error) {
       log("datagramReceived error", error);
@@ -113,12 +114,7 @@ export class StunProtocol implements Protocol {
       request.addFingerprint();
     }
 
-    const transaction: Transaction = new Transaction(
-      request,
-      addr,
-      this,
-      retransmissions,
-    );
+    const transaction: Transaction = new Transaction(request, addr, this);
     this.transactions[request.transactionIdHex] = transaction;
 
     try {
