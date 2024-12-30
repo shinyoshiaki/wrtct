@@ -18,9 +18,9 @@ import {
   CONSENT_INTERVAL,
   CandidatePair,
   CandidatePairState,
-  type ConnectionBase,
   ICE_COMPLETED,
   ICE_FAILED,
+  type IceConnection,
   type IceOptions,
   type IceState,
   defaultOptions,
@@ -38,7 +38,7 @@ import { getHostAddresses } from "./utils";
 
 const log = debug("werift-ice : packages/ice/src/ice.ts : log");
 
-export class Connection implements ConnectionBase {
+export class Connection implements IceConnection {
   localUserName = randomString(4);
   localPassword = randomString(22);
   remotePassword: string = "";

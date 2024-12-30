@@ -23,7 +23,8 @@ import { getHostAddresses } from "./utils";
 
 const log = debug("werift-ice : packages/ice/src/ice.ts : log");
 
-export interface ConnectionBase {
+export interface IceConnection {
+  iceControlling: boolean;
   localUserName: string;
   localPassword: string;
   remotePassword: string;

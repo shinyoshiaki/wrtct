@@ -2,14 +2,19 @@ import debug from "debug";
 import { v4 } from "uuid";
 import { Event } from "../imports/common";
 
-import { Candidate, Connection, type IceOptions } from "../../../ice/src";
+import {
+  Candidate,
+  Connection,
+  type IceConnection,
+  type IceOptions,
+} from "../../../ice/src";
 import { candidateFromSdp, candidateToSdp } from "../sdp";
 
 const log = debug("werift:packages/webrtc/src/transport/ice.ts");
 
 export class RTCIceTransport {
   readonly id = v4();
-  connection: Connection;
+  connection: IceConnection;
   state: RTCIceConnectionState = "new";
 
   readonly onStateChange = new Event<[RTCIceConnectionState]>();
@@ -122,7 +127,7 @@ export class RTCIceGatherer {
   gatheringState: IceGathererState = "new";
 
   readonly onGatheringStateChange = new Event<[IceGathererState]>();
-  readonly connection: Connection;
+  readonly connection: IceConnection;
 
   constructor(private options: Partial<IceOptions> = {}) {
     this.connection = new Connection(false, this.options);

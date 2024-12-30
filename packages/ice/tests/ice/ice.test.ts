@@ -1,17 +1,17 @@
 import { setTimeout } from "timers/promises";
 
 import { Event } from "../../../common/src";
+import {
+  CandidatePair,
+  CandidatePairState,
+  sortCandidatePairs,
+} from "../../src";
 import { Candidate, candidatePriority } from "../../src/candidate";
 import { Connection } from "../../src/ice";
 import { classes, methods } from "../../src/stun/const";
 import { Message } from "../../src/stun/message";
 import type { Address, Protocol } from "../../src/types/model";
 import { assertCandidateTypes, inviteAccept } from "../utils";
-import {
-  CandidatePair,
-  CandidatePairState,
-  sortCandidatePairs,
-} from "../../src";
 
 class ProtocolMock implements Protocol {
   type = "mock";
