@@ -156,7 +156,7 @@ export class Connection implements IceConnection {
     await Promise.allSettled(
       addresses.map(async (address) => {
         // # create transport
-        const protocol = new StunProtocol(this);
+        const protocol = new StunProtocol();
         this.ensureProtocol(protocol);
         try {
           await protocol.connectionMade(
@@ -233,7 +233,6 @@ export class Connection implements IceConnection {
             address: turnServer,
             username: turnUsername,
             password: turnPassword,
-            ice: this,
           },
           {
             portRange: this.options.portRange,
@@ -247,7 +246,6 @@ export class Connection implements IceConnection {
                 address: turnServer,
                 username: turnUsername,
                 password: turnPassword,
-                ice: this,
               },
               {
                 portRange: this.options.portRange,

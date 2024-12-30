@@ -28,7 +28,7 @@ export class StunProtocol implements Protocol {
 
   private readonly closed = new Event();
 
-  constructor(public receiver?: Connection) {}
+  constructor() {}
 
   connectionLost() {
     this.closed.execute();

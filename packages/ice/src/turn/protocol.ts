@@ -32,10 +32,7 @@ export class StunOverTurnProtocol implements Protocol {
     new Event();
   onDataReceived: Event<[Buffer, number]> = new Event();
 
-  constructor(
-    public turn: TurnProtocol,
-    private ice: Connection,
-  ) {
+  constructor(public turn: TurnProtocol) {
     turn.onData
       .subscribe((data, addr) => {
         this.handleStunMessage(data, addr);
@@ -494,12 +491,10 @@ export async function createStunOverTurnClient(
     address,
     username,
     password,
-    ice,
   }: {
     address: Address;
     username: string;
     password: string;
-    ice: Connection;
   },
   {
     lifetime,
@@ -527,7 +522,7 @@ export async function createStunOverTurnClient(
       transport: transportType,
     },
   );
-  const turnTransport = new StunOverTurnProtocol(turn, ice);
+  const turnTransport = new StunOverTurnProtocol(turn);
   return turnTransport;
 }
 
