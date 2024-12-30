@@ -19,6 +19,7 @@ class ProtocolMock implements Protocol {
   responseMessage?: string;
   onRequestReceived: Event<[Message, readonly [string, number], Buffer]> =
     new Event();
+  onDataReceived: Event<[Buffer, number]> = new Event();
   localCandidate = new Candidate(
     "some-foundation",
     1,

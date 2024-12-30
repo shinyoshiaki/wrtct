@@ -7,6 +7,7 @@ export type Address = Readonly<[string, number]>;
 export interface Protocol {
   type: string;
   onRequestReceived: Event<[Message, readonly [string, number], Buffer]>;
+  onDataReceived: Event<[Buffer, number]>;
   request: (
     message: Message,
     addr: Address,

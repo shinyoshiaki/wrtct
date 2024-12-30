@@ -65,8 +65,6 @@ export interface IceConnection {
 
   getDefaultCandidate(): Candidate | undefined;
 
-  dataReceived(data: Buffer, component: number): void;
-
   resetNominatedPair(): void;
 }
 

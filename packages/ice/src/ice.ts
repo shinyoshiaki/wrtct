@@ -137,6 +137,15 @@ export class Connection implements IceConnection {
     this.setState("completed");
   }
 
+  private ensureProtocol(protocol: Protocol) {
+    protocol.onRequestReceived.subscribe((msg, addr, data) => {
+      this._requestReceived(msg, addr, protocol, data);
+    });
+    protocol.onDataReceived.subscribe((data, component) => {
+      this.dataReceived(data, component);
+    });
+  }
+
   private async getCandidates(
     addresses: string[],
     timeout = 5,
@@ -148,9 +157,7 @@ export class Connection implements IceConnection {
       addresses.map(async (address) => {
         // # create transport
         const protocol = new StunProtocol(this);
-        protocol.onRequestReceived.subscribe((msg, addr, data) => {
-          this._requestReceived(msg, addr, protocol, data);
-        });
+        this.ensureProtocol(protocol);
         try {
           await protocol.connectionMade(
             isIPv4(address),
@@ -252,7 +259,7 @@ export class Connection implements IceConnection {
             throw e;
           }
         });
-        protocol.turn.onData;
+        this.ensureProtocol(protocol);
         this.protocols.push(protocol);
 
         const candidateAddress = protocol.turn.relayedAddress;
@@ -675,7 +682,7 @@ export class Connection implements IceConnection {
     // }
   }
 
-  dataReceived(data: Buffer, component: number) {
+  private dataReceived(data: Buffer, component: number) {
     try {
       this.onData.execute(data, component);
     } catch (error) {

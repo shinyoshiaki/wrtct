@@ -24,6 +24,7 @@ export class StunProtocol implements Protocol {
   sentMessage?: Message;
   localAddress?: string;
   onRequestReceived = new Event<[Message, Address, Buffer]>();
+  onDataReceived = new Event<[Buffer, number]>();
 
   private readonly closed = new Event();
 
@@ -61,7 +62,7 @@ export class StunProtocol implements Protocol {
       const message = parseMessage(data);
       if (!message) {
         if (this.localCandidate) {
-          this.receiver?.dataReceived?.(data, this.localCandidate.component);
+          this.onDataReceived.execute(data, this.localCandidate.component);
         }
         return;
       }
