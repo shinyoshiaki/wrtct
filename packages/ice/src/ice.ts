@@ -40,26 +40,21 @@ const log = debug("werift-ice : packages/ice/src/ice.ts : log");
 export class Connection implements IceConnection {
   localUserName = randomString(4);
   localPassword = randomString(22);
+  remoteIsLite = false;
   remotePassword: string = "";
   remoteUsername: string = "";
-  remoteIsLite = false;
   checkList: CandidatePair[] = [];
   localCandidates: Candidate[] = [];
   stunServer?: Address;
   turnServer?: Address;
-  useIpv4: boolean;
-  useIpv6: boolean;
   options: IceOptions;
   remoteCandidatesEnd = false;
-  _localCandidatesEnd = false;
-  _tieBreaker: bigint = BigInt(new Uint64BE(randomBytes(64)).toString());
+  localCandidatesEnd = false;
+  private readonly tieBreaker: bigint = BigInt(
+    new Uint64BE(randomBytes(64)).toString(),
+  );
   state: IceState = "new";
   lookup?: MdnsLookup;
-  restarted = false;
-
-  readonly onData = new Event<[Buffer]>();
-  readonly stateChanged = new Event<[IceState]>();
-  readonly onIceCandidate: Event<[Candidate]> = new Event();
 
   private _remoteCandidates: Candidate[] = [];
   // P2P接続完了したソケット
@@ -74,6 +69,10 @@ export class Connection implements IceConnection {
   private queryConsentHandle?: Cancelable<void>;
   private promiseGatherCandidates?: Event<[]>;
 
+  readonly onData = new Event<[Buffer]>();
+  readonly stateChanged = new Event<[IceState]>();
+  readonly onIceCandidate: Event<[Candidate]> = new Event();
+
   constructor(
     public iceControlling: boolean,
     options?: Partial<IceOptions>,
@@ -82,14 +81,38 @@ export class Connection implements IceConnection {
       ...defaultOptions,
       ...options,
     };
-    const { stunServer, turnServer, useIpv4, useIpv6 } = this.options;
+    const { stunServer, turnServer } = this.options;
     this.stunServer = validateAddress(stunServer) ?? [
       "stun.l.google.com",
       19302,
     ];
     this.turnServer = validateAddress(turnServer);
-    this.useIpv4 = useIpv4;
-    this.useIpv6 = useIpv6;
+    this.restart();
+  }
+
+  restart() {
+    this.localUserName = randomString(4);
+    this.localPassword = randomString(22);
+    this.remoteIsLite = false;
+    this.remoteUsername = "";
+    this.remotePassword = "";
+    this.checkList = [];
+    this.localCandidates = [];
+    this.remoteCandidatesEnd = false;
+    this.localCandidatesEnd = false;
+    this.state = "new";
+    this.lookup = undefined;
+    this._remoteCandidates = [];
+    this.nominated = undefined;
+    this.nominating = false;
+    this.checkListDone = false;
+    this.checkListState = new PQueue<number>();
+    this.earlyChecks = [];
+    this.earlyChecksDone = false;
+    this.localCandidatesStart = false;
+    this.protocols = [];
+    this.queryConsentHandle = undefined;
+    this.promiseGatherCandidates = undefined;
   }
 
   setRemoteParams({
@@ -113,7 +136,10 @@ export class Connection implements IceConnection {
       this.localCandidatesStart = true;
       this.promiseGatherCandidates = new Event();
 
-      let address = getHostAddresses(this.useIpv4, this.useIpv6);
+      let address = getHostAddresses(
+        this.options.useIpv4,
+        this.options.useIpv6,
+      );
       const { interfaceAddresses } = this.options;
       if (interfaceAddresses) {
         const filteredAddresses = address.filter((check) =>
@@ -132,7 +158,7 @@ export class Connection implements IceConnection {
       const candidates = await this.getCandidates(address, 5);
       this.localCandidates = [...this.localCandidates, ...candidates];
 
-      this._localCandidatesEnd = true;
+      this.localCandidatesEnd = true;
       this.promiseGatherCandidates.execute();
     }
     this.setState("completed");
@@ -163,7 +189,7 @@ export class Connection implements IceConnection {
 
       // 7.2.1.1.  Detecting and Repairing Role Conflicts
       if (iceControlling && msg.attributesKeys.includes("ICE-CONTROLLING")) {
-        if (this._tieBreaker >= msg.getAttributeValue("ICE-CONTROLLING")) {
+        if (this.tieBreaker >= msg.getAttributeValue("ICE-CONTROLLING")) {
           this.respondError(msg, addr, protocol, [487, "Role Conflict"]);
           return;
         } else {
@@ -173,7 +199,7 @@ export class Connection implements IceConnection {
         !iceControlling &&
         msg.attributesKeys.includes("ICE-CONTROLLED")
       ) {
-        if (this._tieBreaker < msg.getAttributeValue("ICE-CONTROLLED")) {
+        if (this.tieBreaker < msg.getAttributeValue("ICE-CONTROLLED")) {
           this.respondError(msg, addr, protocol, [487, "Role Conflict"]);
         } else {
           this.switchRole(true);
@@ -382,7 +408,7 @@ export class Connection implements IceConnection {
     // and raises an exception otherwise.
     // """
     log("start connect ice", this.localCandidates);
-    if (!this._localCandidatesEnd) {
+    if (!this.localCandidatesEnd) {
       if (!this.localCandidatesStart)
         throw new Error("Local candidates gathering was not performed");
       if (this.promiseGatherCandidates)
@@ -521,7 +547,7 @@ export class Connection implements IceConnection {
           if (!pair) {
             break;
           }
-          const request = this.buildRequest(pair, false);
+          const request = this.buildRequest(false);
           try {
             const [msg, addr] = await pair.protocol.request(
               request,
@@ -579,7 +605,7 @@ export class Connection implements IceConnection {
     this.protocols = [];
     this.localCandidates = [];
 
-    await this.lookup?.close();
+    this.lookup?.close();
   }
 
   private setState(state: IceState) {
@@ -621,7 +647,7 @@ export class Connection implements IceConnection {
     }
 
     log("addRemoteCandidate", remoteCandidate);
-    this.remoteCandidates.push(remoteCandidate);
+    this._remoteCandidates.push(remoteCandidate);
 
     this.pairRemoteCandidate(remoteCandidate);
     this.sortCheckList();
@@ -656,7 +682,7 @@ export class Connection implements IceConnection {
       } catch (error) {
         continue;
       }
-      this.remoteCandidates.push(remoteCandidate);
+      this._remoteCandidates.push(remoteCandidate);
     }
 
     this.remoteCandidatesEnd = true;
@@ -785,7 +811,7 @@ export class Connection implements IceConnection {
       this.setPairState(pair, CandidatePairState.IN_PROGRESS);
 
       const nominate = this.iceControlling && !this.remoteIsLite;
-      const request = this.buildRequest(pair, nominate);
+      const request = this.buildRequest(nominate);
 
       const result: { response?: Message; addr?: Address } = {};
       try {
@@ -836,7 +862,7 @@ export class Connection implements IceConnection {
       } else if (this.iceControlling && !this.nominating) {
         // # perform regular nomination
         this.nominating = true;
-        const request = this.buildRequest(pair, true);
+        const request = this.buildRequest(true);
         try {
           await pair.protocol.request(
             request,
@@ -884,7 +910,7 @@ export class Connection implements IceConnection {
         port,
         "prflx",
       );
-      this.remoteCandidates.push(remoteCandidate);
+      this._remoteCandidates.push(remoteCandidate);
     }
 
     // find pair
@@ -949,19 +975,19 @@ export class Connection implements IceConnection {
     }
   };
 
-  private buildRequest(pair: CandidatePair, nominate: boolean) {
+  private buildRequest(nominate: boolean) {
     const txUsername = `${this.remoteUsername}:${this.localUserName}`;
     const request = new Message(methods.BINDING, classes.REQUEST);
     request
       .setAttribute("USERNAME", txUsername)
       .setAttribute("PRIORITY", candidatePriority("prflx"));
     if (this.iceControlling) {
-      request.setAttribute("ICE-CONTROLLING", this._tieBreaker);
+      request.setAttribute("ICE-CONTROLLING", this.tieBreaker);
       if (nominate) {
         request.setAttribute("USE-CANDIDATE", null);
       }
     } else {
-      request.setAttribute("ICE-CONTROLLED", this._tieBreaker);
+      request.setAttribute("ICE-CONTROLLED", this.tieBreaker);
     }
     return request;
   }

@@ -90,7 +90,7 @@ describe("ice", () => {
       new Candidate("some-foundation", 1, "udp", 2345, "2.3.4.5", 2345, "host"),
     );
 
-    await connection.checkStart(pair);
+    await connection.checkStart(pair).awaitable;
     expect(pair.state).toBe(CandidatePairState.FAILED);
   });
 
@@ -357,7 +357,7 @@ describe("ice", () => {
     new Promise<void>(async (done) => {
       const conn = new Connection(true);
 
-      conn._localCandidatesEnd = true;
+      conn.localCandidatesEnd = true;
       conn.remoteCandidates = [
         Candidate.fromSdp(
           "6815297761 1 udp 659136 1.2.3.4 31102 typ host generation 0",
@@ -416,8 +416,10 @@ describe("ice", () => {
       const a = new Connection(true);
       const b = new Connection(true);
 
-      a._tieBreaker = BigInt(1);
-      b._tieBreaker = BigInt(2);
+      //@ts-ignore
+      a.tieBreaker = BigInt(1);
+      //@ts-ignore
+      b.tieBreaker = BigInt(2);
 
       await inviteAccept(a, b);
 
@@ -439,8 +441,10 @@ describe("ice", () => {
       const a = new Connection(false);
       const b = new Connection(false);
 
-      a._tieBreaker = BigInt(1);
-      b._tieBreaker = BigInt(2);
+      //@ts-ignore
+      a.tieBreaker = BigInt(1);
+      //@ts-ignore
+      b.tieBreaker = BigInt(2);
 
       await inviteAccept(a, b);
 

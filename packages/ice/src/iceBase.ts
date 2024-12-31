@@ -23,15 +23,11 @@ export interface IceConnection {
   localCandidates: Candidate[];
   stunServer?: Address;
   turnServer?: Address;
-  useIpv4: boolean;
-  useIpv6: boolean;
   options: IceOptions;
   remoteCandidatesEnd: boolean;
-  _localCandidatesEnd: boolean;
-  _tieBreaker: bigint;
+  localCandidatesEnd: boolean;
   state: IceState;
   lookup?: MdnsLookup;
-  restarted: boolean;
 
   readonly onData: Event<[Buffer]>;
   readonly stateChanged: Event<[IceState]>;
