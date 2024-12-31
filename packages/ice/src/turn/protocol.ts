@@ -26,9 +26,8 @@ export class StunOverTurnProtocol implements Protocol {
   readonly type = StunOverTurnProtocol.type;
   localCandidate!: Candidate;
   private disposer = new EventDisposer();
-  onRequestReceived: Event<[Message, readonly [string, number], Buffer]> =
-    new Event();
-  onDataReceived: Event<[Buffer, number]> = new Event();
+  onRequestReceived: Event<[Message, Address, Buffer]> = new Event();
+  onDataReceived: Event<[Buffer]> = new Event();
 
   constructor(public turn: TurnProtocol) {
     turn.onData
@@ -42,7 +41,7 @@ export class StunOverTurnProtocol implements Protocol {
     try {
       const message = parseMessage(data);
       if (!message) {
-        this.onDataReceived.execute(data, this.localCandidate.component);
+        this.onDataReceived.execute(data);
         return;
       }
 
@@ -100,9 +99,8 @@ export class TurnProtocol implements Protocol {
   static type = "turn";
   readonly type = TurnProtocol.type;
   readonly onData = new Event<[Buffer, Address]>();
-  onRequestReceived: Event<[Message, readonly [string, number], Buffer]> =
-    new Event();
-  onDataReceived: Event<[Buffer, number]> = new Event();
+  onRequestReceived: Event<[Message, Address, Buffer]> = new Event();
+  onDataReceived: Event<[Buffer]> = new Event();
   integrityKey?: Buffer;
   nonce?: Buffer;
   realm?: string;

@@ -3,7 +3,6 @@ import { Event } from "../imports/common";
 
 import type { InterfaceAddresses } from "../../../common/src/network";
 import type { Candidate } from "../candidate";
-import type { Connection } from "../ice";
 import { UdpTransport } from "../transport";
 import type { Address, Protocol } from "../types/model";
 import { classes } from "./const";
@@ -24,7 +23,7 @@ export class StunProtocol implements Protocol {
   sentMessage?: Message;
   localAddress?: string;
   onRequestReceived = new Event<[Message, Address, Buffer]>();
-  onDataReceived = new Event<[Buffer, number]>();
+  onDataReceived = new Event<[Buffer]>();
 
   private readonly closed = new Event();
 
@@ -62,7 +61,7 @@ export class StunProtocol implements Protocol {
       const message = parseMessage(data);
       if (!message) {
         if (this.localCandidate) {
-          this.onDataReceived.execute(data, this.localCandidate.component);
+          this.onDataReceived.execute(data);
         }
         return;
       }

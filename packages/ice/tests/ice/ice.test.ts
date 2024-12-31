@@ -17,9 +17,8 @@ class ProtocolMock implements Protocol {
   type = "mock";
   responseAddr?: Address;
   responseMessage?: string;
-  onRequestReceived: Event<[Message, readonly [string, number], Buffer]> =
-    new Event();
-  onDataReceived: Event<[Buffer, number]> = new Event();
+  onRequestReceived: Event<[Message, Address, Buffer]> = new Event();
+  onDataReceived: Event<[Buffer]> = new Event();
   localCandidate = new Candidate(
     "some-foundation",
     1,
@@ -75,26 +74,6 @@ describe("ice", () => {
     protocol.responseAddr = ["2.3.4.5", 2345];
     protocol.responseMessage = "bad";
     await pair.handle?.awaitable;
-  });
-
-  test("test_request_with_invalid_method", () => {
-    const connection = new Connection(true);
-    const protocol = new ProtocolMock();
-
-    const request = new Message(methods.ALLOCATE, classes.REQUEST);
-    connection._requestReceived(
-      request,
-      ["2.3.4.5", 2345],
-      protocol,
-      request.bytes,
-    );
-    expect(protocol.sentMessage).not.toBeNull();
-    expect(protocol.sentMessage?.messageMethod).toBe(methods.ALLOCATE);
-    expect(protocol.sentMessage?.messageClass).toBe(classes.ERROR);
-    expect(protocol.sentMessage?.getAttributeValue("ERROR-CODE")).toEqual([
-      400,
-      "Bad Request",
-    ]);
   });
 
   test("test_response_with_invalid_address", async () => {

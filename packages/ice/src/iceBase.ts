@@ -33,7 +33,7 @@ export interface IceConnection {
   lookup?: MdnsLookup;
   restarted: boolean;
 
-  readonly onData: Event<[Buffer, number]>;
+  readonly onData: Event<[Buffer]>;
   readonly stateChanged: Event<[IceState]>;
   readonly onIceCandidate: Event<[Candidate]>;
 

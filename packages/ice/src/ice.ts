@@ -57,7 +57,7 @@ export class Connection implements IceConnection {
   lookup?: MdnsLookup;
   restarted = false;
 
-  readonly onData = new Event<[Buffer, number]>();
+  readonly onData = new Event<[Buffer]>();
   readonly stateChanged = new Event<[IceState]>();
   readonly onIceCandidate: Event<[Candidate]> = new Event();
 
@@ -68,6 +68,7 @@ export class Connection implements IceConnection {
   private checkListDone = false;
   private checkListState = new PQueue<number>();
   private earlyChecks: [Message, Address, Protocol][] = [];
+  private earlyChecksDone = false;
   private localCandidatesStart = false;
   private protocols: Protocol[] = [];
   private queryConsentHandle?: Cancelable<void>;
@@ -139,10 +140,80 @@ export class Connection implements IceConnection {
 
   private ensureProtocol(protocol: Protocol) {
     protocol.onRequestReceived.subscribe((msg, addr, data) => {
-      this._requestReceived(msg, addr, protocol, data);
+      if (msg.messageMethod !== methods.BINDING) {
+        this.respondError(msg, addr, protocol, [400, "Bad Request"]);
+        return;
+      }
+
+      // # authenticate request
+      try {
+        parseMessage(data, Buffer.from(this.localPassword, "utf8"));
+        if (!this.remoteUsername) {
+          const rxUsername = `${this.localUserName}:${this.remoteUsername}`;
+          if (msg.getAttributeValue("USERNAME") != rxUsername) {
+            throw new Error("Wrong username");
+          }
+        }
+      } catch (error) {
+        this.respondError(msg, addr, protocol, [400, "Bad Request"]);
+        return;
+      }
+
+      const { iceControlling } = this;
+
+      // 7.2.1.1.  Detecting and Repairing Role Conflicts
+      if (iceControlling && msg.attributesKeys.includes("ICE-CONTROLLING")) {
+        if (this._tieBreaker >= msg.getAttributeValue("ICE-CONTROLLING")) {
+          this.respondError(msg, addr, protocol, [487, "Role Conflict"]);
+          return;
+        } else {
+          this.switchRole(false);
+        }
+      } else if (
+        !iceControlling &&
+        msg.attributesKeys.includes("ICE-CONTROLLED")
+      ) {
+        if (this._tieBreaker < msg.getAttributeValue("ICE-CONTROLLED")) {
+          this.respondError(msg, addr, protocol, [487, "Role Conflict"]);
+        } else {
+          this.switchRole(true);
+          return;
+        }
+      }
+
+      if (
+        this.options.filterStunResponse &&
+        !this.options.filterStunResponse(msg, addr, protocol)
+      ) {
+        return;
+      }
+
+      // # send binding response
+      const response = new Message(
+        methods.BINDING,
+        classes.RESPONSE,
+        msg.transactionId,
+      );
+      response
+        .setAttribute("XOR-MAPPED-ADDRESS", addr)
+        .addMessageIntegrity(Buffer.from(this.localPassword, "utf8"))
+        .addFingerprint();
+      protocol.sendStun(response, addr).catch((e) => {
+        log("sendStun error", e);
+      });
+
+      if (this.checkList.length === 0 && !this.earlyChecksDone) {
+        this.earlyChecks.push([msg, addr, protocol]);
+      } else {
+        this.checkIncoming(msg, addr, protocol);
+      }
     });
-    protocol.onDataReceived.subscribe((data, component) => {
-      this.dataReceived(data, component);
+    protocol.onDataReceived.subscribe((data) => {
+      try {
+        this.onData.execute(data);
+      } catch (error) {
+        log("dataReceived", error);
+      }
     });
   }
 
@@ -330,6 +401,7 @@ export class Connection implements IceConnection {
     // # handle early checks
     this.earlyChecks.forEach((earlyCheck) => this.checkIncoming(...earlyCheck));
     this.earlyChecks = [];
+    this.earlyChecksDone = true;
 
     // # perform checks
     // 5.8.  Scheduling Checks
@@ -590,91 +662,6 @@ export class Connection implements IceConnection {
     );
     const [candidate] = candidates;
     return candidate;
-  }
-
-  /**@private */
-  _requestReceived(
-    message: Message,
-    addr: Address,
-    protocol: Protocol,
-    rawData: Buffer,
-  ) {
-    if (message.messageMethod !== methods.BINDING) {
-      this.respondError(message, addr, protocol, [400, "Bad Request"]);
-      return;
-    }
-
-    // # authenticate request
-    try {
-      parseMessage(rawData, Buffer.from(this.localPassword, "utf8"));
-      if (!this.remoteUsername) {
-        const rxUsername = `${this.localUserName}:${this.remoteUsername}`;
-        if (message.getAttributeValue("USERNAME") != rxUsername) {
-          throw new Error("Wrong username");
-        }
-      }
-    } catch (error) {
-      this.respondError(message, addr, protocol, [400, "Bad Request"]);
-      return;
-    }
-
-    const { iceControlling } = this;
-
-    // 7.2.1.1.  Detecting and Repairing Role Conflicts
-    if (iceControlling && message.attributesKeys.includes("ICE-CONTROLLING")) {
-      if (this._tieBreaker >= message.getAttributeValue("ICE-CONTROLLING")) {
-        this.respondError(message, addr, protocol, [487, "Role Conflict"]);
-        return;
-      } else {
-        this.switchRole(false);
-      }
-    } else if (
-      !iceControlling &&
-      message.attributesKeys.includes("ICE-CONTROLLED")
-    ) {
-      if (this._tieBreaker < message.getAttributeValue("ICE-CONTROLLED")) {
-        this.respondError(message, addr, protocol, [487, "Role Conflict"]);
-      } else {
-        this.switchRole(true);
-        return;
-      }
-    }
-
-    if (
-      this.options.filterStunResponse &&
-      !this.options.filterStunResponse(message, addr, protocol)
-    ) {
-      return;
-    }
-
-    // # send binding response
-    const response = new Message(
-      methods.BINDING,
-      classes.RESPONSE,
-      message.transactionId,
-    );
-    response
-      .setAttribute("XOR-MAPPED-ADDRESS", addr)
-      .addMessageIntegrity(Buffer.from(this.localPassword, "utf8"))
-      .addFingerprint();
-    protocol.sendStun(response, addr).catch((e) => {
-      log("sendStun error", e);
-    });
-
-    // todo fix
-    // if (this.checkList.length === 0) {
-    //   this.earlyChecks.push([message, addr, protocol]);
-    // } else {
-    this.checkIncoming(message, addr, protocol);
-    // }
-  }
-
-  private dataReceived(data: Buffer, component: number) {
-    try {
-      this.onData.execute(data, component);
-    } catch (error) {
-      log("dataReceived", error);
-    }
   }
 
   // for test only
