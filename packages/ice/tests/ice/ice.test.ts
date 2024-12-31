@@ -74,7 +74,7 @@ describe("ice", () => {
     expect(pair.handle).not.toBeNull();
     protocol.responseAddr = ["2.3.4.5", 2345];
     protocol.responseMessage = "bad";
-    await pair.handle?.promise;
+    await pair.handle?.awaitable;
   });
 
   test("test_request_with_invalid_method", () => {

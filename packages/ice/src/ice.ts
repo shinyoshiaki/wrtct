@@ -5,14 +5,13 @@ import debug from "debug";
 import { Uint64BE } from "int64-buffer";
 
 import isEqual from "lodash/isEqual";
-import PCancelable from "p-cancelable";
 import timers from "timers/promises";
 import { Event } from "./imports/common";
 
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import { MdnsLookup } from "./dns/lookup";
 import type { TransactionError } from "./exceptions";
-import { type Future, PQueue, future, randomString } from "./helper";
+import { type Cancelable, PQueue, cancelable, randomString } from "./helper";
 import {
   CONSENT_FAILURES,
   CONSENT_INTERVAL,
@@ -71,7 +70,7 @@ export class Connection implements IceConnection {
   private earlyChecks: [Message, Address, Protocol][] = [];
   private localCandidatesStart = false;
   private protocols: Protocol[] = [];
-  private queryConsentHandle?: Future;
+  private queryConsentHandle?: Cancelable<void>;
   private promiseGatherCandidates?: Event<[]>;
 
   constructor(
@@ -347,14 +346,14 @@ export class Connection implements IceConnection {
     }
 
     // # cancel remaining checks
-    this.checkList.forEach((check) => check.handle?.cancel());
+    this.checkList.forEach((check) => check.handle?.resolve());
 
     if (res !== ICE_COMPLETED) {
       throw new Error("ICE negotiation failed");
     }
 
     // # start consent freshness tests
-    this.queryConsentHandle = future(this.queryConsent());
+    this.queryConsent();
 
     this.setState("connected");
   }
@@ -397,7 +396,7 @@ export class Connection implements IceConnection {
         })
         .find((pair) => pair.state === CandidatePairState.WAITING);
       if (pair) {
-        pair.handle = future(this.checkStart(pair));
+        pair.handle = this.checkStart(pair);
         return true;
       }
     }
@@ -408,7 +407,7 @@ export class Connection implements IceConnection {
         (pair) => pair.state === CandidatePairState.FROZEN,
       );
       if (pair) {
-        pair.handle = future(this.checkStart(pair));
+        pair.handle = this.checkStart(pair);
         return true;
       }
     }
@@ -422,15 +421,15 @@ export class Connection implements IceConnection {
   }
 
   // 4.1.1.4 ? 生存確認 life check
-  private queryConsent = () =>
-    new PCancelable(async (r, f, onCancel) => {
+  private queryConsent = () => {
+    this.queryConsentHandle = cancelable(async (r, _, onCancel) => {
       let failures = 0;
 
       const cancelEvent = new AbortController();
-      onCancel(() => {
+      onCancel.once(() => {
         failures += CONSENT_FAILURES;
         cancelEvent.abort();
-        f("cancel");
+        this.queryConsentHandle = undefined;
       });
 
       // """
@@ -477,6 +476,7 @@ export class Connection implements IceConnection {
         }
       } catch (error) {}
     });
+  };
 
   async close() {
     // """
@@ -486,14 +486,7 @@ export class Connection implements IceConnection {
     this.setState("closed");
 
     // # stop consent freshness tests
-    if (this.queryConsentHandle && !this.queryConsentHandle.done()) {
-      this.queryConsentHandle.cancel();
-      try {
-        await this.queryConsentHandle.promise;
-      } catch (error) {
-        // pass
-      }
-    }
+    this.queryConsentHandle?.resolve?.();
 
     // # stop check list
     if (this.checkList && !this.checkListDone) {
@@ -814,9 +807,7 @@ export class Connection implements IceConnection {
 
   // 3.  Terminology : Check
   checkStart = (pair: CandidatePair) =>
-    new PCancelable(async (r, f, onCancel) => {
-      onCancel(() => f("cancel"));
-
+    cancelable<void>(async (r) => {
       // """
       // Starts a check.
       // """
@@ -943,7 +934,7 @@ export class Connection implements IceConnection {
         pair.state,
       )
     ) {
-      pair.handle = future(this.checkStart(pair));
+      pair.handle = this.checkStart(pair);
     } else {
       pair;
     }

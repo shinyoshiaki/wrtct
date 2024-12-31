@@ -1,7 +1,6 @@
 import { createHash } from "crypto";
 import { jspack } from "@shinyoshiaki/jspack";
 import debug from "debug";
-import PCancelable from "p-cancelable";
 import { setTimeout } from "timers/promises";
 import { Event, EventDisposer } from "../imports/common";
 
@@ -9,8 +8,7 @@ import { bufferReader, int } from "../../../common/src";
 import type { InterfaceAddresses } from "../../../common/src/network";
 import type { Candidate } from "../candidate";
 import { TransactionFailed } from "../exceptions";
-import { type Future, future, randomTransactionId } from "../helper";
-import type { Connection } from "../ice";
+import { type Cancelable, cancelable, randomTransactionId } from "../helper";
 import { classes, methods } from "../stun/const";
 import { Message, paddingLength, parseMessage } from "../stun/message";
 import { Transaction } from "../stun/transaction";
@@ -112,7 +110,7 @@ export class TurnProtocol implements Protocol {
   mappedAddress!: Address;
   localCandidate!: Candidate;
   transactions: { [hexId: string]: Transaction } = {};
-  private refreshHandle?: Future;
+  private refreshHandle?: Cancelable<void>;
   private channelNumber = 0x4000;
   private channelByAddr: {
     [addr: string]: { number: number; address: Address };
@@ -162,7 +160,7 @@ export class TurnProtocol implements Protocol {
     const exp = response.getAttributeValue("LIFETIME");
     log("connect", this.relayedAddress, this.mappedAddress, { exp });
 
-    this.refreshHandle = future(this.refresh(exp));
+    this.refresh(exp);
   }
 
   private handleChannelData(data: Buffer) {
@@ -257,12 +255,11 @@ export class TurnProtocol implements Protocol {
     });
   }
 
-  private refresh = (exp: number) =>
-    new PCancelable(async (_, f, onCancel) => {
+  private refresh = (exp: number) => {
+    this.refreshHandle = cancelable<void>(async (_, f, onCancel) => {
       let run = true;
-      onCancel(() => {
+      onCancel.once(() => {
         run = false;
-        f("cancel");
       });
 
       while (run) {
@@ -283,6 +280,7 @@ export class TurnProtocol implements Protocol {
         }
       }
     });
+  };
 
   async request(request: Message, addr: Address): Promise<[Message, Address]> {
     if (this.transactions[request.transactionIdHex]) {
@@ -439,7 +437,7 @@ export class TurnProtocol implements Protocol {
   }
 
   async close() {
-    this.refreshHandle?.cancel();
+    this.refreshHandle?.resolve?.();
     await this.transport.close();
   }
 }

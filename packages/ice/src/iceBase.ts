@@ -5,7 +5,7 @@ import type { Event } from "./imports/common";
 import type { InterfaceAddresses } from "../../common/src/network";
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import type { MdnsLookup } from "./dns/lookup";
-import type { Future } from "./helper";
+import type { Cancelable } from "./helper";
 import { classes, methods } from "./stun/const";
 import { Message } from "./stun/message";
 import type { Address, Protocol } from "./types/model";
@@ -59,7 +59,7 @@ export interface IceConnection {
 }
 
 export class CandidatePair {
-  handle?: Future;
+  handle?: Cancelable<void>;
   nominated = false;
   remoteNominated = false;
   // 5.7.4.  Computing States
