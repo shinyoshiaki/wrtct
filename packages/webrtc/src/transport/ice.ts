@@ -131,14 +131,15 @@ export class RTCIceGatherer {
 
   constructor(private options: Partial<IceOptions> = {}) {
     this.connection = new Connection(false, this.options);
+    this.connection.onIceCandidate.subscribe((candidate) => {
+      this.onIceCandidate(candidateFromIce(candidate));
+    });
   }
 
   async gather() {
     if (this.gatheringState === "new") {
       this.setState("gathering");
-      await this.connection.gatherCandidates((candidate) => {
-        this.onIceCandidate(candidateFromIce(candidate));
-      });
+      await this.connection.gatherCandidates();
       this.onIceCandidate(undefined);
       this.setState("complete");
     }

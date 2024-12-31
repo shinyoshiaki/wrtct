@@ -60,6 +60,7 @@ export class Connection implements IceConnection {
 
   readonly onData = new Event<[Buffer, number]>();
   readonly stateChanged = new Event<[IceState]>();
+  readonly onIceCandidate: Event<[Candidate]> = new Event();
 
   private _remoteCandidates: Candidate[] = [];
   // P2P接続完了したソケット
@@ -107,7 +108,7 @@ export class Connection implements IceConnection {
   }
 
   // 4.1.1 Gathering Candidates
-  async gatherCandidates(cb?: (candidate: Candidate) => void) {
+  async gatherCandidates() {
     if (!this.localCandidatesStart) {
       this.localCandidatesStart = true;
       this.promiseGatherCandidates = new Event();
@@ -128,7 +129,7 @@ export class Connection implements IceConnection {
         );
       }
 
-      const candidates = await this.getCandidates(address, 5, cb);
+      const candidates = await this.getCandidates(address, 5);
       this.localCandidates = [...this.localCandidates, ...candidates];
 
       this._localCandidatesEnd = true;
@@ -146,11 +147,7 @@ export class Connection implements IceConnection {
     });
   }
 
-  private async getCandidates(
-    addresses: string[],
-    timeout = 5,
-    cb?: (candidate: Candidate) => void,
-  ) {
+  private async getCandidates(addresses: string[], timeout = 5) {
     let candidates: Candidate[] = [];
 
     await Promise.allSettled(
@@ -187,9 +184,7 @@ export class Connection implements IceConnection {
 
         this.pairLocalProtocol(protocol);
         candidates.push(protocol.localCandidate);
-        if (cb) {
-          cb(protocol.localCandidate);
-        }
+        this.onIceCandidate.execute(protocol.localCandidate);
       }),
     );
 
@@ -209,7 +204,9 @@ export class Connection implements IceConnection {
               protocol,
               stunServer,
             ).catch((error) => log("error", error));
-            if (candidate && cb) cb(candidate);
+            if (candidate) {
+              this.onIceCandidate.execute(candidate);
+            }
 
             clearTimeout(timer);
             r(candidate);
@@ -276,9 +273,8 @@ export class Connection implements IceConnection {
           relatedAddress[0],
           relatedAddress[1],
         );
-        if (cb) {
-          cb(protocol.localCandidate);
-        }
+        this.onIceCandidate.execute(protocol.localCandidate);
+
         return protocol.localCandidate;
       })().catch((error) => {
         log("query TURN server", error);

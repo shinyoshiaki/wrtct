@@ -46,6 +46,7 @@ export interface IceConnection {
 
   readonly onData: Event<[Buffer, number]>;
   readonly stateChanged: Event<[IceState]>;
+  readonly onIceCandidate: Event<[Candidate]>;
 
   setRemoteParams(params: {
     iceLite: boolean;
@@ -53,7 +54,7 @@ export interface IceConnection {
     password: string;
   }): void;
 
-  gatherCandidates(cb?: (candidate: Candidate) => void): Promise<void>;
+  gatherCandidates(): Promise<void>;
 
   connect(): Promise<void>;
 
