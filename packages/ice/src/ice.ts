@@ -628,25 +628,6 @@ export class Connection implements IceConnection {
   }
 
   send = async (data: Buffer) => {
-    // """
-    // Send a datagram on the first component.
-
-    // If the connection is not established, a `ConnectionError` is raised.
-
-    // :param data: The data to be sent.
-    // """
-    await this.sendTo(data);
-  };
-
-  private async sendTo(data: Buffer) {
-    // """
-    // Send a datagram on the specified component.
-
-    // If the connection is not established, a `ConnectionError` is raised.
-
-    // :param data: The data to be sent.
-    // :param component: The component on which to send the data.
-    // """
     const activePair = this.nominated;
     if (activePair) {
       await activePair.protocol.sendData(data, activePair.remoteAddr);
@@ -654,7 +635,7 @@ export class Connection implements IceConnection {
       // log("Cannot send data, ice not connected");
       return;
     }
-  }
+  };
 
   getDefaultCandidate() {
     const candidates = this.localCandidates.sort(
@@ -827,7 +808,7 @@ export class Connection implements IceConnection {
           } else if (request.attributesKeys.includes("ICE-CONTROLLING")) {
             this.switchRole(false);
           }
-          await this.checkStart(pair);
+          await this.checkStart(pair).awaitable;
           r();
           return;
         } else {
