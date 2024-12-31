@@ -18,23 +18,36 @@ export class RTCIceTransport {
   state: RTCIceConnectionState = "new";
 
   readonly onStateChange = new Event<[RTCIceConnectionState]>();
+  readonly onIceCandidate = new Event<[IceCandidate | undefined]>();
 
   private waitStart?: Event<[]>;
+  private restarting = false;
 
-  constructor(private gather: RTCIceGatherer) {
-    this.connection = this.gather.connection;
+  constructor(private iceGather: RTCIceGatherer) {
+    this.connection = this.iceGather.connection;
     this.connection.stateChanged.subscribe((state) => {
       this.setState(state);
     });
-  }
-
-  get iceGather() {
-    return this.gather;
+    this.iceGather.onIceCandidate = (candidate) => {
+      this.onIceCandidate.execute(candidate);
+    };
   }
 
   get role() {
     if (this.connection.iceControlling) return "controlling";
     else return "controlled";
+  }
+
+  get gatheringState() {
+    return this.iceGather.gatheringState;
+  }
+
+  get localCandidates() {
+    return this.iceGather.localCandidates;
+  }
+
+  get localParameters() {
+    return this.iceGather.localParameters;
   }
 
   private setState(state: RTCIceConnectionState) {
@@ -52,6 +65,10 @@ export class RTCIceTransport {
     }
   }
 
+  gather() {
+    return this.iceGather.gather();
+  }
+
   addRemoteCandidate = (candidate?: IceCandidate) => {
     if (!this.connection.remoteCandidatesEnd) {
       if (!candidate) {
@@ -62,7 +79,7 @@ export class RTCIceTransport {
     }
   };
 
-  setRemoteParams(remoteParameters: RTCIceParameters) {
+  async setRemoteParams(remoteParameters: RTCIceParameters) {
     if (
       this.connection.remoteUsername &&
       this.connection.remotePassword &&
@@ -70,9 +87,20 @@ export class RTCIceTransport {
         this.connection.remotePassword !== remoteParameters.password)
     ) {
       log("restartIce", remoteParameters);
-      this.connection.resetNominatedPair();
+      await this.restart();
     }
     this.connection.setRemoteParams(remoteParameters);
+  }
+
+  private async restart() {
+    if (this.restarting) {
+      return;
+    }
+    this.restarting = true;
+    this.connection.restart();
+    await this.gather();
+    await this.start();
+    this.restarting = false;
   }
 
   async start() {

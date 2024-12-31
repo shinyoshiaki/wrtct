@@ -715,12 +715,6 @@ export class Connection implements IceConnection {
     this.sortCheckList();
   }
 
-  resetNominatedPair() {
-    log("resetNominatedPair");
-    this.nominated = undefined;
-    this.nominating = false;
-  }
-
   private checkComplete(pair: CandidatePair) {
     pair.handle = undefined;
     if (pair.state === CandidatePairState.SUCCEEDED) {

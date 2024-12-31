@@ -33,6 +33,8 @@ export interface IceConnection {
   readonly stateChanged: Event<[IceState]>;
   readonly onIceCandidate: Event<[Candidate]>;
 
+  restart(): void;
+
   setRemoteParams(params: {
     iceLite: boolean;
     usernameFragment: string;
@@ -50,8 +52,6 @@ export interface IceConnection {
   send(data: Buffer): Promise<void>;
 
   getDefaultCandidate(): Candidate | undefined;
-
-  resetNominatedPair(): void;
 }
 
 export class CandidatePair {

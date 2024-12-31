@@ -518,7 +518,7 @@ export class RTCPeerConnection extends EventTarget {
       this.updateIceConnectionState();
     });
 
-    iceTransport.iceGather.onIceCandidate = (candidate) => {
+    iceTransport.onIceCandidate.subscribe((candidate) => {
       if (!this.localDescription) {
         log("localDescription not found when ice candidate was gathered");
         return;
@@ -572,7 +572,7 @@ export class RTCPeerConnection extends EventTarget {
         this.onicecandidate({ candidate: candidate.toJSON() });
       }
       this.emit("icecandidate", { candidate });
-    };
+    });
 
     const dtlsTransport = new RTCDtlsTransport(
       this.config,
@@ -682,12 +682,9 @@ export class RTCPeerConnection extends EventTarget {
     );
     if (this.remoteIsBundled && connected) {
       // no need to gather ice candidates on an existing bundled connection
-      await connected.iceGather.gather();
     } else {
       await Promise.allSettled(
-        this.iceTransports.map((iceTransport) =>
-          iceTransport.iceGather.gather(),
-        ),
+        this.iceTransports.map((iceTransport) => iceTransport.gather()),
       );
     }
 
@@ -962,15 +959,17 @@ export class RTCPeerConnection extends EventTarget {
 
       const iceTransport = dtlsTransport.iceTransport;
 
-      if (remoteMedia.iceParams && remoteMedia.dtlsParams) {
+      if (remoteMedia.iceParams) {
         iceTransport.setRemoteParams(remoteMedia.iceParams);
-        dtlsTransport.setRemoteParams(remoteMedia.dtlsParams);
 
         // One agent full, one lite:  The full agent MUST take the controlling role, and the lite agent MUST take the controlled role
         // RFC 8445 S6.1.1
         if (remoteMedia.iceParams?.iceLite) {
           iceTransport.connection.iceControlling = true;
         }
+      }
+      if (remoteMedia.dtlsParams) {
+        dtlsTransport.setRemoteParams(remoteMedia.dtlsParams);
       }
 
       // # add ICE candidates
@@ -1444,8 +1443,8 @@ export class RTCPeerConnection extends EventTarget {
 
     function allMatch(...state: IceGathererState[]) {
       return (
-        all.filter((check) => state.includes(check.iceGather.gatheringState))
-          .length === all.length
+        all.filter((check) => state.includes(check.gatheringState)).length ===
+        all.length
       );
     }
 
@@ -1455,9 +1454,7 @@ export class RTCPeerConnection extends EventTarget {
       newState = "complete";
     } else if (!all.length || allMatch("new", "complete")) {
       newState = "new";
-    } else if (
-      all.map((check) => check.iceGather.gatheringState).includes("gathering")
-    ) {
+    } else if (all.map((check) => check.gatheringState).includes("gathering")) {
       newState = "gathering";
     } else {
       newState = "new";
@@ -1604,11 +1601,10 @@ export function addTransportDescription(
   dtlsTransport: RTCDtlsTransport,
 ) {
   const iceTransport = dtlsTransport.iceTransport;
-  const iceGatherer = iceTransport.iceGather;
 
-  media.iceCandidates = iceGatherer.localCandidates;
-  media.iceCandidatesComplete = iceGatherer.gatheringState === "complete";
-  media.iceParams = iceGatherer.localParameters;
+  media.iceCandidates = iceTransport.localCandidates;
+  media.iceCandidatesComplete = iceTransport.gatheringState === "complete";
+  media.iceParams = iceTransport.localParameters;
   media.iceOptions = "trickle";
 
   media.host = DISCARD_HOST;
