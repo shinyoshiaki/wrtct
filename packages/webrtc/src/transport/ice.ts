@@ -16,12 +16,10 @@ export class RTCIceTransport {
   readonly id = v4();
   connection: IceConnection;
   state: RTCIceConnectionState = "new";
+  private waitStart?: Event<[]>;
 
   readonly onStateChange = new Event<[RTCIceConnectionState]>();
   readonly onIceCandidate = new Event<[IceCandidate | undefined]>();
-
-  private waitStart?: Event<[]>;
-  private restarting = false;
 
   constructor(private iceGather: RTCIceGatherer) {
     this.connection = this.iceGather.connection;
@@ -79,7 +77,7 @@ export class RTCIceTransport {
     }
   };
 
-  async setRemoteParams(remoteParameters: RTCIceParameters) {
+  setRemoteParams(remoteParameters: RTCIceParameters) {
     if (
       this.connection.remoteUsername &&
       this.connection.remotePassword &&
@@ -87,20 +85,15 @@ export class RTCIceTransport {
         this.connection.remotePassword !== remoteParameters.password)
     ) {
       log("restartIce", remoteParameters);
-      await this.restart();
+      this.restart();
     }
     this.connection.setRemoteParams(remoteParameters);
   }
 
-  private async restart() {
-    if (this.restarting) {
-      return;
-    }
-    this.restarting = true;
+  restart() {
     this.connection.restart();
-    await this.gather();
-    await this.start();
-    this.restarting = false;
+    this.state = "new";
+    this.iceGather.gatheringState = "new";
   }
 
   async start() {
@@ -153,9 +146,9 @@ export type IceGathererState = (typeof IceGathererStates)[number];
 export class RTCIceGatherer {
   onIceCandidate: (candidate: IceCandidate | undefined) => void = () => {};
   gatheringState: IceGathererState = "new";
+  readonly connection: IceConnection;
 
   readonly onGatheringStateChange = new Event<[IceGathererState]>();
-  readonly connection: IceConnection;
 
   constructor(private options: Partial<IceOptions> = {}) {
     this.connection = new Connection(false, this.options);

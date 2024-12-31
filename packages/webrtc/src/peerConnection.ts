@@ -258,7 +258,11 @@ export class RTCPeerConnection extends EventTarget {
     return this.config;
   }
 
-  async createOffer() {
+  async createOffer({ iceRestart }: { iceRestart?: boolean } = {}) {
+    if (iceRestart) {
+      this.iceTransports.forEach((t) => t.restart());
+    }
+
     await this.ensureCerts();
 
     const description = this.buildOfferSdp();
@@ -776,20 +780,22 @@ export class RTCPeerConnection extends EventTarget {
   }
 
   private async connect() {
-    if (this.transportEstablished) {
-      return;
-    }
     log("start connect");
-
-    this.setConnectionState("connecting");
 
     await Promise.allSettled(
       this.dtlsTransports.map(async (dtlsTransport) => {
         const { iceTransport } = dtlsTransport;
+
+        this.setConnectionState("connecting");
+
         await iceTransport.start().catch((err) => {
           log("iceTransport.start failed", err);
           throw err;
         });
+
+        if (dtlsTransport.state === "connected") {
+          return;
+        }
         await dtlsTransport.start().catch((err) => {
           log("dtlsTransport.start failed", err);
           throw err;
@@ -806,7 +812,6 @@ export class RTCPeerConnection extends EventTarget {
       }),
     );
 
-    this.transportEstablished = true;
     this.setConnectionState("connected");
   }
 
