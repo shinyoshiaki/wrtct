@@ -420,11 +420,13 @@ export class Connection implements IceConnection {
     // """
     log("start connect ice", this.localCandidates);
     if (!this.localCandidatesEnd) {
-      if (!this.localCandidatesStart)
+      if (!this.localCandidatesStart) {
         throw new Error("Local candidates gathering was not performed");
-      if (this.promiseGatherCandidates)
+      }
+      if (this.promiseGatherCandidates) {
         // wait for GatherCandidates finish
         await this.promiseGatherCandidates.asPromise();
+      }
     }
     if (!this.remoteUsername || !this.remotePassword)
       throw new Error("Remote username or password is missing");

@@ -619,7 +619,7 @@ export class RTCPeerConnection extends EventTarget {
     }
 
     // # assign MID
-    description.media.forEach((media, i) => {
+    for (const [i, media] of enumerate(description.media)) {
       const mid = media.rtp.muxId!;
       this.seenMid.add(mid);
       if (["audio", "video"].includes(media.kind)) {
@@ -631,9 +631,10 @@ export class RTCPeerConnection extends EventTarget {
       if (media.kind === "application" && this.sctpTransport) {
         this.sctpTransport.mid = mid;
       }
-    });
+    }
 
-    const setupRole = (dtlsTransport: RTCDtlsTransport) => {
+    // setup ice,dtls role
+    for (const dtlsTransport of this.dtlsTransports) {
       const iceTransport = dtlsTransport.iceTransport;
 
       // # set ICE role
@@ -656,15 +657,14 @@ export class RTCPeerConnection extends EventTarget {
           dtlsTransport.role = role;
         }
       }
-    };
-    this.dtlsTransports.forEach((d) => setupRole(d));
+    }
 
     // # configure direction
     if (["answer", "pranswer"].includes(description.type)) {
-      this.transceivers.forEach((t) => {
+      for (const t of this.transceivers) {
         const direction = andDirection(t.direction, t.offerDirection);
         t.setCurrentDirection(direction);
-      });
+      }
     }
 
     // for trickle ice
@@ -781,6 +781,9 @@ export class RTCPeerConnection extends EventTarget {
     await Promise.allSettled(
       this.dtlsTransports.map(async (dtlsTransport) => {
         const { iceTransport } = dtlsTransport;
+        if (iceTransport.state === "connected") {
+          return;
+        }
 
         this.setConnectionState("connecting");
 
@@ -857,7 +860,7 @@ export class RTCPeerConnection extends EventTarget {
     return receiveParameters;
   }
 
-  get remoteIsBundled() {
+  private get remoteIsBundled() {
     const remoteSdp = this._remoteDescription;
     if (!remoteSdp) {
       return undefined;
@@ -1401,11 +1404,11 @@ export class RTCPeerConnection extends EventTarget {
 
     if (this.config.bundlePolicy !== "disable") {
       const bundle = new GroupDescription("BUNDLE", []);
-      description.media.forEach((media) => {
+      for (const media of description.media) {
         if (media.direction !== "inactive") {
           bundle.items.push(media.rtp.muxId!);
         }
-      });
+      }
       description.group.push(bundle);
     }
 
