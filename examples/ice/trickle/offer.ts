@@ -5,7 +5,7 @@ const server = new Server({ port: 8888 });
 console.log("start");
 
 server.on("connection", async (socket) => {
-  const pc = new RTCPeerConnection();
+  const pc = new RTCPeerConnection({});
   pc.onIceCandidate.subscribe((candidate) => {
     socket.send(JSON.stringify(candidate));
   });
@@ -19,20 +19,12 @@ server.on("connection", async (socket) => {
   const sdp = JSON.stringify(pc.localDescription);
   socket.send(sdp);
 
-  socket.on("message", async (data: any) => {
+  socket.on("message", (data: any) => {
     const msg = JSON.parse(data);
     if (msg.candidate) {
-      await pc.addIceCandidate(msg);
+      pc.addIceCandidate(msg);
     } else {
-      if (msg.type === "offer") {
-        await pc.setRemoteDescription(msg);
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        const sdp = JSON.stringify(pc.localDescription);
-        socket.send(sdp);
-      } else {
-        await pc.setRemoteDescription(msg);
-      }
+      pc.setRemoteDescription(msg);
     }
   });
 });

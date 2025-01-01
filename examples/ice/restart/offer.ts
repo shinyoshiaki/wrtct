@@ -9,11 +9,17 @@ server.on("connection", async (socket) => {
   pc.onIceCandidate.subscribe((candidate) => {
     socket.send(JSON.stringify(candidate));
   });
+  pc.iceConnectionStateChange.subscribe((state) => {
+    console.log(state);
+  });
 
   const transceiver = pc.addTransceiver("video");
-  transceiver.onTrack.subscribe((track) =>
-    transceiver.sender.replaceTrack(track),
-  );
+  transceiver.onTrack.subscribe((track) => {
+    transceiver.sender.replaceTrack(track);
+    setInterval(async () => {
+      await transceiver.receiver.sendRtcpPLI(track.ssrc);
+    }, 3000);
+  });
 
   pc.setLocalDescription(await pc.createOffer());
   const sdp = JSON.stringify(pc.localDescription);
