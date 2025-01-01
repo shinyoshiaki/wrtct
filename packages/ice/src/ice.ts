@@ -50,6 +50,7 @@ export class Connection implements IceConnection {
   options: IceOptions;
   remoteCandidatesEnd = false;
   localCandidatesEnd = false;
+  generation = -1;
   private readonly tieBreaker: bigint = BigInt(
     new Uint64BE(randomBytes(64)).toString(),
   );
@@ -113,6 +114,8 @@ export class Connection implements IceConnection {
     this.protocols = [];
     this.queryConsentHandle = undefined;
     this.promiseGatherCandidates = undefined;
+
+    this.generation++;
   }
 
   setRemoteParams({
@@ -276,6 +279,11 @@ export class Connection implements IceConnection {
           candidateAddress[0],
           candidateAddress[1],
           "host",
+          undefined,
+          undefined,
+          undefined,
+          this.generation,
+          this.localUserName,
         );
 
         this.pairLocalProtocol(protocol);
@@ -368,6 +376,9 @@ export class Connection implements IceConnection {
           "relay",
           relatedAddress[0],
           relatedAddress[1],
+          undefined,
+          this.generation,
+          this.localUserName,
         );
         this.onIceCandidate.execute(protocol.localCandidate);
 
@@ -903,6 +914,11 @@ export class Connection implements IceConnection {
         host,
         port,
         "prflx",
+        undefined,
+        undefined,
+        undefined,
+        this.generation,
+        this.remoteUsername,
       );
       this._remoteCandidates.push(remoteCandidate);
     }

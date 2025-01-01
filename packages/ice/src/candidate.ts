@@ -17,16 +17,19 @@ export class Candidate {
     public relatedPort?: number,
     public tcptype?: string,
     public generation?: number,
+    public ufrag?: string,
   ) {}
 
   static fromSdp(sdp: string) {
     // Parse a :class:`Candidate` from SDP.
     // .. code-block:: python
     //    Candidate.from_sdp(
-    //     '6815297761 1 udp 659136 1.2.3.4 31102 typ host generation 0')
+    //     '6815297761 1 udp 659136 1.2.3.4 31102 typ host generation 0 ufrag b7l3')
 
     const bits = sdp.split(" ");
-    if (bits.length < 8) throw new Error("SDP does not have enough properties");
+    if (bits.length < 8) {
+      throw new Error("SDP does not have enough properties");
+    }
 
     const kwargs = {
       foundation: bits[0],
@@ -36,6 +39,8 @@ export class Candidate {
       host: bits[4],
       port: Number(bits[5]),
       type: bits[7],
+      generation: bits[9],
+      ufrag: bits[11],
     };
 
     for (const i of range(8, bits.length - 1, 2)) {
@@ -47,6 +52,8 @@ export class Candidate {
         (kwargs as any)["tcptype"] = bits[i + 1];
       } else if (bits[i] === "generation") {
         (kwargs as any)["generation"] = Number(bits[i + 1]);
+      } else if (bits[i] === "ufrag") {
+        (kwargs as any)["ufrag"] = bits[i + 1];
       }
     }
     const { foundation, component, transport, priority, host, port, type } =
@@ -64,6 +71,7 @@ export class Candidate {
       (kwargs as any)["related_port"],
       (kwargs as any)["tcptype"],
       (kwargs as any)["generation"],
+      (kwargs as any)["ufrag"],
     );
   }
 
@@ -89,6 +97,7 @@ export class Candidate {
     if (this.relatedPort != undefined) sdp += ` rport ${this.relatedPort}`;
     if (this.tcptype) sdp += ` tcptype ${this.tcptype}`;
     if (this.generation != undefined) sdp += ` generation ${this.generation}`;
+    if (this.ufrag != undefined) sdp += ` ufrag ${this.ufrag}`;
 
     return sdp;
   }

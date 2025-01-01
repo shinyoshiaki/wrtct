@@ -94,6 +94,7 @@ export class RTCIceTransport {
     this.connection.restart();
     this.state = "new";
     this.iceGather.gatheringState = "new";
+    this.waitStart = undefined;
   }
 
   async start() {
@@ -118,7 +119,9 @@ export class RTCIceTransport {
       throw error;
     }
 
+    this.waitStart.execute();
     this.waitStart.complete();
+    this.waitStart = undefined;
   }
 
   async stop() {
@@ -196,6 +199,8 @@ export function candidateFromIce(c: Candidate) {
     c.priority,
     c.transport,
     c.type,
+    c.generation,
+    c.ufrag,
   );
   candidate.relatedAddress = c.relatedAddress;
   candidate.relatedPort = c.relatedPort;
@@ -222,6 +227,7 @@ export class RTCIceCandidate {
   candidate!: string;
   sdpMid?: string;
   sdpMLineIndex?: number;
+  usernameFragment?: string;
 
   constructor(props: Partial<RTCIceCandidate>) {
     Object.assign(this, props);
@@ -236,6 +242,7 @@ export class RTCIceCandidate {
       candidate: this.candidate,
       sdpMid: this.sdpMid,
       sdpMLineIndex: this.sdpMLineIndex,
+      usernameFragment: this.usernameFragment,
     };
   }
 }
@@ -260,6 +267,8 @@ export class IceCandidate {
     public priority: number,
     public protocol: string,
     public type: string,
+    public generation?: number,
+    public ufrag?: string,
   ) {}
 
   toJSON(): RTCIceCandidate {
@@ -267,6 +276,7 @@ export class IceCandidate {
       candidate: candidateToSdp(this),
       sdpMLineIndex: this.sdpMLineIndex,
       sdpMid: this.sdpMid,
+      usernameFragment: this.ufrag,
     });
   }
 

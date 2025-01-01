@@ -94,10 +94,6 @@ export class Event<T extends any[]> {
     complete?: EventComplete,
     error?: EventError,
   ) => {
-    if (this.ended) {
-      throw new Error("event completed");
-    }
-
     const id = this.event.eventId;
     this.event.stack.push({ execute, id, complete, error });
     this.event.eventId++;

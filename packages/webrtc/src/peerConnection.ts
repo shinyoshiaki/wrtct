@@ -561,16 +561,6 @@ export class RTCPeerConnection extends EventTarget {
 
       candidate.foundation = "candidate:" + candidate.foundation;
 
-      // prevent ice candidates that have already been sent from being being resent
-      // when the connection is renegotiated during a later setLocalDescription call.
-      if (candidate.sdpMid) {
-        const candidateKey = `${candidate.foundation}:${candidate.sdpMid}`;
-        if (this.candidatesSent.has(candidateKey)) {
-          return;
-        }
-        this.candidatesSent.add(candidateKey);
-      }
-
       this.onIceCandidate.execute(candidate.toJSON());
       if (this.onicecandidate) {
         this.onicecandidate({ candidate: candidate.toJSON() });
@@ -680,17 +670,9 @@ export class RTCPeerConnection extends EventTarget {
     // for trickle ice
     this.setLocal(description);
 
-    // # gather candidates
-    const connected = this.iceTransports.find(
-      (transport) => transport.state === "connected",
-    );
-    if (this.remoteIsBundled && connected) {
-      // no need to gather ice candidates on an existing bundled connection
-    } else {
-      await Promise.allSettled(
-        this.iceTransports.map((iceTransport) => iceTransport.gather()),
-      );
-    }
+    this.gatherCandidates().catch((e) => {
+      log("gatherCandidates failed", e);
+    });
 
     // connect transports
     if (description.type === "answer") {
@@ -707,6 +689,20 @@ export class RTCPeerConnection extends EventTarget {
     }
 
     return description;
+  }
+
+  private async gatherCandidates() {
+    // # gather candidates
+    const connected = this.iceTransports.find(
+      (transport) => transport.state === "connected",
+    );
+    if (this.remoteIsBundled && connected) {
+      // no need to gather ice candidates on an existing bundled connection
+    } else {
+      await Promise.allSettled(
+        this.iceTransports.map((iceTransport) => iceTransport.gather()),
+      );
+    }
   }
 
   private setLocal(description: SessionDescription) {
@@ -1047,13 +1043,17 @@ export class RTCPeerConnection extends EventTarget {
       const localCodecs = this.config.codecs[remoteMedia.kind] || [];
 
       const existCodec = findCodecByMimeType(localCodecs, remoteCodec);
-      if (!existCodec) return false;
+      if (!existCodec) {
+        return false;
+      }
 
       if (existCodec?.name.toLowerCase() === "rtx") {
         const params = codecParametersFromString(existCodec.parameters ?? "");
         const pt = params["apt"];
         const origin = remoteMedia.rtp.codecs.find((c) => c.payloadType === pt);
-        if (!origin) return false;
+        if (!origin) {
+          return false;
+        }
         return !!findCodecByMimeType(localCodecs, origin);
       }
 

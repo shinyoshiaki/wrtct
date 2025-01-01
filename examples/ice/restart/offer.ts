@@ -21,6 +21,7 @@ server.on("connection", async (socket) => {
 
   socket.on("message", async (data: any) => {
     const msg = JSON.parse(data);
+    console.log(msg);
     if (msg.candidate) {
       await pc.addIceCandidate(msg);
     } else {
@@ -30,8 +31,13 @@ server.on("connection", async (socket) => {
         await pc.setLocalDescription(answer);
         const sdp = JSON.stringify(pc.localDescription);
         socket.send(sdp);
-      } else {
+      } else if (msg.type === "answer") {
         await pc.setRemoteDescription(msg);
+      } else if (msg.type === "restart") {
+        const offer = await pc.createOffer({ iceRestart: true });
+        await pc.setLocalDescription(offer);
+        const sdp = JSON.stringify(pc.localDescription);
+        socket.send(sdp);
       }
     }
   });
