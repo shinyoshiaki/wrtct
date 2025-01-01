@@ -28,6 +28,7 @@ export interface IceConnection {
   localCandidatesEnd: boolean;
   state: IceState;
   lookup?: MdnsLookup;
+  nominated?:CandidatePair
 
   readonly onData: Event<[Buffer]>;
   readonly stateChanged: Event<[IceState]>;
