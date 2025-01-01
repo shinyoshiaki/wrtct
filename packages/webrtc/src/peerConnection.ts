@@ -670,7 +670,7 @@ export class RTCPeerConnection extends EventTarget {
     // for trickle ice
     this.setLocal(description);
 
-    this.gatherCandidates().catch((e) => {
+    await this.gatherCandidates().catch((e) => {
       log("gatherCandidates failed", e);
     });
 

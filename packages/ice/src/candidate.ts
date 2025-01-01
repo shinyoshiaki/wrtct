@@ -31,6 +31,7 @@ export class Candidate {
       throw new Error("SDP does not have enough properties");
     }
 
+    // 固定ワード
     const kwargs = {
       foundation: bits[0],
       component: Number(bits[1]),
@@ -39,8 +40,6 @@ export class Candidate {
       host: bits[4],
       port: Number(bits[5]),
       type: bits[7],
-      generation: bits[9],
-      ufrag: bits[11],
     };
 
     for (const i of range(8, bits.length - 1, 2)) {

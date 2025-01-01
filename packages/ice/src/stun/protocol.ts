@@ -114,7 +114,12 @@ export class StunProtocol implements Protocol {
       request.addFingerprint();
     }
 
-    const transaction: Transaction = new Transaction(request, addr, this);
+    const transaction: Transaction = new Transaction(
+      request,
+      addr,
+      this,
+      retransmissions,
+    );
     this.transactions[request.transactionIdHex] = transaction;
 
     try {

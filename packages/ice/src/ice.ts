@@ -917,8 +917,8 @@ export class Connection implements IceConnection {
         undefined,
         undefined,
         undefined,
-        this.generation,
-        this.remoteUsername,
+        undefined,
+        undefined,
       );
       this._remoteCandidates.push(remoteCandidate);
     }

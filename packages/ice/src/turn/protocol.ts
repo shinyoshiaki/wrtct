@@ -254,7 +254,7 @@ export class TurnProtocol implements Protocol {
   }
 
   private refresh = (exp: number) => {
-    this.refreshHandle = cancelable<void>(async (_, f, onCancel) => {
+    this.refreshHandle = cancelable<void>(async (_, __, onCancel) => {
       let run = true;
       onCancel.once(() => {
         run = false;

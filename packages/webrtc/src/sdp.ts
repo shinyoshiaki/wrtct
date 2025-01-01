@@ -651,6 +651,12 @@ export function candidateFromSdp(sdp: string) {
       case "tcptype":
         candidate.tcpType = bits[i + 1];
         break;
+      case "generation":
+        candidate.generation = Number.parseInt(bits[i + 1]);
+        break;
+      case "ufrag":
+        candidate.ufrag = bits[i + 1];
+        break;
     }
   });
 
