@@ -115,6 +115,7 @@ export class Message extends AttributeRepository {
     return {
       messageMethod: methods[this.messageMethod],
       messageClass: classes[this.messageClass],
+      attributes: this.attributes,
     };
   }
 
