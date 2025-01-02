@@ -35,7 +35,7 @@ export interface IceConnection {
   readonly stateChanged: Event<[IceState]>;
   readonly onIceCandidate: Event<[Candidate]>;
 
-  restart(): Promise<void>;
+  restart(): void;
 
   setRemoteParams(params: {
     iceLite: boolean;
@@ -136,6 +136,7 @@ export interface IceOptions {
   turnPassword?: string;
   turnTransport?: "udp" | "tcp";
   forceTurn?: boolean;
+  localPasswordPrefix?: string;
   useIpv4: boolean;
   useIpv6: boolean;
   portRange?: [number, number];

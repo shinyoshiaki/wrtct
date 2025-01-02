@@ -10,7 +10,10 @@ export class ice_restart_web_trigger {
     switch (type) {
       case "init":
         {
-          this.pc = new RTCPeerConnection(await peerConfig);
+          this.pc = new RTCPeerConnection({
+            ...(await peerConfig),
+            icePasswordPrefix: "restartw",
+          });
           this.pc.onIceCandidate.subscribe((candidate) => {
             peer
               .request(ice_restart_web_trigger_label + "ice", candidate)

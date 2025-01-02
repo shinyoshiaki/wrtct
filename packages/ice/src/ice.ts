@@ -50,7 +50,7 @@ export class Connection implements IceConnection {
   options: IceOptions;
   remoteCandidatesEnd = false;
   localCandidatesEnd = false;
-  generation = 0;
+  generation = -1;
   private readonly tieBreaker: bigint = BigInt(
     new Uint64BE(randomBytes(64)).toString(),
   );
@@ -88,6 +88,7 @@ export class Connection implements IceConnection {
       19302,
     ];
     this.turnServer = validateAddress(turnServer);
+    this.restart();
   }
 
   get iceControlling() {
@@ -132,6 +133,12 @@ export class Connection implements IceConnection {
     this.promiseGatherCandidates = undefined;
 
     this.generation++;
+
+    if (this.options.localPasswordPrefix) {
+      this.localPassword =
+        this.options.localPasswordPrefix +
+        this.localPassword.slice(this.options.localPasswordPrefix.length);
+    }
   }
 
   resetNominatedPair() {
@@ -450,7 +457,7 @@ export class Connection implements IceConnection {
     // This coroutine returns if a candidate pair was successfully nominated
     // and raises an exception otherwise.
     // """
-    log("start connect ice", this.localCandidates);
+    log("start connect ice");
     if (!this.localCandidatesEnd) {
       if (!this.localCandidatesStart) {
         throw new Error("Local candidates gathering was not performed");
@@ -472,6 +479,7 @@ export class Connection implements IceConnection {
 
     this.unfreezeInitial();
 
+    log("earlyChecks", this.localPassword, this.earlyChecks.length);
     // # handle early checks
     for (const earlyCheck of this.earlyChecks) {
       this.checkIncoming(...earlyCheck);

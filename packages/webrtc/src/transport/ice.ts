@@ -105,7 +105,7 @@ export class RTCIceTransport {
   }
 
   async restart() {
-    await this.connection.restart();
+    this.connection.restart();
     this.setState("new");
     this.iceGather.gatheringState = "new";
     this.waitStart = undefined;

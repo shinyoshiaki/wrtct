@@ -510,6 +510,7 @@ export class RTCPeerConnection extends EventTarget {
       additionalHostAddresses: this.config.iceAdditionalHostAddresses,
       filterStunResponse: this.config.iceFilterStunResponse,
       filterCandidatePair: this.config.iceFilterCandidatePair,
+      localPasswordPrefix: this.config.icePasswordPrefix,
       useIpv4: this.config.iceUseIpv4,
       useIpv6: this.config.iceUseIpv6,
       turnTransport: this.config.forceTurnTCP === true ? "tcp" : "udp",
@@ -1695,6 +1696,7 @@ export interface PeerConfig {
   dtls: Partial<{
     keys: DtlsKeys;
   }>;
+  icePasswordPrefix: string | undefined;
   bundlePolicy: BundlePolicy;
   debug: Partial<{
     /**% */
@@ -1762,6 +1764,7 @@ export const defaultPeerConfig: PeerConfig = {
   iceUseIpv6: true,
   iceFilterStunResponse: undefined,
   iceFilterCandidatePair: undefined,
+  icePasswordPrefix: undefined,
   dtls: {},
   bundlePolicy: "max-compat",
   debug: {},
