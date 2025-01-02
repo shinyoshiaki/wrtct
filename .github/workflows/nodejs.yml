@@ -34,7 +34,7 @@ jobs:
           npm i
           cd e2e
           npm i
-          npx playwright install
+          npx playwright install chromium
           cd ../
       - name: test
         env:

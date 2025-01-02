@@ -40,10 +40,13 @@
                         videoRef.current.srcObject = e.streams[0];
                     };
 
+                    console.log(pc);
+
                     const localStream = await navigator.mediaDevices.getUserMedia({
                         video: true,
                         audio: false,
                     });
+                    console.log(localStream);
                     localStream
                         .getVideoTracks()
                         .forEach((track) => pc.addTrack(track, localStream));

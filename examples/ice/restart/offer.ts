@@ -5,6 +5,7 @@ const server = new Server({ port: 8888 });
 console.log("start");
 
 server.on("connection", async (socket) => {
+  console.log("connection");
   const pc = new RTCPeerConnection();
   pc.onIceCandidate.subscribe((candidate) => {
     socket.send(JSON.stringify(candidate));

@@ -22,4 +22,5 @@ export interface Protocol {
   sentMessage?: Message;
   responseAddr?: Address;
   responseMessage?: string;
+  localIp?: string;
 }

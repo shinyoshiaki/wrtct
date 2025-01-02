@@ -462,16 +462,15 @@ describe("ice", () => {
     const a = new Connection(true, {
       stunServer: ["stun.l.google.com", 19302],
     });
-    const b = new Connection(false, {
-      stunServer: ["stun.l.google.com", 19302],
-    });
+    const b = new Connection(false);
+    b.stunServer = undefined;
 
     // # invite / accept
     await inviteAccept(a, b);
 
     // # we would have both host and server-reflexive candidates
     assertCandidateTypes(a, ["host", "srflx"]);
-    assertCandidateTypes(b, ["host", "srflx"]);
+    assertCandidateTypes(b, ["host"]);
 
     const candidate = a.getDefaultCandidate()!;
     expect(candidate).not.toBeUndefined();

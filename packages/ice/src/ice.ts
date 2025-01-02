@@ -124,10 +124,9 @@ export class Connection implements IceConnection {
     this.earlyChecks = [];
     this.earlyChecksDone = false;
     this.localCandidatesStart = false;
-    for (const protocol of this.protocols) {
-      await protocol.close();
-    }
-    this.protocols = [];
+
+    // protocolsはincomingのearlyCheckに使うかもしれないので残す
+
     this.queryConsentHandle?.resolve?.();
     this.queryConsentHandle = undefined;
     this.promiseGatherCandidates = undefined;
@@ -272,6 +271,14 @@ export class Connection implements IceConnection {
   private async getCandidates(addresses: string[], timeout = 5) {
     let candidates: Candidate[] = [];
 
+    addresses = addresses.filter((address) => {
+      // ice restartで同じアドレスが追加されるのを防ぐ
+      if (this.protocols.find((protocol) => protocol.localIp === address)) {
+        return false;
+      }
+      return true;
+    });
+
     await Promise.allSettled(
       addresses.map(async (address) => {
         // # create transport
@@ -288,7 +295,7 @@ export class Connection implements IceConnection {
           return;
         }
 
-        protocol.localAddress = address;
+        protocol.localIp = address;
         this.protocols.push(protocol);
 
         // # add host candidate
@@ -330,7 +337,9 @@ export class Connection implements IceConnection {
             const candidate = await serverReflexiveCandidate(
               protocol,
               stunServer,
-            ).catch((error) => log("error", error));
+            ).catch((error) => {
+              log("error", error);
+            });
             if (candidate) {
               this.onIceCandidate.execute(candidate);
             }
@@ -451,11 +460,14 @@ export class Connection implements IceConnection {
         await this.promiseGatherCandidates.asPromise();
       }
     }
-    if (!this.remoteUsername || !this.remotePassword)
+    if (!this.remoteUsername || !this.remotePassword) {
       throw new Error("Remote username or password is missing");
+    }
 
     // # 5.7.1. Forming Candidate Pairs
-    this.remoteCandidates.forEach(this.pairRemoteCandidate);
+    for (const c of this.remoteCandidates) {
+      this.pairRemoteCandidate(c);
+    }
     this.sortCheckList();
 
     this.unfreezeInitial();
@@ -704,9 +716,9 @@ export class Connection implements IceConnection {
   };
 
   getDefaultCandidate() {
-    const candidates = this.localCandidates
-      .sort((a, b) => a.priority - b.priority)
-      .reverse();
+    const candidates = this.localCandidates.sort(
+      (a, b) => a.priority - b.priority,
+    );
     const [candidate] = candidates;
     return candidate;
   }

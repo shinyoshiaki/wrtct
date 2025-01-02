@@ -21,7 +21,7 @@ export class StunProtocol implements Protocol {
   }
   localCandidate?: Candidate;
   sentMessage?: Message;
-  localAddress?: string;
+  localIp?: string;
 
   readonly onRequestReceived = new Event<[Message, Address, Buffer]>();
   readonly onDataReceived = new Event<[Buffer]>();

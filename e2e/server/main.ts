@@ -57,6 +57,10 @@ import {
   mediachannel_simulcast_answer,
   mediachannel_simulcast_offer,
 } from "./handler/mediachannel/simulcast";
+import {
+  ice_restart_node_trigger,
+  ice_restart_web_trigger,
+} from "./handler/ice/restart";
 
 const app = express();
 app.use(express.json() as never);
@@ -116,6 +120,8 @@ server.on("connectionrequest", async (_, accept) => {
     mediachannel_addtrack_removefirst_addtrack:
       new mediachannel_addtrack_removefirst_addtrack(),
     mediachannel_offer_replace_second: new mediachannel_offer_replace_second(),
+    ice_restart_web_trigger: new ice_restart_web_trigger(),
+    ice_restart_node_trigger: new ice_restart_node_trigger(),
   };
 
   const transport = accept();
