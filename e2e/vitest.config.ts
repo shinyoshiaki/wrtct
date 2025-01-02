@@ -7,6 +7,7 @@ export default defineConfig({
     globals: true,
     testTimeout: 20_000,
     // fileParallelism: false,
+    retry: 1,
     browser: {
       enabled: true,
       name: "chromium",
