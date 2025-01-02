@@ -50,7 +50,7 @@ export class Connection implements IceConnection {
   options: IceOptions;
   remoteCandidatesEnd = false;
   localCandidatesEnd = false;
-  generation = -1;
+  generation = 0;
   private readonly tieBreaker: bigint = BigInt(
     new Uint64BE(randomBytes(64)).toString(),
   );
@@ -75,7 +75,7 @@ export class Connection implements IceConnection {
   readonly onIceCandidate: Event<[Candidate]> = new Event();
 
   constructor(
-    public iceControlling: boolean,
+    private _iceControlling: boolean,
     options?: Partial<IceOptions>,
   ) {
     this.options = {
@@ -88,13 +88,25 @@ export class Connection implements IceConnection {
       19302,
     ];
     this.turnServer = validateAddress(turnServer);
-    this.restart();
   }
 
-  restart() {
+  get iceControlling() {
+    return this._iceControlling;
+  }
+
+  set iceControlling(value: boolean) {
+    if (this.generation > 0 || this.nominated) {
+      return;
+    }
+    this._iceControlling = value;
+    for (const pair of this.checkList) {
+      pair.iceControlling = value;
+    }
+  }
+
+  async restart() {
     this.localUserName = randomString(4);
     this.localPassword = randomString(22);
-    this.remoteIsLite = false;
     this.remoteUsername = "";
     this.remotePassword = "";
     this.checkList = [];
@@ -102,6 +114,7 @@ export class Connection implements IceConnection {
     this.remoteCandidatesEnd = false;
     this.localCandidatesEnd = false;
     this.state = "new";
+    this.lookup?.close?.();
     this.lookup = undefined;
     this._remoteCandidates = [];
     this.nominated = undefined;
@@ -111,11 +124,21 @@ export class Connection implements IceConnection {
     this.earlyChecks = [];
     this.earlyChecksDone = false;
     this.localCandidatesStart = false;
+    for (const protocol of this.protocols) {
+      await protocol.close();
+    }
     this.protocols = [];
+    this.queryConsentHandle?.resolve?.();
     this.queryConsentHandle = undefined;
     this.promiseGatherCandidates = undefined;
 
     this.generation++;
+  }
+
+  resetNominatedPair() {
+    log("resetNominatedPair");
+    this.nominated = undefined;
+    this.nominating = false;
   }
 
   setRemoteParams({
@@ -438,7 +461,9 @@ export class Connection implements IceConnection {
     this.unfreezeInitial();
 
     // # handle early checks
-    this.earlyChecks.forEach((earlyCheck) => this.checkIncoming(...earlyCheck));
+    for (const earlyCheck of this.earlyChecks) {
+      this.checkIncoming(...earlyCheck);
+    }
     this.earlyChecks = [];
     this.earlyChecksDone = true;
 
@@ -474,7 +499,7 @@ export class Connection implements IceConnection {
     const [firstPair] = this.checkList;
     if (!firstPair) return;
     if (firstPair.state === CandidatePairState.FROZEN) {
-      this.setPairState(firstPair, CandidatePairState.WAITING);
+      firstPair.updateState(CandidatePairState.WAITING);
     }
 
     // # unfreeze pairs with same component but different foundations
@@ -485,7 +510,7 @@ export class Connection implements IceConnection {
         !seenFoundations.has(pair.localCandidate.foundation) &&
         pair.state === CandidatePairState.FROZEN
       ) {
-        this.setPairState(pair, CandidatePairState.WAITING);
+        pair.updateState(CandidatePairState.WAITING);
         seenFoundations.add(pair.localCandidate.foundation);
       }
     }
@@ -642,7 +667,9 @@ export class Connection implements IceConnection {
 
     if (remoteCandidate.host.includes(".local")) {
       try {
-        if (this.state === "closed") return;
+        if (this.state === "closed") {
+          return;
+        }
         if (!this.lookup) {
           this.lookup = new MdnsLookup();
         }
@@ -677,9 +704,9 @@ export class Connection implements IceConnection {
   };
 
   getDefaultCandidate() {
-    const candidates = this.localCandidates.sort(
-      (a, b) => a.priority - b.priority,
-    );
+    const candidates = this.localCandidates
+      .sort((a, b) => a.priority - b.priority)
+      .reverse();
     const [candidate] = candidates;
     return candidate;
   }
@@ -717,11 +744,6 @@ export class Connection implements IceConnection {
     return pair;
   }
 
-  private setPairState(pair: CandidatePair, state: CandidatePairState) {
-    log("setPairState", pair.toJSON(), CandidatePairState[state]);
-    pair.updateState(state);
-  }
-
   private switchRole(iceControlling: boolean) {
     log("switch role", iceControlling);
     this.iceControlling = iceControlling;
@@ -754,7 +776,7 @@ export class Connection implements IceConnection {
               p.state,
             )
           ) {
-            this.setPairState(p, CandidatePairState.FAILED);
+            p.updateState(CandidatePairState.FAILED);
           }
         }
       }
@@ -777,7 +799,7 @@ export class Connection implements IceConnection {
           p.localCandidate.foundation === pair.localCandidate.foundation &&
           p.state === CandidatePairState.FROZEN
         ) {
-          this.setPairState(p, CandidatePairState.WAITING);
+          p.updateState(CandidatePairState.WAITING);
         }
       }
     }
@@ -815,7 +837,7 @@ export class Connection implements IceConnection {
 
       log("check start", pair.toJSON());
 
-      this.setPairState(pair, CandidatePairState.IN_PROGRESS);
+      pair.updateState(CandidatePairState.IN_PROGRESS);
 
       const nominate = this.iceControlling && !this.remoteIsLite;
       const request = this.buildRequest(nominate);
@@ -847,7 +869,7 @@ export class Connection implements IceConnection {
         } else {
           // timeout
           log("CandidatePairState.FAILED", pair.toJSON());
-          this.setPairState(pair, CandidatePairState.FAILED);
+          pair.updateState(CandidatePairState.FAILED);
           this.checkComplete(pair);
           r();
           return;
@@ -856,7 +878,7 @@ export class Connection implements IceConnection {
 
       // # check remote address matches
       if (!isEqual(result.addr, pair.remoteAddr)) {
-        this.setPairState(pair, CandidatePairState.FAILED);
+        pair.updateState(CandidatePairState.FAILED);
         this.checkComplete(pair);
         r();
         return;
@@ -877,17 +899,22 @@ export class Connection implements IceConnection {
             Buffer.from(this.remotePassword, "utf8"),
           );
         } catch (error) {
-          this.setPairState(pair, CandidatePairState.FAILED);
+          pair.updateState(CandidatePairState.FAILED);
           this.checkComplete(pair);
           return;
         }
         pair.nominated = true;
       }
 
-      this.setPairState(pair, CandidatePairState.SUCCEEDED);
+      pair.updateState(CandidatePairState.SUCCEEDED);
       this.checkComplete(pair);
       r();
     });
+
+  private addPair(pair: CandidatePair) {
+    this.checkList.push(pair);
+    this.sortCheckList();
+  }
 
   // 7.2.  STUN Server Procedures
   // 7.2.1.3、7.2.1.4、および7.2.1.5
@@ -928,10 +955,9 @@ export class Connection implements IceConnection {
     // find pair
     let pair = this.findPair(protocol, remoteCandidate);
     if (!pair) {
-      pair = new CandidatePair(protocol, remoteCandidate);
-      this.setPairState(pair, CandidatePairState.WAITING);
-      this.checkList.push(pair);
-      this.sortCheckList();
+      pair = new CandidatePair(protocol, remoteCandidate, this.iceControlling);
+      pair.updateState(CandidatePairState.WAITING);
+      this.addPair(pair);
     }
 
     // 7.2.1.4.  Triggered Checks
@@ -963,15 +989,19 @@ export class Connection implements IceConnection {
       protocol.localCandidate?.canPairWith(remoteCandidate) &&
       !this.findPair(protocol, remoteCandidate)
     ) {
-      const pair = new CandidatePair(protocol, remoteCandidate);
+      const pair = new CandidatePair(
+        protocol,
+        remoteCandidate,
+        this.iceControlling,
+      );
       if (
         this.options.filterCandidatePair &&
         !this.options.filterCandidatePair(pair)
       ) {
         return;
       }
-      this.checkList.push(pair);
-      this.setPairState(pair, CandidatePairState.WAITING);
+      pair.updateState(CandidatePairState.WAITING);
+      this.addPair(pair);
     }
   }
 

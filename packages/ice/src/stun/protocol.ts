@@ -9,7 +9,7 @@ import { classes } from "./const";
 import { type Message, parseMessage } from "./message";
 import { Transaction } from "./transaction";
 
-const log = debug("packages/ice/src/stun/protocol.ts");
+const log = debug("werift-ice : packages/ice/src/stun/protocol.ts");
 
 export class StunProtocol implements Protocol {
   static readonly type = "stun";
@@ -22,17 +22,11 @@ export class StunProtocol implements Protocol {
   localCandidate?: Candidate;
   sentMessage?: Message;
   localAddress?: string;
-  onRequestReceived = new Event<[Message, Address, Buffer]>();
-  onDataReceived = new Event<[Buffer]>();
 
-  private readonly closed = new Event();
+  readonly onRequestReceived = new Event<[Message, Address, Buffer]>();
+  readonly onDataReceived = new Event<[Buffer]>();
 
   constructor() {}
-
-  connectionLost() {
-    this.closed.execute();
-    this.closed.complete();
-  }
 
   connectionMade = async (
     useIpv4: boolean,
@@ -53,7 +47,9 @@ export class StunProtocol implements Protocol {
       );
     }
 
-    this.transport.onData = (data, addr) => this.datagramReceived(data, addr);
+    this.transport.onData = (data, addr) => {
+      this.datagramReceived(data, addr);
+    };
   };
 
   private datagramReceived(data: Buffer, addr: Address) {
@@ -65,7 +61,7 @@ export class StunProtocol implements Protocol {
         }
         return;
       }
-      // log("parseMessage", addr, message);
+      log("parseMessage", addr, message.toJSON());
       if (
         (message.messageClass === classes.RESPONSE ||
           message.messageClass === classes.ERROR) &&
@@ -136,5 +132,7 @@ export class StunProtocol implements Protocol {
       transaction.cancel();
     });
     await this.transport.close();
+    this.onRequestReceived.complete();
+    this.onDataReceived.complete();
   }
 }

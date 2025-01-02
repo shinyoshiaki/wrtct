@@ -363,7 +363,9 @@ class IceTransport implements Transport {
   constructor(private ice: IceConnection) {
     ice.onData.subscribe((buf) => {
       if (isDtls(buf)) {
-        if (this.onData) this.onData(buf);
+        if (this.onData) {
+          this.onData(buf);
+        }
       }
     });
   }

@@ -23,18 +23,19 @@ export interface IceConnection {
   localCandidates: Candidate[];
   stunServer?: Address;
   turnServer?: Address;
+  generation: number;
   options: IceOptions;
   remoteCandidatesEnd: boolean;
   localCandidatesEnd: boolean;
   state: IceState;
   lookup?: MdnsLookup;
-  nominated?:CandidatePair
+  nominated?: CandidatePair;
 
   readonly onData: Event<[Buffer]>;
   readonly stateChanged: Event<[IceState]>;
   readonly onIceCandidate: Event<[Candidate]>;
 
-  restart(): void;
+  restart(): Promise<void>;
 
   setRemoteParams(params: {
     iceLite: boolean;
@@ -53,6 +54,7 @@ export interface IceConnection {
   send(data: Buffer): Promise<void>;
 
   getDefaultCandidate(): Candidate | undefined;
+  resetNominatedPair(): void;
 }
 
 export class CandidatePair {
@@ -75,6 +77,7 @@ export class CandidatePair {
   constructor(
     public protocol: Protocol,
     public remoteCandidate: Candidate,
+    public iceControlling: boolean,
   ) {}
 
   updateState(state: CandidatePairState) {
@@ -94,6 +97,14 @@ export class CandidatePair {
 
   get component() {
     return this.localCandidate.component;
+  }
+
+  get priority() {
+    return candidatePairPriority(
+      this.localCandidate,
+      this.remoteCandidate,
+      this.iceControlling,
+    );
   }
 }
 

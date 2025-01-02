@@ -17,9 +17,11 @@ export class RTCIceTransport {
   connection: IceConnection;
   state: RTCIceConnectionState = "new";
   private waitStart?: Event<[]>;
+  private renominating = false;
 
   readonly onStateChange = new Event<[RTCIceConnectionState]>();
   readonly onIceCandidate = new Event<[IceCandidate | undefined]>();
+  readonly onNegotiationNeeded = new Event<[]>();
 
   constructor(private iceGather: RTCIceGatherer) {
     this.connection = this.iceGather.connection;
@@ -77,24 +79,37 @@ export class RTCIceTransport {
     }
   };
 
-  setRemoteParams(remoteParameters: RTCIceParameters) {
+  async setRemoteParams(
+    remoteParameters: RTCIceParameters,
+    renomination = false,
+  ) {
+    if (renomination) {
+      this.renominating = true;
+    }
     if (
       this.connection.remoteUsername &&
       this.connection.remotePassword &&
       (this.connection.remoteUsername !== remoteParameters.usernameFragment ||
         this.connection.remotePassword !== remoteParameters.password)
     ) {
-      log("restartIce", remoteParameters);
-      this.restart();
+      if (this.renominating) {
+        log("renomination", remoteParameters);
+        this.connection.resetNominatedPair();
+        this.renominating = false;
+      } else {
+        log("restart", remoteParameters);
+        await this.restart();
+      }
     }
     this.connection.setRemoteParams(remoteParameters);
   }
 
-  restart() {
-    this.connection.restart();
+  async restart() {
+    await this.connection.restart();
     this.setState("new");
     this.iceGather.gatheringState = "new";
     this.waitStart = undefined;
+    this.onNegotiationNeeded.execute();
   }
 
   async start() {
@@ -220,6 +235,8 @@ export function candidateToIce(x: IceCandidate) {
     x.relatedAddress,
     x.relatedPort,
     x.tcpType,
+    x.generation,
+    x.ufrag,
   );
 }
 
