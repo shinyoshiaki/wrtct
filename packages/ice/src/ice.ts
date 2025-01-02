@@ -876,7 +876,13 @@ export class Connection implements IceConnection {
       } catch (error: any) {
         const exc: TransactionError = error;
         // 7.1.3.1.  Failure Cases
-        log("failure case", exc.response);
+        log(
+          "failure case",
+          this.localPassword,
+          exc.response
+            ? JSON.stringify(exc.response.toJSON(), null, 2)
+            : undefined,
+        );
         if (exc.response?.getAttributeValue("ERROR-CODE")[0] === 487) {
           if (request.attributesKeys.includes("ICE-CONTROLLED")) {
             this.switchRole(true);
