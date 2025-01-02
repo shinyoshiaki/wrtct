@@ -31,7 +31,7 @@
     "format:e2e": "cd e2e && cp ../biome.json ./ && npm run format",
     "format:examples": "cd examples && cp ../biome.json ./ && npm run format",
     "media": "DEBUG=werift* ts-node-dev examples/mediachannel/pubsub/offer.ts",
-    "test": "run-s test:small e2e:verbose",
+    "test": "run-s e2e:verbose",
     "test:small": "npm run test --workspaces --if-present",
     "type": "run-s type:packages type:extra",
     "type:extra": "tsc --noEmit -p ./tsconfig.json",
