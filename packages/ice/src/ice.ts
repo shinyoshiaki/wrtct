@@ -596,6 +596,8 @@ export class Connection implements IceConnection {
         this.queryConsentHandle = undefined;
       });
 
+      const { localUsername, remoteUsername, iceControlling } = this;
+
       // """
       // Periodically check consent (RFC 7675).
       // """
@@ -613,7 +615,12 @@ export class Connection implements IceConnection {
           if (!pair) {
             break;
           }
-          const request = this.buildRequest(false);
+          const request = this.buildRequest({
+            nominate: false,
+            localUsername,
+            remoteUsername,
+            iceControlling,
+          });
           try {
             const [msg, addr] = await pair.protocol.request(
               request,
@@ -875,10 +882,6 @@ export class Connection implements IceConnection {
       log("check start", pair.toJSON());
 
       pair.updateState(CandidatePairState.IN_PROGRESS);
-
-      const nominate = this.iceControlling && !this.remoteIsLite;
-      const request = this.buildRequest(nominate);
-
       const result: { response?: Message; addr?: Address } = {};
       const {
         remotePassword,
@@ -887,6 +890,15 @@ export class Connection implements IceConnection {
         localPassword,
         generation,
       } = this;
+
+      const nominate = this.iceControlling && !this.remoteIsLite;
+      const request = this.buildRequest({
+        nominate,
+        localUsername,
+        remoteUsername,
+        iceControlling: this.iceControlling,
+      });
+
       try {
         const [response, addr] = await pair.protocol.request(
           request,
@@ -958,7 +970,12 @@ export class Connection implements IceConnection {
       } else if (this.iceControlling && !this.nominating) {
         // # perform regular nomination
         this.nominating = true;
-        const request = this.buildRequest(true);
+        const request = this.buildRequest({
+          nominate: true,
+          localUsername,
+          remoteUsername,
+          iceControlling: this.iceControlling,
+        });
         try {
           await pair.protocol.request(
             request,
@@ -1084,13 +1101,23 @@ export class Connection implements IceConnection {
     }
   };
 
-  private buildRequest(nominate: boolean) {
-    const txUsername = `${this.remoteUsername}:${this.localUsername}`;
+  private buildRequest({
+    nominate,
+    remoteUsername,
+    localUsername,
+    iceControlling,
+  }: {
+    nominate: boolean;
+    remoteUsername: string;
+    localUsername: string;
+    iceControlling: boolean;
+  }) {
+    const txUsername = `${remoteUsername}:${localUsername}`;
     const request = new Message(methods.BINDING, classes.REQUEST);
     request
       .setAttribute("USERNAME", txUsername)
       .setAttribute("PRIORITY", candidatePriority("prflx"));
-    if (this.iceControlling) {
+    if (iceControlling) {
       request.setAttribute("ICE-CONTROLLING", this.tieBreaker);
       if (nominate) {
         request.setAttribute("USE-CANDIDATE", null);
