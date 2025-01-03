@@ -67,6 +67,10 @@ describe("ice/restart", () => {
     }
 
     await waitVideoPlay(remote);
+
+    await peer.request(ice_restart_web_trigger_label, {
+      type: "fin",
+    });
   }, 60_000);
 
   it(ice_restart_node_trigger_label, async () => {

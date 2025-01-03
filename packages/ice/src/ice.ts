@@ -779,7 +779,16 @@ export class Connection implements IceConnection {
       // Once the nominated flag is set for a component of a data stream, it
       // concludes the ICE processing for that component.  See Section 8.
       // So disallow overwriting of the pair nominated for that component
-      if (pair.nominated && this.nominated == undefined) {
+      if (
+        pair.nominated &&
+        (pair.localCandidate.generation
+          ? pair.localCandidate.generation === this.generation
+          : true) &&
+        (pair.remoteCandidate.generation
+          ? pair.remoteCandidate.generation === this.generation
+          : true) &&
+        this.nominated == undefined
+      ) {
         log("nominated", pair.toJSON());
         this.nominated = pair;
         this.nominating = false;
@@ -812,6 +821,8 @@ export class Connection implements IceConnection {
         }
         return;
       }
+
+      log("not completed", pair.toJSON());
 
       // 7.1.3.2.3.  Updating Pair States
       for (const p of this.checkList) {
@@ -851,6 +862,18 @@ export class Connection implements IceConnection {
   // 3.  Terminology : Check
   checkStart = (pair: CandidatePair) =>
     cancelable<void>(async (r) => {
+      const { generation } = this;
+      if (
+        this.nominated &&
+        this.nominated.localCandidate.generation === generation &&
+        (this.nominated.remoteCandidate.generation
+          ? this.nominated.remoteCandidate.generation === generation
+          : false)
+      ) {
+        log("generation unmatched", pair.toJSON());
+        r();
+        return;
+      }
       // """
       // Starts a check.
       // """
@@ -863,14 +886,19 @@ export class Connection implements IceConnection {
       const request = this.buildRequest(nominate);
 
       const result: { response?: Message; addr?: Address } = {};
+      const { remotePassword } = this;
       try {
         const [response, addr] = await pair.protocol.request(
           request,
           pair.remoteAddr,
-          Buffer.from(this.remotePassword, "utf8"),
+          Buffer.from(remotePassword, "utf8"),
           4,
         );
-        log("response", response, addr);
+        log("response received", request.toJSON(), response.toJSON(), addr, {
+          localPassword: this.localPassword,
+          remotePassword,
+          generation,
+        });
         result.response = response;
         result.addr = addr;
       } catch (error: any) {
@@ -878,10 +906,11 @@ export class Connection implements IceConnection {
         // 7.1.3.1.  Failure Cases
         log(
           "failure case",
-          this.localPassword,
+          request.toJSON(),
           exc.response
             ? JSON.stringify(exc.response.toJSON(), null, 2)
             : undefined,
+          { localPassword: this.localPassword, remotePassword, generation },
         );
         if (exc.response?.getAttributeValue("ERROR-CODE")[0] === 487) {
           if (request.attributesKeys.includes("ICE-CONTROLLED")) {

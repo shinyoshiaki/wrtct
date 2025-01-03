@@ -70,7 +70,8 @@ export class CandidatePair {
   toJSON() {
     return {
       protocol: this.protocol.type,
-      remoteAddr: this.remoteAddr,
+      localCandidate: this.localCandidate.toSdp(),
+      remoteCandidate: this.remoteCandidate.toSdp(),
     };
   }
 

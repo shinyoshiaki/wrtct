@@ -28,7 +28,11 @@ export class ice_restart_web_trigger {
           const transceiver = this.pc.addTransceiver("video");
           transceiver.onTrack.subscribe((track) => {
             transceiver.sender.replaceTrack(track);
-            setInterval(async () => {
+            const interval = setInterval(async () => {
+              if (this.pc.signalingState === "closed") {
+                clearInterval(interval);
+                return;
+              }
               await transceiver.receiver.sendRtcpPLI(track.ssrc);
             }, 3000);
           });
@@ -55,6 +59,12 @@ export class ice_restart_web_trigger {
           const answer = await this.pc.createAnswer();
           this.pc.setLocalDescription(answer);
           accept(this.pc.localDescription);
+        }
+        break;
+      case "fin":
+        {
+          this.pc.close();
+          accept({});
         }
         break;
     }
