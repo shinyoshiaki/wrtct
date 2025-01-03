@@ -285,12 +285,12 @@ describe("ice", () => {
 
       await a.gatherCandidates();
       b.remoteCandidates = a.localCandidates;
-      b.remoteUsername = a.localUserName;
+      b.remoteUsername = a.localUsername;
       b.remotePassword = a.remotePassword;
 
       await b.gatherCandidates();
       a.remoteCandidates = b.localCandidates;
-      a.remoteUsername = b.localUserName;
+      a.remoteUsername = b.localUsername;
       a.remotePassword = "wrong-password";
 
       try {
@@ -310,7 +310,7 @@ describe("ice", () => {
 
       await a.gatherCandidates();
       b.remoteCandidates = a.localCandidates;
-      b.remoteUsername = a.localUserName;
+      b.remoteUsername = a.localUsername;
       b.remotePassword = a.remotePassword;
 
       await b.gatherCandidates();

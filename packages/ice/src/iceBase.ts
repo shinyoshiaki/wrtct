@@ -14,7 +14,7 @@ const log = debug("werift-ice : packages/ice/src/ice.ts : log");
 
 export interface IceConnection {
   iceControlling: boolean;
-  localUserName: string;
+  localUsername: string;
   localPassword: string;
   remotePassword: string;
   remoteUsername: string;

@@ -11,11 +11,11 @@ describe("IceTrickleTest", () => {
     b.stunServer = undefined;
 
     await a.gatherCandidates();
-    b.remoteUsername = a.localUserName;
+    b.remoteUsername = a.localUsername;
     b.remotePassword = a.localPassword;
 
     await b.gatherCandidates();
-    a.remoteUsername = b.localUserName;
+    a.remoteUsername = b.localUsername;
     a.remotePassword = b.localPassword;
 
     assertCandidateTypes(a, ["host"]);

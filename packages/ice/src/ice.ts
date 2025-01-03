@@ -38,7 +38,7 @@ import { getHostAddresses } from "./utils";
 const log = debug("werift-ice : packages/ice/src/ice.ts : log");
 
 export class Connection implements IceConnection {
-  localUserName = randomString(4);
+  localUsername = randomString(4);
   localPassword = randomString(22);
   remoteIsLite = false;
   remotePassword: string = "";
@@ -106,7 +106,7 @@ export class Connection implements IceConnection {
   }
 
   async restart() {
-    this.localUserName = randomString(4);
+    this.localUsername = randomString(4);
     this.localPassword = randomString(22);
     this.remoteUsername = "";
     this.remotePassword = "";
@@ -130,6 +130,7 @@ export class Connection implements IceConnection {
     for (const protocol of this.protocols) {
       if (protocol.localCandidate) {
         protocol.localCandidate.generation = this.generation;
+        protocol.localCandidate.ufrag = this.localUsername;
       }
     }
 
@@ -212,7 +213,7 @@ export class Connection implements IceConnection {
       try {
         parseMessage(data, Buffer.from(this.localPassword, "utf8"));
         if (!this.remoteUsername) {
-          const rxUsername = `${this.localUserName}:${this.remoteUsername}`;
+          const rxUsername = `${this.localUsername}:${this.remoteUsername}`;
           if (msg.getAttributeValue("USERNAME") != rxUsername) {
             throw new Error("Wrong username");
           }
@@ -325,7 +326,7 @@ export class Connection implements IceConnection {
           undefined,
           undefined,
           this.generation,
-          this.localUserName,
+          this.localUsername,
         );
 
         this.pairLocalProtocol(protocol);
@@ -422,7 +423,7 @@ export class Connection implements IceConnection {
           relatedAddress[1],
           undefined,
           this.generation,
-          this.localUserName,
+          this.localUsername,
         );
         this.onIceCandidate.execute(protocol.localCandidate);
 
@@ -867,8 +868,6 @@ export class Connection implements IceConnection {
   // 3.  Terminology : Check
   checkStart = (pair: CandidatePair) =>
     cancelable<void>(async (r) => {
-      const { generation } = this;
-
       // """
       // Starts a check.
       // """
@@ -881,7 +880,13 @@ export class Connection implements IceConnection {
       const request = this.buildRequest(nominate);
 
       const result: { response?: Message; addr?: Address } = {};
-      const { remotePassword } = this;
+      const {
+        remotePassword,
+        remoteUsername,
+        localUsername,
+        localPassword,
+        generation,
+      } = this;
       try {
         const [response, addr] = await pair.protocol.request(
           request,
@@ -890,7 +895,9 @@ export class Connection implements IceConnection {
           4,
         );
         log("response received", request.toJSON(), response.toJSON(), addr, {
-          localPassword: this.localPassword,
+          localUsername,
+          remoteUsername,
+          localPassword,
           remotePassword,
           generation,
         });
@@ -905,7 +912,13 @@ export class Connection implements IceConnection {
           exc.response
             ? JSON.stringify(exc.response.toJSON(), null, 2)
             : undefined,
-          { localPassword: this.localPassword, remotePassword, generation },
+          {
+            localUsername,
+            remoteUsername,
+            localPassword,
+            remotePassword,
+            generation,
+          },
         );
         if (exc.response?.getAttributeValue("ERROR-CODE")[0] === 487) {
           if (request.attributesKeys.includes("ICE-CONTROLLED")) {
@@ -916,9 +929,15 @@ export class Connection implements IceConnection {
           await this.checkStart(pair).awaitable;
           r();
           return;
+        }
+        if (exc.response?.getAttributeValue("ERROR-CODE")[0] === 401) {
+          log("retry 401", pair.toJSON());
+          await this.checkStart(pair).awaitable;
+          r();
+          return;
         } else {
           // timeout
-          log("CandidatePairState.FAILED", pair.toJSON());
+          log("checkStart CandidatePairState.FAILED", pair.toJSON());
           pair.updateState(CandidatePairState.FAILED);
           this.checkComplete(pair);
           r();
@@ -1068,7 +1087,7 @@ export class Connection implements IceConnection {
   };
 
   private buildRequest(nominate: boolean) {
-    const txUsername = `${this.remoteUsername}:${this.localUserName}`;
+    const txUsername = `${this.remoteUsername}:${this.localUsername}`;
     const request = new Message(methods.BINDING, classes.REQUEST);
     request
       .setAttribute("USERNAME", txUsername)

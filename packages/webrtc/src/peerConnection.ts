@@ -516,7 +516,7 @@ export class RTCPeerConnection extends EventTarget {
       turnTransport: this.config.forceTurnTCP === true ? "tcp" : "udp",
     });
     if (existing) {
-      iceGatherer.connection.localUserName = existing.connection.localUserName;
+      iceGatherer.connection.localUsername = existing.connection.localUsername;
       iceGatherer.connection.localPassword = existing.connection.localPassword;
     }
     iceGatherer.onGatheringStateChange.subscribe(() => {

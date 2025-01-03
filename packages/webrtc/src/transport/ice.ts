@@ -190,7 +190,7 @@ export class RTCIceGatherer {
 
   get localParameters() {
     const params = new RTCIceParameters({
-      usernameFragment: this.connection.localUserName,
+      usernameFragment: this.connection.localUsername,
       password: this.connection.localPassword,
     });
 
