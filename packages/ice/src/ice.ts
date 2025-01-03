@@ -214,7 +214,8 @@ export class Connection implements IceConnection {
       const txUsername = msg.getAttributeValue("USERNAME");
       // 相手にとってのremoteは自分にとってのlocal
       const { remoteUsername: localUsername } = decodeTxUsername(txUsername);
-      const localPassword = this.userHistory[localUsername];
+      const localPassword =
+        this.userHistory[localUsername] ?? this.localPassword;
 
       // // # authenticate request
       // try {
