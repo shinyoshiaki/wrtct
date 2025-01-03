@@ -68,6 +68,10 @@ export class CandidatePair {
   }
 
   toJSON() {
+    return this.json;
+  }
+
+  get json() {
     return {
       protocol: this.protocol.type,
       localCandidate: this.localCandidate.toSdp(),

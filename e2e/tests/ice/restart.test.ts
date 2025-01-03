@@ -71,7 +71,7 @@ describe("ice/restart", () => {
     await peer.request(ice_restart_web_trigger_label, {
       type: "fin",
     });
-  }, 60_000);
+  }, 20_000);
 
   it(ice_restart_node_trigger_label, async () => {
     if (!peer.connected) await new Promise<void>((r) => peer.on("open", r));
@@ -144,5 +144,5 @@ describe("ice/restart", () => {
     await peer.request(ice_restart_node_trigger_label, {
       type: "fin",
     });
-  }, 60_000);
+  }, 20_000);
 });

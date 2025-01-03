@@ -127,6 +127,11 @@ export class Connection implements IceConnection {
     this.localCandidatesStart = false;
 
     // protocolsはincomingのearlyCheckに使うかもしれないので残す
+    for (const protocol of this.protocols) {
+      if (protocol.localCandidate) {
+        protocol.localCandidate.generation = this.generation;
+      }
+    }
 
     this.queryConsentHandle?.resolve?.();
     this.queryConsentHandle = undefined;
@@ -502,7 +507,9 @@ export class Connection implements IceConnection {
     }
 
     // # cancel remaining checks
-    this.checkList.forEach((check) => check.handle?.resolve());
+    for (const check of this.checkList) {
+      check.handle?.resolve();
+    }
 
     if (res !== ICE_COMPLETED) {
       throw new Error("ICE negotiation failed");
@@ -781,10 +788,8 @@ export class Connection implements IceConnection {
       // So disallow overwriting of the pair nominated for that component
       if (
         pair.nominated &&
-        (pair.localCandidate.generation
-          ? pair.localCandidate.generation === this.generation
-          : true) &&
-        (pair.remoteCandidate.generation
+        // localのgenerationは更新が間に合わないかもしれないのでチェックしない
+        (pair.remoteCandidate.generation != undefined
           ? pair.remoteCandidate.generation === this.generation
           : true) &&
         this.nominated == undefined
@@ -863,17 +868,7 @@ export class Connection implements IceConnection {
   checkStart = (pair: CandidatePair) =>
     cancelable<void>(async (r) => {
       const { generation } = this;
-      if (
-        this.nominated &&
-        this.nominated.localCandidate.generation === generation &&
-        (this.nominated.remoteCandidate.generation
-          ? this.nominated.remoteCandidate.generation === generation
-          : false)
-      ) {
-        log("generation unmatched", pair.toJSON());
-        r();
-        return;
-      }
+
       // """
       // Starts a check.
       // """
