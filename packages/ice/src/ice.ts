@@ -106,20 +106,22 @@ export class Connection implements IceConnection {
   }
 
   async restart() {
+    this.generation++;
+
     this.localUsername = randomString(4);
     this.localPassword = randomString(22);
     this.remoteUsername = "";
     this.remotePassword = "";
-    this.checkList = [];
     this.localCandidates = [];
+    this._remoteCandidates = [];
     this.remoteCandidatesEnd = false;
     this.localCandidatesEnd = false;
     this.state = "new";
     this.lookup?.close?.();
     this.lookup = undefined;
-    this._remoteCandidates = [];
     this.nominated = undefined;
     this.nominating = false;
+    this.checkList = [];
     this.checkListDone = false;
     this.checkListState = new PQueue<number>();
     this.earlyChecks = [];
@@ -137,8 +139,6 @@ export class Connection implements IceConnection {
     this.queryConsentHandle?.resolve?.();
     this.queryConsentHandle = undefined;
     this.promiseGatherCandidates = undefined;
-
-    this.generation++;
 
     if (this.options.localPasswordPrefix) {
       this.localPassword =
@@ -909,9 +909,7 @@ export class Connection implements IceConnection {
         log(
           "failure case",
           request.toJSON(),
-          exc.response
-            ? JSON.stringify(exc.response.toJSON(), null, 2)
-            : undefined,
+          exc.response ? JSON.stringify(exc.response.toJSON(), null, 2) : error,
           {
             localUsername,
             remoteUsername,

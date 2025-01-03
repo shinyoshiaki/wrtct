@@ -61,7 +61,7 @@ export class StunProtocol implements Protocol {
         }
         return;
       }
-      log("parseMessage", addr, message.toJSON());
+      // log("parseMessage", addr, message.toJSON());
       if (
         (message.messageClass === classes.RESPONSE ||
           message.messageClass === classes.ERROR) &&
