@@ -51,6 +51,7 @@ export class Connection implements IceConnection {
   remoteCandidatesEnd = false;
   localCandidatesEnd = false;
   generation = -1;
+  userHistory: { [username: string]: string } = {};
   private readonly tieBreaker: bigint = BigInt(
     new Uint64BE(randomBytes(64)).toString(),
   );
@@ -110,6 +111,13 @@ export class Connection implements IceConnection {
 
     this.localUsername = randomString(4);
     this.localPassword = randomString(22);
+    if (this.options.localPasswordPrefix) {
+      this.localPassword =
+        this.options.localPasswordPrefix +
+        this.localPassword.slice(this.options.localPasswordPrefix.length);
+    }
+    this.userHistory[this.localUsername] = this.localPassword;
+
     this.remoteUsername = "";
     this.remotePassword = "";
     this.localCandidates = [];
@@ -139,12 +147,6 @@ export class Connection implements IceConnection {
     this.queryConsentHandle?.resolve?.();
     this.queryConsentHandle = undefined;
     this.promiseGatherCandidates = undefined;
-
-    if (this.options.localPasswordPrefix) {
-      this.localPassword =
-        this.options.localPasswordPrefix +
-        this.localPassword.slice(this.options.localPasswordPrefix.length);
-    }
   }
 
   resetNominatedPair() {
@@ -209,19 +211,29 @@ export class Connection implements IceConnection {
         return;
       }
 
-      // # authenticate request
-      try {
-        parseMessage(data, Buffer.from(this.localPassword, "utf8"));
-        if (!this.remoteUsername) {
-          const rxUsername = `${this.localUsername}:${this.remoteUsername}`;
-          if (msg.getAttributeValue("USERNAME") != rxUsername) {
-            throw new Error("Wrong username");
-          }
-        }
-      } catch (error) {
-        this.respondError(msg, addr, protocol, [400, "Bad Request"]);
-        return;
-      }
+      const txUsername = msg.getAttributeValue("USERNAME");
+      // 相手にとってのremoteは自分にとってのlocal
+      const { remoteUsername: localUsername } = decodeTxUsername(txUsername);
+      const localPassword = this.userHistory[localUsername];
+
+      // // # authenticate request
+      // try {
+      //   parseMessage(data, Buffer.from(localPassword, "utf8"));
+      //   if (this.remoteUsername) {
+      //     const rxUsername = `${localUsername}:${this.remoteUsername}`;
+      //     if (txUsername != rxUsername) {
+      //       log("Wrong username", {
+      //         txUsername,
+      //         localUsername: this.localUsername,
+      //         remoteUsername: this.remoteUsername,
+      //       });
+      //       throw new Error("Wrong username");
+      //     }
+      //   }
+      // } catch (error) {
+      //   this.respondError(msg, addr, protocol, [400, "Bad Request"]);
+      //   return;
+      // }
 
       const { iceControlling } = this;
 
@@ -258,9 +270,10 @@ export class Connection implements IceConnection {
         classes.RESPONSE,
         msg.transactionId,
       );
+
       response
         .setAttribute("XOR-MAPPED-ADDRESS", addr)
-        .addMessageIntegrity(Buffer.from(this.localPassword, "utf8"))
+        .addMessageIntegrity(Buffer.from(localPassword, "utf8"))
         .addFingerprint();
       protocol.sendStun(response, addr).catch((e) => {
         log("sendStun error", e);
@@ -883,13 +896,8 @@ export class Connection implements IceConnection {
 
       pair.updateState(CandidatePairState.IN_PROGRESS);
       const result: { response?: Message; addr?: Address } = {};
-      const {
-        remotePassword,
-        remoteUsername,
-        localUsername,
-        localPassword,
-        generation,
-      } = this;
+      const { remotePassword, remoteUsername, generation } = this;
+      const localUsername = pair.localCandidate.ufrag ?? this.localUsername;
 
       const nominate = this.iceControlling && !this.remoteIsLite;
       const request = this.buildRequest({
@@ -909,7 +917,6 @@ export class Connection implements IceConnection {
         log("response received", request.toJSON(), response.toJSON(), addr, {
           localUsername,
           remoteUsername,
-          localPassword,
           remotePassword,
           generation,
         });
@@ -925,7 +932,6 @@ export class Connection implements IceConnection {
           {
             localUsername,
             remoteUsername,
-            localPassword,
             remotePassword,
             generation,
           },
@@ -1003,10 +1009,12 @@ export class Connection implements IceConnection {
   // 7.2.  STUN Server Procedures
   // 7.2.1.3、7.2.1.4、および7.2.1.5
   checkIncoming(message: Message, addr: Address, protocol: Protocol) {
-    // log("checkIncoming", message.toJSON(), addr);
     // """
     // Handle a successful incoming check.
     // """
+
+    const txUsername = message.getAttributeValue("USERNAME");
+    const { remoteUsername: localUsername } = decodeTxUsername(txUsername);
 
     // find remote candidate
     let remoteCandidate: Candidate | undefined;
@@ -1043,6 +1051,15 @@ export class Connection implements IceConnection {
       pair.updateState(CandidatePairState.WAITING);
       this.addPair(pair);
     }
+    pair.localCandidate.ufrag = localUsername;
+
+    log("Triggered Checks", message.toJSON(), pair.toJSON(), {
+      localUsername: this.localUsername,
+      remoteUsername: this.remoteUsername,
+      localPassword: this.localPassword,
+      remotePassword: this.remotePassword,
+      generation: this.generation,
+    });
 
     // 7.2.1.4.  Triggered Checks
     if (
@@ -1112,7 +1129,7 @@ export class Connection implements IceConnection {
     localUsername: string;
     iceControlling: boolean;
   }) {
-    const txUsername = `${remoteUsername}:${localUsername}`;
+    const txUsername = encodeTxUsername({ remoteUsername, localUsername });
     const request = new Message(methods.BINDING, classes.REQUEST);
     request
       .setAttribute("USERNAME", txUsername)
@@ -1148,3 +1165,18 @@ export class Connection implements IceConnection {
     });
   }
 }
+
+const encodeTxUsername = ({
+  remoteUsername,
+  localUsername,
+}: {
+  remoteUsername: string;
+  localUsername: string;
+}) => {
+  return `${remoteUsername}:${localUsername}`;
+};
+
+const decodeTxUsername = (txUsername: string) => {
+  const [remoteUsername, localUsername] = txUsername.split(":");
+  return { remoteUsername, localUsername };
+};
