@@ -49,6 +49,7 @@ describe("ice", () => {
 
     const request = new Message(methods.BINDING, classes.REQUEST);
     request.setAttribute("PRIORITY", 456789);
+    request.setAttribute("USERNAME", `a:b`);
 
     connection.checkIncoming(request, ["2.3.4.5", 2345], protocol);
     expect(protocol.sentMessage).not.toBeNull();
@@ -88,6 +89,7 @@ describe("ice", () => {
     const pair = new CandidatePair(
       protocol,
       new Candidate("some-foundation", 1, "udp", 2345, "2.3.4.5", 2345, "host"),
+      true,
     );
 
     await connection.checkStart(pair).awaitable;
