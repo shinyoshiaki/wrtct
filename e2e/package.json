@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.server.json",
     "chrome:dev": "vitest ./tests",
-    "chrome:prod": "vitest run ./tests --browser.headless --fileParallelism=false --reporter=dot && node stop.js",
+    "chrome:prod": "vitest run ./tests --browser.headless --reporter=dot && node stop.js",
     "ci": "npm run build && run-p server:prod chrome:prod",
     "ci:silent": "npm run build && run-p server:silent chrome:prod",
     "clean": "pkill -9 gst-launch",

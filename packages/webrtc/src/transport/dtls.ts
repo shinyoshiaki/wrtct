@@ -18,7 +18,7 @@ import {
 } from "../../../dtls/src/cipher/const";
 import { CipherContext } from "../../../dtls/src/context/cipher";
 import type { Profile } from "../../../dtls/src/context/srtp";
-import type { Connection, IceConnection } from "../../../ice/src";
+import type { IceConnection } from "../../../ice/src";
 import {
   type RtcpPacket,
   RtcpPacketConverter,

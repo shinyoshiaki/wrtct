@@ -27,6 +27,10 @@ import {
   datachannel_answer,
   datachannel_offer,
 } from "./handler/datachannel/datachannel";
+import {
+  ice_restart_node_trigger,
+  ice_restart_web_trigger,
+} from "./handler/ice/restart";
 import { ice_trickle_answer, ice_trickle_offer } from "./handler/ice/trickle";
 import {
   mediachannel_addTrack_answer,
@@ -57,10 +61,6 @@ import {
   mediachannel_simulcast_answer,
   mediachannel_simulcast_offer,
 } from "./handler/mediachannel/simulcast";
-import {
-  ice_restart_node_trigger,
-  ice_restart_web_trigger,
-} from "./handler/ice/restart";
 
 const app = express();
 app.use(express.json() as never);

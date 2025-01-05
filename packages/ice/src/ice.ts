@@ -217,25 +217,6 @@ export class Connection implements IceConnection {
       const localPassword =
         this.userHistory[localUsername] ?? this.localPassword;
 
-      // // # authenticate request
-      // try {
-      //   parseMessage(data, Buffer.from(localPassword, "utf8"));
-      //   if (this.remoteUsername) {
-      //     const rxUsername = `${localUsername}:${this.remoteUsername}`;
-      //     if (txUsername != rxUsername) {
-      //       log("Wrong username", {
-      //         txUsername,
-      //         localUsername: this.localUsername,
-      //         remoteUsername: this.remoteUsername,
-      //       });
-      //       throw new Error("Wrong username");
-      //     }
-      //   }
-      // } catch (error) {
-      //   this.respondError(msg, addr, protocol, [400, "Bad Request"]);
-      //   return;
-      // }
-
       const { iceControlling } = this;
 
       // 7.2.1.1.  Detecting and Repairing Role Conflicts
@@ -523,7 +504,7 @@ export class Connection implements IceConnection {
 
     // # cancel remaining checks
     for (const check of this.checkList) {
-      check.handle?.resolve();
+      check.handle?.resolve?.();
     }
 
     if (res !== ICE_COMPLETED) {
@@ -726,9 +707,6 @@ export class Connection implements IceConnection {
 
     if (remoteCandidate.host.includes(".local")) {
       try {
-        if (this.state === "closed") {
-          return;
-        }
         if (!this.lookup) {
           this.lookup = new MdnsLookup();
         }
@@ -820,7 +798,7 @@ export class Connection implements IceConnection {
       // So disallow overwriting of the pair nominated for that component
       if (
         pair.nominated &&
-        // localのgenerationは更新が間に合わないかもしれないのでチェックしない
+        // remoteのgenerationをチェックする.localのgenerationは更新が間に合わないかもしれないのでチェックしない
         (pair.remoteCandidate.generation != undefined
           ? pair.remoteCandidate.generation === this.generation
           : true) &&

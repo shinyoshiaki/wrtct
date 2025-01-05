@@ -264,7 +264,7 @@ export class RTCPeerConnection extends EventTarget {
     if (iceRestart || this.needRestart) {
       this.needRestart = false;
       for (const t of this.iceTransports) {
-        await t.restart();
+        t.restart();
       }
     }
 
@@ -919,100 +919,95 @@ export class RTCPeerConnection extends EventTarget {
       transceiver.kind === media.kind &&
       [undefined, media.rtp.muxId].includes(transceiver.mid);
 
-    let transports = (await Promise.all(
-      remoteSdp.media.map(async (remoteMedia, i) => {
-        let dtlsTransport: RTCDtlsTransport;
+    let transports = remoteSdp.media.map((remoteMedia, i) => {
+      let dtlsTransport: RTCDtlsTransport;
 
-        if (["audio", "video"].includes(remoteMedia.kind)) {
-          let transceiver = this.transceivers.find((t) =>
-            matchTransceiverWithMedia(t, remoteMedia),
-          );
-          if (!transceiver) {
-            // create remote transceiver
-            transceiver = this._addTransceiver(remoteMedia.kind, {
-              direction: "recvonly",
-            });
-            transceiver.mid = remoteMedia.rtp.muxId;
-            this.onRemoteTransceiverAdded.execute(transceiver);
-          } else {
-            if (transceiver.direction === "inactive" && transceiver.stopping) {
-              transceiver.stopped = true;
-
-              if (sessionDescription.type === "answer") {
-                transceiver.setCurrentDirection("inactive");
-              }
-              return;
-            }
-          }
-
-          if (this.remoteIsBundled) {
-            if (!bundleTransport) {
-              bundleTransport = transceiver.dtlsTransport;
-            } else {
-              transceiver.setDtlsTransport(bundleTransport);
-            }
-          }
-
-          dtlsTransport = transceiver.dtlsTransport;
-
-          this.setRemoteRTP(transceiver, remoteMedia, remoteSdp.type, i);
-        } else if (remoteMedia.kind === "application") {
-          if (!this.sctpTransport) {
-            this.sctpTransport = this.createSctpTransport();
-            this.sctpTransport.mid = remoteMedia.rtp.muxId;
-          }
-
-          if (this.remoteIsBundled) {
-            if (!bundleTransport) {
-              bundleTransport = this.sctpTransport.dtlsTransport;
-            } else {
-              this.sctpTransport.setDtlsTransport(bundleTransport);
-            }
-          }
-
-          dtlsTransport = this.sctpTransport.dtlsTransport;
-
-          this.setRemoteSCTP(remoteMedia, this.sctpTransport, i);
+      if (["audio", "video"].includes(remoteMedia.kind)) {
+        let transceiver = this.transceivers.find((t) =>
+          matchTransceiverWithMedia(t, remoteMedia),
+        );
+        if (!transceiver) {
+          // create remote transceiver
+          transceiver = this._addTransceiver(remoteMedia.kind, {
+            direction: "recvonly",
+          });
+          transceiver.mid = remoteMedia.rtp.muxId;
+          this.onRemoteTransceiverAdded.execute(transceiver);
         } else {
-          throw new Error("invalid media kind");
-        }
+          if (transceiver.direction === "inactive" && transceiver.stopping) {
+            transceiver.stopped = true;
 
-        const iceTransport = dtlsTransport.iceTransport;
-
-        if (remoteMedia.iceParams) {
-          const renomination = !!remoteSdp.media.find(
-            (m) => m.direction === "inactive",
-          );
-          await iceTransport.setRemoteParams(
-            remoteMedia.iceParams,
-            renomination,
-          );
-
-          // One agent full, one lite:  The full agent MUST take the controlling role, and the lite agent MUST take the controlled role
-          // RFC 8445 S6.1.1
-          if (remoteMedia.iceParams?.iceLite) {
-            iceTransport.connection.iceControlling = true;
+            if (sessionDescription.type === "answer") {
+              transceiver.setCurrentDirection("inactive");
+            }
+            return;
           }
         }
-        if (remoteMedia.dtlsParams) {
-          dtlsTransport.setRemoteParams(remoteMedia.dtlsParams);
+
+        if (this.remoteIsBundled) {
+          if (!bundleTransport) {
+            bundleTransport = transceiver.dtlsTransport;
+          } else {
+            transceiver.setDtlsTransport(bundleTransport);
+          }
         }
 
-        // # add ICE candidates
-        remoteMedia.iceCandidates.forEach(iceTransport.addRemoteCandidate);
+        dtlsTransport = transceiver.dtlsTransport;
 
-        if (remoteMedia.iceCandidatesComplete) {
-          iceTransport.addRemoteCandidate(undefined);
+        this.setRemoteRTP(transceiver, remoteMedia, remoteSdp.type, i);
+      } else if (remoteMedia.kind === "application") {
+        if (!this.sctpTransport) {
+          this.sctpTransport = this.createSctpTransport();
+          this.sctpTransport.mid = remoteMedia.rtp.muxId;
         }
 
-        // # set DTLS role
-        if (remoteSdp.type === "answer" && remoteMedia.dtlsParams?.role) {
-          dtlsTransport.role =
-            remoteMedia.dtlsParams.role === "client" ? "server" : "client";
+        if (this.remoteIsBundled) {
+          if (!bundleTransport) {
+            bundleTransport = this.sctpTransport.dtlsTransport;
+          } else {
+            this.sctpTransport.setDtlsTransport(bundleTransport);
+          }
         }
-        return iceTransport;
-      }),
-    )) as RTCIceTransport[];
+
+        dtlsTransport = this.sctpTransport.dtlsTransport;
+
+        this.setRemoteSCTP(remoteMedia, this.sctpTransport, i);
+      } else {
+        throw new Error("invalid media kind");
+      }
+
+      const iceTransport = dtlsTransport.iceTransport;
+
+      if (remoteMedia.iceParams) {
+        const renomination = !!remoteSdp.media.find(
+          (m) => m.direction === "inactive",
+        );
+        iceTransport.setRemoteParams(remoteMedia.iceParams, renomination);
+
+        // One agent full, one lite:  The full agent MUST take the controlling role, and the lite agent MUST take the controlled role
+        // RFC 8445 S6.1.1
+        if (remoteMedia.iceParams?.iceLite) {
+          iceTransport.connection.iceControlling = true;
+        }
+      }
+      if (remoteMedia.dtlsParams) {
+        dtlsTransport.setRemoteParams(remoteMedia.dtlsParams);
+      }
+
+      // # add ICE candidates
+      remoteMedia.iceCandidates.forEach(iceTransport.addRemoteCandidate);
+
+      if (remoteMedia.iceCandidatesComplete) {
+        iceTransport.addRemoteCandidate(undefined);
+      }
+
+      // # set DTLS role
+      if (remoteSdp.type === "answer" && remoteMedia.dtlsParams?.role) {
+        dtlsTransport.role =
+          remoteMedia.dtlsParams.role === "client" ? "server" : "client";
+      }
+      return iceTransport;
+    }) as RTCIceTransport[];
 
     // filter out inactive transports
     transports = transports.filter((iceTransport) => !!iceTransport);

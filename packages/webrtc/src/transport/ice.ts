@@ -72,10 +72,7 @@ export class RTCIceTransport {
     }
   };
 
-  async setRemoteParams(
-    remoteParameters: RTCIceParameters,
-    renomination = false,
-  ) {
+  setRemoteParams(remoteParameters: RTCIceParameters, renomination = false) {
     if (renomination) {
       this.renominating = true;
     }
@@ -91,13 +88,13 @@ export class RTCIceTransport {
         this.renominating = false;
       } else {
         log("restart", remoteParameters);
-        await this.restart();
+        this.restart();
       }
     }
     this.connection.setRemoteParams(remoteParameters);
   }
 
-  async restart() {
+  restart() {
     this.connection.restart();
     this.setState("new");
     this.iceGather.gatheringState = "new";
