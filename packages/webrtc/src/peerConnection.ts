@@ -94,8 +94,7 @@ export class RTCPeerConnection extends EventTarget {
   private replaceTransceiver(t: RTCRtpTransceiver, index: number) {
     this.transceivers[index] = t;
   }
-
-  candidatesSent = new Set<string>();
+  needRestart = false;
 
   readonly iceGatheringStateChange = new Event<[IceGathererState]>();
   readonly iceConnectionStateChange = new Event<[RTCIceConnectionState]>();
@@ -262,7 +261,8 @@ export class RTCPeerConnection extends EventTarget {
   }
 
   async createOffer({ iceRestart }: { iceRestart?: boolean } = {}) {
-    if (iceRestart) {
+    if (iceRestart || this.needRestart) {
+      this.needRestart = false;
       for (const t of this.iceTransports) {
         await t.restart();
       }
@@ -482,7 +482,9 @@ export class RTCPeerConnection extends EventTarget {
 
   private needNegotiation = async () => {
     this.shouldNegotiationneeded = true;
-    if (this.negotiationneeded || this.signalingState !== "stable") return;
+    if (this.negotiationneeded || this.signalingState !== "stable") {
+      return;
+    }
     this.shouldNegotiationneeded = false;
     setImmediate(() => {
       this.negotiationneeded = true;
@@ -877,6 +879,11 @@ export class RTCPeerConnection extends EventTarget {
       (g) => g.semantic === "BUNDLE" && this.config.bundlePolicy !== "disable",
     );
     return bundle;
+  }
+
+  restartIce() {
+    this.needRestart = true;
+    this.needNegotiation();
   }
 
   async setRemoteDescription(sessionDescription: RTCSessionDescriptionInit) {
