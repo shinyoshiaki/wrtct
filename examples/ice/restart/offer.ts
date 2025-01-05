@@ -43,7 +43,8 @@ console.log("start");
           await pc.setRemoteDescription(msg);
         } else if (msg.type === "restart") {
           console.log("restarted by server");
-          const offer = await pc.createOffer({ iceRestart: true });
+          pc.restartIce();
+          const offer = await pc.createOffer();
           await pc.setLocalDescription(offer);
           const sdp = JSON.stringify(pc.localDescription);
           socket.send(sdp);
