@@ -54,16 +54,7 @@ export class RTCIceTransport {
     if (state !== this.state) {
       this.state = state;
 
-      if (this.onStateChange.ended) {
-        return;
-      }
-
-      if (state === "closed") {
-        this.onStateChange.execute(state);
-        this.onStateChange.complete();
-      } else {
-        this.onStateChange.execute(state);
-      }
+      this.onStateChange.execute(state);
     }
   }
 
@@ -146,6 +137,9 @@ export class RTCIceTransport {
       this.setState("closed");
       await this.connection.close();
     }
+    this.onStateChange.complete();
+    this.onIceCandidate.complete();
+    this.onNegotiationNeeded.complete();
   }
 }
 

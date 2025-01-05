@@ -600,11 +600,17 @@ export class Connection implements IceConnection {
 
   // 4.1.1.4 ? 生存確認 life check
   private queryConsent = () => {
-    this.queryConsentHandle = cancelable(async (r, _, onCancel) => {
+    if (this.queryConsentHandle) {
+      this.queryConsentHandle.resolve();
+    }
+
+    this.queryConsentHandle = cancelable(async (_, __, onCancel) => {
       let failures = 0;
+      let canceled = false;
 
       const cancelEvent = new AbortController();
       onCancel.once(() => {
+        canceled = true;
         failures += CONSENT_FAILURES;
         cancelEvent.abort();
         this.queryConsentHandle = undefined;
@@ -617,7 +623,7 @@ export class Connection implements IceConnection {
       // """
 
       try {
-        while (!this.remoteIsLite && this.state !== "closed") {
+        while (this.state !== "closed" && !canceled) {
           // # randomize between 0.8 and 1.2 times CONSENT_INTERVAL
           await timers.setTimeout(
             CONSENT_INTERVAL * (0.8 + 0.4 * Math.random()) * 1000,
@@ -625,10 +631,11 @@ export class Connection implements IceConnection {
             { signal: cancelEvent.signal },
           );
 
-          const pair = this.nominated;
-          if (!pair) {
+          const nominated = this.nominated;
+          if (!nominated || canceled) {
             break;
           }
+
           const request = this.buildRequest({
             nominate: false,
             localUsername,
@@ -636,9 +643,9 @@ export class Connection implements IceConnection {
             iceControlling,
           });
           try {
-            const [msg, addr] = await pair.protocol.request(
+            await nominated.protocol.request(
               request,
-              pair.remoteAddr,
+              nominated.remoteAddr,
               Buffer.from(this.remotePassword, "utf8"),
               0,
             );
@@ -647,16 +654,18 @@ export class Connection implements IceConnection {
               this.setState("connected");
             }
           } catch (error) {
-            log("no stun response");
-            failures++;
-            this.setState("disconnected");
+            if (nominated.id === this.nominated?.id) {
+              log("no stun response");
+              failures++;
+              this.setState("disconnected");
+              break;
+            }
           }
           if (failures >= CONSENT_FAILURES) {
             log("Consent to send expired");
             this.queryConsentHandle = undefined;
-            // 切断検知
-            r(await this.close());
-            return;
+            this.setState("closed");
+            break;
           }
         }
       } catch (error) {}
@@ -692,7 +701,8 @@ export class Connection implements IceConnection {
     this.protocols = [];
     this.localCandidates = [];
 
-    this.lookup?.close();
+    this.lookup?.close?.();
+    this.lookup = undefined;
   }
 
   private setState(state: IceState) {

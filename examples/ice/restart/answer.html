@@ -51,28 +51,38 @@
                         .getVideoTracks()
                         .forEach((track) => pc.addTrack(track, localStream));
 
-                    socket = new WebSocket("ws://localhost:8888");
-                    socket.onmessage = async (ev) => {
-                        const msg = JSON.parse(ev.data);
-                        console.log("message", msg);
-                        if (msg.candidate) {
-                            await pc.addIceCandidate(msg);
-                        } else {
-                            if (msg.type === "offer") {
-                                await pc.setRemoteDescription(msg);
-                                const answer = await pc.createAnswer();
-                                await pc.setLocalDescription(answer);
-                                const sdp = JSON.stringify(pc.localDescription);
-                                socket.send(sdp);
-                            } else {
-                                await pc.setRemoteDescription(msg);
-                            }
-                        }
-                    };
+                    await connect();
+                    socket.send(JSON.stringify({ type: "connect" }));
                 })();
             }, []);
 
+            const connect = async () => {
+                if (socket) {
+                    socket.close();
+                }
+                socket = new WebSocket("wss://e410-240d-f-b88-6800-6aa2-4c0c-4726-9284.ngrok-free.app");
+                socket.onmessage = async (ev) => {
+                    const msg = JSON.parse(ev.data);
+                    console.log("message", msg);
+                    if (msg.candidate) {
+                        await pc.addIceCandidate(msg);
+                    } else {
+                        if (msg.type === "offer") {
+                            await pc.setRemoteDescription(msg);
+                            const answer = await pc.createAnswer();
+                            await pc.setLocalDescription(answer);
+                            const sdp = JSON.stringify(pc.localDescription);
+                            socket.send(sdp);
+                        } else {
+                            await pc.setRemoteDescription(msg);
+                        }
+                    }
+                };
+                await new Promise((resolve) => (socket.onopen = resolve));
+            }
+
             const restart = async () => {
+                await connect();
                 const offer = await pc.createOffer({ iceRestart: true });
                 await pc.setLocalDescription(offer);
                 const sdp = JSON.stringify(pc.localDescription);
@@ -80,6 +90,7 @@
             }
 
             const requestRestart = async () => {
+                await connect();
                 socket.send(JSON.stringify({ type: "restart" }));
             }
 

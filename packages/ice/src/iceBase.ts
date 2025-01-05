@@ -9,6 +9,7 @@ import type { Cancelable } from "./helper";
 import { classes, methods } from "./stun/const";
 import { Message } from "./stun/message";
 import type { Address, Protocol } from "./types/model";
+import { randomUUID } from "crypto";
 
 const log = debug("werift-ice : packages/ice/src/ice.ts : log");
 
@@ -58,6 +59,7 @@ export interface IceConnection {
 }
 
 export class CandidatePair {
+  readonly id = randomUUID();
   handle?: Cancelable<void>;
   nominated = false;
   remoteNominated = false;
