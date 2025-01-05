@@ -54,7 +54,9 @@ export class RTCIceTransport {
     if (state !== this.state) {
       this.state = state;
 
-      if (this.onStateChange.ended) return;
+      if (this.onStateChange.ended) {
+        return;
+      }
 
       if (state === "closed") {
         this.onStateChange.execute(state);

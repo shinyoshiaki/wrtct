@@ -1545,7 +1545,9 @@ export class RTCPeerConnection extends EventTarget {
     log("connectionStateChange", state);
     this.connectionState = state;
     this.connectionStateChange.execute(state);
-    if (this.onconnectionstatechange) this.onconnectionstatechange();
+    if (this.onconnectionstatechange) {
+      this.onconnectionstatechange();
+    }
     this.emit("connectionstatechange");
   }
 
