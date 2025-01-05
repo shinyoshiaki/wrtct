@@ -42,12 +42,12 @@ export class Transaction {
       const res = await this.onResponse.asPromise();
       return res;
     } catch (error) {
-      log(
-        "transaction run failed",
-        error,
-        this.protocol.type,
-        this.request.toJSON(),
-      );
+      // log(
+      //   "transaction run failed",
+      //   error,
+      //   this.protocol.type,
+      //   this.request.toJSON(),
+      // );
 
       throw error;
     } finally {

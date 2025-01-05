@@ -108,9 +108,14 @@ export class Message extends AttributeRepository {
   }
 
   toJSON() {
+    return this.json;
+  }
+
+  get json() {
     return {
       messageMethod: methods[this.messageMethod],
       messageClass: classes[this.messageClass],
+      attributes: this.attributes,
     };
   }
 

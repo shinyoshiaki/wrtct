@@ -31,7 +31,6 @@ export const createDtlsTransport = () => {
     defaultPeerConfig,
     new RTCIceTransport(new RTCIceGatherer()),
     new RtpRouter(),
-    [],
   );
   return dtls;
 };

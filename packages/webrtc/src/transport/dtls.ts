@@ -18,7 +18,7 @@ import {
 } from "../../../dtls/src/cipher/const";
 import { CipherContext } from "../../../dtls/src/context/cipher";
 import type { Profile } from "../../../dtls/src/context/srtp";
-import type { Connection } from "../../../ice/src";
+import type { IceConnection } from "../../../ice/src";
 import {
   type RtcpPacket,
   RtcpPacketConverter,
@@ -360,10 +360,12 @@ export class RTCDtlsParameters {
 }
 
 class IceTransport implements Transport {
-  constructor(private ice: Connection) {
+  constructor(private ice: IceConnection) {
     ice.onData.subscribe((buf) => {
       if (isDtls(buf)) {
-        if (this.onData) this.onData(buf);
+        if (this.onData) {
+          this.onData(buf);
+        }
       }
     });
   }
@@ -378,4 +380,4 @@ class IceTransport implements Transport {
   }
 }
 
-const createIceTransport = (ice: Connection) => new IceTransport(ice);
+const createIceTransport = (ice: IceConnection) => new IceTransport(ice);

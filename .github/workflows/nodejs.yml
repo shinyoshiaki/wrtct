@@ -34,8 +34,10 @@ jobs:
           npm i
           cd e2e
           npm i
-          npx playwright install
+          npx playwright install chromium
           cd ../
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3    
       - name: test
         env:
           CI: true

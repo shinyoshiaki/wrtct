@@ -563,15 +563,22 @@ function ipAddressToSdp(addr: string) {
 
 export function candidateToSdp(c: IceCandidate) {
   let sdp = `${c.foundation} ${c.component} ${c.protocol} ${c.priority} ${c.ip} ${c.port} typ ${c.type}`;
-  if (c.relatedAddress) {
+  if (c.relatedAddress != undefined) {
     sdp += ` raddr ${c.relatedAddress}`;
   }
-  if (c.relatedPort) {
+  if (c.relatedPort != undefined) {
     sdp += ` rport ${c.relatedPort}`;
   }
-  if (c.tcpType) {
+  if (c.tcpType != undefined) {
     sdp += ` tcptype ${c.tcpType}`;
   }
+  if (c.generation != undefined) {
+    sdp += ` generation ${c.generation}`;
+  }
+  if (c.ufrag != undefined) {
+    sdp += ` ufrag ${c.ufrag}`;
+  }
+
   return sdp;
 }
 
@@ -643,6 +650,12 @@ export function candidateFromSdp(sdp: string) {
         break;
       case "tcptype":
         candidate.tcpType = bits[i + 1];
+        break;
+      case "generation":
+        candidate.generation = Number.parseInt(bits[i + 1]);
+        break;
+      case "ufrag":
+        candidate.ufrag = bits[i + 1];
         break;
     }
   });

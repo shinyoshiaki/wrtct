@@ -3,14 +3,13 @@ import { Event } from "../imports/common";
 
 import type { InterfaceAddresses } from "../../../common/src/network";
 import type { Candidate } from "../candidate";
-import type { Connection } from "../ice";
 import { UdpTransport } from "../transport";
 import type { Address, Protocol } from "../types/model";
 import { classes } from "./const";
 import { type Message, parseMessage } from "./message";
 import { Transaction } from "./transaction";
 
-const log = debug("packages/ice/src/stun/protocol.ts");
+const log = debug("werift-ice : packages/ice/src/stun/protocol.ts");
 
 export class StunProtocol implements Protocol {
   static readonly type = "stun";
@@ -22,16 +21,12 @@ export class StunProtocol implements Protocol {
   }
   localCandidate?: Candidate;
   sentMessage?: Message;
-  localAddress?: string;
+  localIp?: string;
 
-  private readonly closed = new Event();
+  readonly onRequestReceived = new Event<[Message, Address, Buffer]>();
+  readonly onDataReceived = new Event<[Buffer]>();
 
-  constructor(public receiver?: Connection) {}
-
-  connectionLost() {
-    this.closed.execute();
-    this.closed.complete();
-  }
+  constructor() {}
 
   connectionMade = async (
     useIpv4: boolean,
@@ -52,7 +47,9 @@ export class StunProtocol implements Protocol {
       );
     }
 
-    this.transport.onData = (data, addr) => this.datagramReceived(data, addr);
+    this.transport.onData = (data, addr) => {
+      this.datagramReceived(data, addr);
+    };
   };
 
   private datagramReceived(data: Buffer, addr: Address) {
@@ -60,11 +57,11 @@ export class StunProtocol implements Protocol {
       const message = parseMessage(data);
       if (!message) {
         if (this.localCandidate) {
-          this.receiver?.dataReceived?.(data, this.localCandidate.component);
+          this.onDataReceived.execute(data);
         }
         return;
       }
-      // log("parseMessage", addr, message);
+      // log("parseMessage", addr, message.toJSON());
       if (
         (message.messageClass === classes.RESPONSE ||
           message.messageClass === classes.ERROR) &&
@@ -73,7 +70,7 @@ export class StunProtocol implements Protocol {
         const transaction = this.transactions[message.transactionIdHex];
         transaction.responseReceived(message, addr);
       } else if (message.messageClass === classes.REQUEST) {
-        this.receiver?.requestReceived?.(message, addr, this, data);
+        this.onRequestReceived.execute(message, addr, data);
       }
     } catch (error) {
       log("datagramReceived error", error);
@@ -135,5 +132,7 @@ export class StunProtocol implements Protocol {
       transaction.cancel();
     });
     await this.transport.close();
+    this.onRequestReceived.complete();
+    this.onDataReceived.complete();
   }
 }
