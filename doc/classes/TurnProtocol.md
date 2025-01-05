@@ -80,6 +80,26 @@ sec
 
 ***
 
+### onDataReceived
+
+> **onDataReceived**: [`Event`](Event.md)\<[`Buffer`]\>
+
+#### Implementation of
+
+[`Protocol`](../interfaces/Protocol.md).[`onDataReceived`](../interfaces/Protocol.md#ondatareceived)
+
+***
+
+### onRequestReceived
+
+> **onRequestReceived**: [`Event`](Event.md)\<[[`Message`](Message.md), readonly [`string`, `number`], `Buffer`]\>
+
+#### Implementation of
+
+[`Protocol`](../interfaces/Protocol.md).[`onRequestReceived`](../interfaces/Protocol.md#onrequestreceived)
+
+***
+
 ### options
 
 > **options**: `object` = `{}`

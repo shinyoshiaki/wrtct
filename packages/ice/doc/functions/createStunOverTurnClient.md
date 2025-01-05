@@ -14,8 +14,6 @@
 
 • **\_\_namedParameters.address**: readonly [`string`, `number`]
 
-• **\_\_namedParameters.ice**: [`Connection`](../classes/Connection.md)
-
 • **\_\_namedParameters.password**: `string`
 
 • **\_\_namedParameters.username**: `string`

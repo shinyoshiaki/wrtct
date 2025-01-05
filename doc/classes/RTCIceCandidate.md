@@ -38,6 +38,12 @@
 
 > `optional` **sdpMid**: `string`
 
+***
+
+### usernameFragment?
+
+> `optional` **usernameFragment**: `string`
+
 ## Methods
 
 ### toJSON()
@@ -59,6 +65,10 @@
 ##### sdpMid
 
 > **sdpMid**: `undefined` \| `string`
+
+##### usernameFragment
+
+> **usernameFragment**: `undefined` \| `string`
 
 ***
 

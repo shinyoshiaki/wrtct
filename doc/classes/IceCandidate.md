@@ -10,7 +10,7 @@
 
 ### new IceCandidate()
 
-> **new IceCandidate**(`component`, `foundation`, `ip`, `port`, `priority`, `protocol`, `type`): [`IceCandidate`](IceCandidate.md)
+> **new IceCandidate**(`component`, `foundation`, `ip`, `port`, `priority`, `protocol`, `type`, `generation`?, `ufrag`?): [`IceCandidate`](IceCandidate.md)
 
 #### Parameters
 
@@ -28,6 +28,10 @@
 
 • **type**: `string`
 
+• **generation?**: `number`
+
+• **ufrag?**: `string`
+
 #### Returns
 
 [`IceCandidate`](IceCandidate.md)
@@ -43,6 +47,12 @@
 ### foundation
 
 > **foundation**: `string`
+
+***
+
+### generation?
+
+> `optional` **generation**: `number`
 
 ***
 
@@ -103,6 +113,12 @@
 ### type
 
 > **type**: `string`
+
+***
+
+### ufrag?
+
+> `optional` **ufrag**: `string`
 
 ## Methods
 

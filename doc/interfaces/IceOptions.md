@@ -58,6 +58,12 @@
 
 ***
 
+### localPasswordPrefix?
+
+> `optional` **localPasswordPrefix**: `string`
+
+***
+
 ### portRange?
 
 > `optional` **portRange**: [`number`, `number`]
@@ -84,7 +90,7 @@
 
 ### turnTransport?
 
-> `optional` **turnTransport**: `"tcp"` \| `"udp"`
+> `optional` **turnTransport**: `"udp"` \| `"tcp"`
 
 ***
 

@@ -10,13 +10,15 @@
 
 ### new CandidatePair()
 
-> **new CandidatePair**(`protocol`, `remoteCandidate`): [`CandidatePair`](CandidatePair.md)
+> **new CandidatePair**(`protocol`, `remoteCandidate`, `iceControlling`): [`CandidatePair`](CandidatePair.md)
 
 #### Parameters
 
 • **protocol**: [`Protocol`](../interfaces/Protocol.md)
 
 • **remoteCandidate**: [`Candidate`](Candidate.md)
+
+• **iceControlling**: `boolean`
 
 #### Returns
 
@@ -26,27 +28,19 @@
 
 ### handle?
 
-> `optional` **handle**: `object`
+> `optional` **handle**: `Cancelable`\<`void`\>
 
-#### cancel()
+***
 
-> **cancel**: () => `void`
+### iceControlling
 
-##### Returns
+> **iceControlling**: `boolean`
 
-`void`
+***
 
-#### done()
+### id
 
-> **done**: () => `boolean`
-
-##### Returns
-
-`boolean`
-
-#### promise
-
-> **promise**: `PCancelable`\<`any`\> = `pCancel`
+> `readonly` **id**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
 
 ***
 
@@ -84,6 +78,28 @@
 
 ***
 
+### json
+
+> `get` **json**(): `object`
+
+#### Returns
+
+`object`
+
+##### localCandidate
+
+> **localCandidate**: `string`
+
+##### protocol
+
+> **protocol**: `string`
+
+##### remoteCandidate
+
+> **remoteCandidate**: `string`
+
+***
+
 ### localCandidate
 
 > `get` **localCandidate**(): [`Candidate`](Candidate.md)
@@ -91,6 +107,16 @@
 #### Returns
 
 [`Candidate`](Candidate.md)
+
+***
+
+### priority
+
+> `get` **priority**(): `number`
+
+#### Returns
+
+`number`
 
 ***
 
@@ -122,13 +148,17 @@ readonly [`string`, `number`]
 
 `object`
 
+##### localCandidate
+
+> **localCandidate**: `string`
+
 ##### protocol
 
 > **protocol**: `string`
 
-##### remoteAddr
+##### remoteCandidate
 
-> **remoteAddr**: readonly [`string`, `number`]
+> **remoteCandidate**: `string`
 
 ***
 

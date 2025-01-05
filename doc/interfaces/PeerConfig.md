@@ -131,6 +131,12 @@ Return `true` if a STUN response should be sent, false if it should be skipped.
 
 ***
 
+### icePasswordPrefix
+
+> **icePasswordPrefix**: `undefined` \| `string`
+
+***
+
 ### icePortRange
 
 > **icePortRange**: `undefined` \| [`number`, `number`]

@@ -24,6 +24,7 @@
 
 ## Interfaces
 
+- [IceConnection](interfaces/IceConnection.md)
 - [IceOptions](interfaces/IceOptions.md)
 - [Protocol](interfaces/Protocol.md)
 - [Transport](interfaces/Transport.md)
@@ -33,19 +34,25 @@
 ## Type Aliases
 
 - [Address](type-aliases/Address.md)
+- [IceState](type-aliases/IceState.md)
 
 ## Variables
 
 - [AttributeKeys](variables/AttributeKeys.md)
+- [CONSENT\_FAILURES](variables/CONSENT_FAILURES.md)
+- [CONSENT\_INTERVAL](variables/CONSENT_INTERVAL.md)
 - [COOKIE](variables/COOKIE.md)
 - [FINGERPRINT\_LENGTH](variables/FINGERPRINT_LENGTH.md)
 - [FINGERPRINT\_XOR](variables/FINGERPRINT_XOR.md)
 - [HEADER\_LENGTH](variables/HEADER_LENGTH.md)
+- [ICE\_COMPLETED](variables/ICE_COMPLETED.md)
+- [ICE\_FAILED](variables/ICE_FAILED.md)
 - [INTEGRITY\_LENGTH](variables/INTEGRITY_LENGTH.md)
 - [IPV4\_PROTOCOL](variables/IPV4_PROTOCOL.md)
 - [IPV6\_PROTOCOL](variables/IPV6_PROTOCOL.md)
 - [RETRY\_MAX](variables/RETRY_MAX.md)
 - [RETRY\_RTO](variables/RETRY_RTO.md)
+- [defaultOptions](variables/defaultOptions.md)
 
 ## Functions
 

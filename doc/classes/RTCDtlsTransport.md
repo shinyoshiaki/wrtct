@@ -10,7 +10,7 @@
 
 ### new RTCDtlsTransport()
 
-> **new RTCDtlsTransport**(`config`, `iceTransport`, `router`, `certificates`, `srtpProfiles`): [`RTCDtlsTransport`](RTCDtlsTransport.md)
+> **new RTCDtlsTransport**(`config`, `iceTransport`, `router`, `localCertificate`?, `srtpProfiles`?): [`RTCDtlsTransport`](RTCDtlsTransport.md)
 
 #### Parameters
 
@@ -20,21 +20,15 @@
 
 • **router**: `RtpRouter`
 
-• **certificates**: [`RTCCertificate`](RTCCertificate.md)[]
+• **localCertificate?**: [`RTCCertificate`](RTCCertificate.md)
 
-• **srtpProfiles**: (`1` \| `7`)[] = `[]`
+• **srtpProfiles?**: (`1` \| `7`)[] = `[]`
 
 #### Returns
 
 [`RTCDtlsTransport`](RTCDtlsTransport.md)
 
 ## Properties
-
-### certificates
-
-> `readonly` **certificates**: [`RTCCertificate`](RTCCertificate.md)[]
-
-***
 
 ### config
 
@@ -77,12 +71,6 @@
 ### localCertificate?
 
 > `optional` **localCertificate**: [`RTCCertificate`](RTCCertificate.md)
-
-***
-
-### localCertificatePromise?
-
-> `optional` **localCertificatePromise**: `Promise`\<[`RTCCertificate`](RTCCertificate.md)\>
 
 ***
 
@@ -131,6 +119,18 @@
 ### transportSequenceNumber
 
 > **transportSequenceNumber**: `number` = `0`
+
+***
+
+### localCertificate?
+
+> `static` `optional` **localCertificate**: [`RTCCertificate`](RTCCertificate.md)
+
+***
+
+### localCertificatePromise?
+
+> `static` `optional` **localCertificatePromise**: `Promise`\<[`RTCCertificate`](RTCCertificate.md)\>
 
 ## Accessors
 
@@ -202,16 +202,6 @@
 
 ***
 
-### setupCertificate()
-
-> **setupCertificate**(): `Promise`\<[`RTCCertificate`](RTCCertificate.md)\>
-
-#### Returns
-
-`Promise`\<[`RTCCertificate`](RTCCertificate.md)\>
-
-***
-
 ### start()
 
 > **start**(): `Promise`\<`void`\>
@@ -249,3 +239,13 @@
 #### Returns
 
 `void`
+
+***
+
+### SetupCertificate()
+
+> `static` **SetupCertificate**(): `Promise`\<[`RTCCertificate`](RTCCertificate.md)\>
+
+#### Returns
+
+`Promise`\<[`RTCCertificate`](RTCCertificate.md)\>

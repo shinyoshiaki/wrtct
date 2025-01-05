@@ -30,12 +30,6 @@
 
 ## Properties
 
-### candidatesSent
-
-> **candidatesSent**: `Set`\<`string`\>
-
-***
-
 ### cname
 
 > `readonly` **cname**: `string`
@@ -81,6 +75,12 @@
 ### iceGatheringStateChange
 
 > `readonly` **iceGatheringStateChange**: [`Event`](Event.md)\<[`"complete"` \| `"new"` \| `"gathering"`]\>
+
+***
+
+### needRestart
+
+> **needRestart**: `boolean` = `false`
 
 ***
 
@@ -186,12 +186,6 @@
 
 ***
 
-### transportEstablished
-
-> **transportEstablished**: `boolean` = `false`
-
-***
-
 ### captureRejectionSymbol
 
 > `readonly` `static` **captureRejectionSymbol**: *typeof* [`captureRejectionSymbol`](RTCDataChannel.md#capturerejectionsymbol)
@@ -262,6 +256,16 @@ regular `'error'` listener is installed.
 
 ***
 
+### iceGeneration
+
+> `get` **iceGeneration**(): `number`
+
+#### Returns
+
+`number`
+
+***
+
 ### iceTransports
 
 > `get` **iceTransports**(): [`RTCIceTransport`](RTCIceTransport.md)[]
@@ -289,16 +293,6 @@ regular `'error'` listener is installed.
 #### Returns
 
 `undefined` \| [`RTCSessionDescription`](RTCSessionDescription.md)
-
-***
-
-### remoteIsBundled
-
-> `get` **remoteIsBundled**(): `undefined` \| [`GroupDescription`](GroupDescription.md)
-
-#### Returns
-
-`undefined` \| [`GroupDescription`](GroupDescription.md)
 
 ## Methods
 
@@ -466,7 +460,13 @@ todo impl
 
 ### createOffer()
 
-> **createOffer**(): `Promise`\<[`RTCSessionDescription`](RTCSessionDescription.md)\>
+> **createOffer**(`__namedParameters`): `Promise`\<[`RTCSessionDescription`](RTCSessionDescription.md)\>
+
+#### Parameters
+
+• **\_\_namedParameters** = `{}`
+
+• **\_\_namedParameters.iceRestart?**: `boolean`
 
 #### Returns
 
@@ -1115,6 +1115,30 @@ v0.1.26
 #### Parameters
 
 • **sender**: [`RTCRtpSender`](RTCRtpSender.md)
+
+#### Returns
+
+`void`
+
+***
+
+### restartIce()
+
+> **restartIce**(): `void`
+
+#### Returns
+
+`void`
+
+***
+
+### setConfiguration()
+
+> **setConfiguration**(`config`): `void`
+
+#### Parameters
+
+• **config**: `Partial`\<[`PeerConfig`](../interfaces/PeerConfig.md)\>
 
 #### Returns
 

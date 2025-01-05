@@ -82,7 +82,7 @@ todo impl
 
 ### onReceiveRtp
 
-> `readonly` **onReceiveRtp**: [`Event`](Event.md)\<[[`RtpPacket`](RtpPacket.md)]\>
+> `readonly` **onReceiveRtp**: [`Event`](Event.md)\<[[`RtpPacket`](RtpPacket.md), `Extensions?`]\>
 
 ***
 

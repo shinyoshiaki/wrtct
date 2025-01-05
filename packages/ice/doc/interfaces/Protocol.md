@@ -38,6 +38,24 @@
 
 ***
 
+### localIp?
+
+> `optional` **localIp**: `string`
+
+***
+
+### onDataReceived
+
+> **onDataReceived**: `Event`\<[`Buffer`]\>
+
+***
+
+### onRequestReceived
+
+> **onRequestReceived**: `Event`\<[[`Message`](../classes/Message.md), readonly [`string`, `number`], `Buffer`]\>
+
+***
+
 ### request()
 
 > **request**: (`message`, `addr`, `integrityKey`?, `retransmissions`?) => `Promise`\<[[`Message`](../classes/Message.md), readonly [`string`, `number`]]\>

@@ -10,11 +10,11 @@
 
 ### new RTCIceTransport()
 
-> **new RTCIceTransport**(`gather`): [`RTCIceTransport`](RTCIceTransport.md)
+> **new RTCIceTransport**(`iceGather`): [`RTCIceTransport`](RTCIceTransport.md)
 
 #### Parameters
 
-• **gather**: [`RTCIceGatherer`](RTCIceGatherer.md)
+• **iceGather**: [`RTCIceGatherer`](RTCIceGatherer.md)
 
 #### Returns
 
@@ -24,13 +24,25 @@
 
 ### connection
 
-> **connection**: [`Connection`](Connection.md)
+> **connection**: [`IceConnection`](../interfaces/IceConnection.md)
 
 ***
 
 ### id
 
 > `readonly` **id**: `string`
+
+***
+
+### onIceCandidate
+
+> `readonly` **onIceCandidate**: [`Event`](Event.md)\<[`undefined` \| [`IceCandidate`](IceCandidate.md)]\>
+
+***
+
+### onNegotiationNeeded
+
+> `readonly` **onNegotiationNeeded**: [`Event`](Event.md)\<[]\>
 
 ***
 
@@ -46,13 +58,33 @@
 
 ## Accessors
 
-### iceGather
+### gatheringState
 
-> `get` **iceGather**(): [`RTCIceGatherer`](RTCIceGatherer.md)
+> `get` **gatheringState**(): `"complete"` \| `"new"` \| `"gathering"`
 
 #### Returns
 
-[`RTCIceGatherer`](RTCIceGatherer.md)
+`"complete"` \| `"new"` \| `"gathering"`
+
+***
+
+### localCandidates
+
+> `get` **localCandidates**(): [`IceCandidate`](IceCandidate.md)[]
+
+#### Returns
+
+[`IceCandidate`](IceCandidate.md)[]
+
+***
+
+### localParameters
+
+> `get` **localParameters**(): [`RTCIceParameters`](RTCIceParameters.md)
+
+#### Returns
+
+[`RTCIceParameters`](RTCIceParameters.md)
 
 ***
 
@@ -80,13 +112,35 @@
 
 ***
 
+### gather()
+
+> **gather**(): `Promise`\<`void`\>
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### restart()
+
+> **restart**(): `void`
+
+#### Returns
+
+`void`
+
+***
+
 ### setRemoteParams()
 
-> **setRemoteParams**(`remoteParameters`): `void`
+> **setRemoteParams**(`remoteParameters`, `renomination`): `void`
 
 #### Parameters
 
 • **remoteParameters**: [`RTCIceParameters`](RTCIceParameters.md)
+
+• **renomination**: `boolean` = `false`
 
 #### Returns
 

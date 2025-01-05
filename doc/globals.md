@@ -101,6 +101,8 @@
 
 ## Interfaces
 
+- [Extensions](interfaces/Extensions.md)
+- [IceConnection](interfaces/IceConnection.md)
 - [IceOptions](interfaces/IceOptions.md)
 - [MessageEvent](interfaces/MessageEvent.md)
 - [PeerConfig](interfaces/PeerConfig.md)
@@ -116,6 +118,7 @@
 - [Transport](interfaces/Transport.md)
 - [TurnClientConfig](interfaces/TurnClientConfig.md)
 - [TurnClientOptions](interfaces/TurnClientOptions.md)
+- [videoOrientationPayload](interfaces/videoOrientationPayload.md)
 
 ## Type Aliases
 
@@ -134,6 +137,7 @@
 - [Extension](type-aliases/Extension.md)
 - [HashAlgorithms](type-aliases/HashAlgorithms.md)
 - [IceGathererState](type-aliases/IceGathererState.md)
+- [IceState](type-aliases/IceState.md)
 - [InterfaceAddresses](type-aliases/InterfaceAddresses.md)
 - [Kind](type-aliases/Kind.md)
 - [NamedCurveAlgorithms](type-aliases/NamedCurveAlgorithms.md)
@@ -153,6 +157,8 @@
 ## Variables
 
 - [AttributeKeys](variables/AttributeKeys.md)
+- [CONSENT\_FAILURES](variables/CONSENT_FAILURES.md)
+- [CONSENT\_INTERVAL](variables/CONSENT_INTERVAL.md)
 - [COOKIE](variables/COOKIE.md)
 - [CipherSuite](variables/CipherSuite.md)
 - [CipherSuiteList](variables/CipherSuiteList.md)
@@ -165,6 +171,8 @@
 - [FINGERPRINT\_XOR](variables/FINGERPRINT_XOR.md)
 - [HEADER\_LENGTH](variables/HEADER_LENGTH.md)
 - [HashAlgorithm](variables/HashAlgorithm.md)
+- [ICE\_COMPLETED](variables/ICE_COMPLETED.md)
+- [ICE\_FAILED](variables/ICE_FAILED.md)
 - [INTEGRITY\_LENGTH](variables/INTEGRITY_LENGTH.md)
 - [IPV4\_PROTOCOL](variables/IPV4_PROTOCOL.md)
 - [IPV6\_PROTOCOL](variables/IPV6_PROTOCOL.md)
@@ -185,6 +193,7 @@
 - [SignatureAlgorithm](variables/SignatureAlgorithm.md)
 - [SignatureScheme](variables/SignatureScheme.md)
 - [certificateTypes](variables/certificateTypes.md)
+- [defaultOptions](variables/defaultOptions.md)
 - [defaultPeerConfig](variables/defaultPeerConfig.md)
 - [depacketizerCodecs](variables/depacketizerCodecs.md)
 - [signatures](variables/signatures.md)
@@ -225,6 +234,7 @@
 - [deserializeAudioLevelIndication](functions/deserializeAudioLevelIndication.md)
 - [deserializeString](functions/deserializeString.md)
 - [deserializeUint16BE](functions/deserializeUint16BE.md)
+- [deserializeVideoOrientation](functions/deserializeVideoOrientation.md)
 - [dumpBuffer](functions/dumpBuffer.md)
 - [enumerate](functions/enumerate.md)
 - [findCodecByMimeType](functions/findCodecByMimeType.md)
@@ -290,6 +300,7 @@
 - [useSdesRTPStreamId](functions/useSdesRTPStreamId.md)
 - [useTWCC](functions/useTWCC.md)
 - [useTransportWideCC](functions/useTransportWideCC.md)
+- [useVideoOrientation](functions/useVideoOrientation.md)
 - [validateAddress](functions/validateAddress.md)
 - [validateRemoteCandidate](functions/validateRemoteCandidate.md)
 - [wrapRtx](functions/wrapRtx.md)

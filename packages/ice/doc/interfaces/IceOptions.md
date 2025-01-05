@@ -58,6 +58,12 @@
 
 ***
 
+### localPasswordPrefix?
+
+> `optional` **localPasswordPrefix**: `string`
+
+***
+
 ### portRange?
 
 > `optional` **portRange**: [`number`, `number`]

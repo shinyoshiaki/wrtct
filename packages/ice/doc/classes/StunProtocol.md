@@ -14,23 +14,13 @@
 
 ### new StunProtocol()
 
-> **new StunProtocol**(`receiver`?): [`StunProtocol`](StunProtocol.md)
-
-#### Parameters
-
-• **receiver?**: [`Connection`](Connection.md)
+> **new StunProtocol**(): [`StunProtocol`](StunProtocol.md)
 
 #### Returns
 
 [`StunProtocol`](StunProtocol.md)
 
 ## Properties
-
-### localAddress?
-
-> `optional` **localAddress**: `string`
-
-***
 
 ### localCandidate?
 
@@ -42,9 +32,33 @@
 
 ***
 
-### receiver?
+### localIp?
 
-> `optional` **receiver**: [`Connection`](Connection.md)
+> `optional` **localIp**: `string`
+
+#### Implementation of
+
+[`Protocol`](../interfaces/Protocol.md).[`localIp`](../interfaces/Protocol.md#localip)
+
+***
+
+### onDataReceived
+
+> `readonly` **onDataReceived**: `Event`\<[`Buffer`]\>
+
+#### Implementation of
+
+[`Protocol`](../interfaces/Protocol.md).[`onDataReceived`](../interfaces/Protocol.md#ondatareceived)
+
+***
+
+### onRequestReceived
+
+> `readonly` **onRequestReceived**: `Event`\<[[`Message`](Message.md), readonly [`string`, `number`], `Buffer`]\>
+
+#### Implementation of
+
+[`Protocol`](../interfaces/Protocol.md).[`onRequestReceived`](../interfaces/Protocol.md#onrequestreceived)
 
 ***
 
@@ -111,16 +125,6 @@
 #### Implementation of
 
 [`Protocol`](../interfaces/Protocol.md).[`close`](../interfaces/Protocol.md#close)
-
-***
-
-### connectionLost()
-
-> **connectionLost**(): `void`
-
-#### Returns
-
-`void`
 
 ***
 

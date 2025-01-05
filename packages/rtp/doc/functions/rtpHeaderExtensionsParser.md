@@ -6,7 +6,7 @@
 
 # Function: rtpHeaderExtensionsParser()
 
-> **rtpHeaderExtensionsParser**(`extensions`, `extIdUriMap`): `object`
+> **rtpHeaderExtensionsParser**(`extensions`, `extIdUriMap`): [`Extensions`](../interfaces/Extensions.md)
 
 ## Parameters
 
@@ -16,4 +16,4 @@
 
 ## Returns
 
-`object`
+[`Extensions`](../interfaces/Extensions.md)

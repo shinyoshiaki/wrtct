@@ -37,3 +37,7 @@
 ### transportWideCC
 
 > `readonly` **transportWideCC**: `"http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01"` = `"http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01"`
+
+### videoOrientation
+
+> `readonly` **videoOrientation**: `"urn:3gpp:video-orientation"` = `"urn:3gpp:video-orientation"`

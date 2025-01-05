@@ -10,7 +10,7 @@
 
 ### new Candidate()
 
-> **new Candidate**(`foundation`, `component`, `transport`, `priority`, `host`, `port`, `type`, `relatedAddress`?, `relatedPort`?, `tcptype`?, `generation`?): [`Candidate`](Candidate.md)
+> **new Candidate**(`foundation`, `component`, `transport`, `priority`, `host`, `port`, `type`, `relatedAddress`?, `relatedPort`?, `tcptype`?, `generation`?, `ufrag`?): [`Candidate`](Candidate.md)
 
 #### Parameters
 
@@ -35,6 +35,8 @@
 • **tcptype?**: `string`
 
 • **generation?**: `number`
+
+• **ufrag?**: `string`
 
 #### Returns
 
@@ -105,6 +107,12 @@
 ### type
 
 > **type**: `string`
+
+***
+
+### ufrag?
+
+> `optional` **ufrag**: `string`
 
 ## Methods
 

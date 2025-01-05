@@ -24,7 +24,7 @@
 
 ### connection
 
-> `readonly` **connection**: [`Connection`](Connection.md)
+> `readonly` **connection**: [`IceConnection`](../interfaces/IceConnection.md)
 
 ***
 

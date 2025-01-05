@@ -14,13 +14,11 @@
 
 ### new StunOverTurnProtocol()
 
-> **new StunOverTurnProtocol**(`turn`, `ice`): [`StunOverTurnProtocol`](StunOverTurnProtocol.md)
+> **new StunOverTurnProtocol**(`turn`): [`StunOverTurnProtocol`](StunOverTurnProtocol.md)
 
 #### Parameters
 
 • **turn**: [`TurnProtocol`](TurnProtocol.md)
-
-• **ice**: [`Connection`](Connection.md)
 
 #### Returns
 
@@ -35,6 +33,26 @@
 #### Implementation of
 
 [`Protocol`](../interfaces/Protocol.md).[`localCandidate`](../interfaces/Protocol.md#localcandidate)
+
+***
+
+### onDataReceived
+
+> **onDataReceived**: `Event`\<[`Buffer`]\>
+
+#### Implementation of
+
+[`Protocol`](../interfaces/Protocol.md).[`onDataReceived`](../interfaces/Protocol.md#ondatareceived)
+
+***
+
+### onRequestReceived
+
+> **onRequestReceived**: `Event`\<[[`Message`](Message.md), readonly [`string`, `number`], `Buffer`]\>
+
+#### Implementation of
+
+[`Protocol`](../interfaces/Protocol.md).[`onRequestReceived`](../interfaces/Protocol.md#onrequestreceived)
 
 ***
 

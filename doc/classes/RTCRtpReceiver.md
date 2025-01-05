@@ -263,7 +263,7 @@ todo impl
 
 • **rid**: `string`
 
-• **extensions**: `Extensions`
+• **extensions**: [`Extensions`](../interfaces/Extensions.md)
 
 #### Returns
 
@@ -279,7 +279,7 @@ todo impl
 
 • **packet**: [`RtpPacket`](RtpPacket.md)
 
-• **extensions**: `Extensions`
+• **extensions**: [`Extensions`](../interfaces/Extensions.md)
 
 #### Returns
 

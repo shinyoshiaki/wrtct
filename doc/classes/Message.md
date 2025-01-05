@@ -88,6 +88,28 @@
 
 ***
 
+### json
+
+> `get` **json**(): `object`
+
+#### Returns
+
+`object`
+
+##### attributes
+
+> **attributes**: `AttributePair`[]
+
+##### messageClass
+
+> **messageClass**: `string`
+
+##### messageMethod
+
+> **messageMethod**: `string`
+
+***
+
 ### transactionIdHex
 
 > `get` **transactionIdHex**(): `string`
@@ -209,6 +231,10 @@
 #### Returns
 
 `object`
+
+##### attributes
+
+> **attributes**: `AttributePair`[]
 
 ##### messageClass
 

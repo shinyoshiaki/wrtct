@@ -55,6 +55,11 @@
 - [Vp9RtpPayload](classes/Vp9RtpPayload.md)
 - [WeriftError](classes/WeriftError.md)
 
+## Interfaces
+
+- [Extensions](interfaces/Extensions.md)
+- [videoOrientationPayload](interfaces/videoOrientationPayload.md)
+
 ## Type Aliases
 
 - [AudioLevelIndicationPayload](type-aliases/AudioLevelIndicationPayload.md)
@@ -89,6 +94,7 @@
 - [deserializeAudioLevelIndication](functions/deserializeAudioLevelIndication.md)
 - [deserializeString](functions/deserializeString.md)
 - [deserializeUint16BE](functions/deserializeUint16BE.md)
+- [deserializeVideoOrientation](functions/deserializeVideoOrientation.md)
 - [dumpBuffer](functions/dumpBuffer.md)
 - [enumerate](functions/enumerate.md)
 - [findPort](functions/findPort.md)
