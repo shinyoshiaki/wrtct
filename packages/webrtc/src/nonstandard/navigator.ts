@@ -12,6 +12,8 @@ export class Navigator {
   }
 }
 
+export const navigator = new Navigator();
+
 export class MediaDevices extends EventTarget {
   video?: MediaStreamTrack;
   audio?: MediaStreamTrack;
