@@ -1300,7 +1300,9 @@ export class RTCPeerConnection extends EventTarget {
     /**todo impl */
     ms?: MediaStream,
   ) {
-    if (this.isClosed) throw new Error("is closed");
+    if (this.isClosed) {
+      throw new Error("is closed");
+    }
     if (this.getSenders().find((sender) => sender.track?.uuid === track.uuid)) {
       throw new Error("track exist");
     }

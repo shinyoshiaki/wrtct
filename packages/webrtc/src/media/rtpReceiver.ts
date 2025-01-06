@@ -36,7 +36,7 @@ import { NackHandler } from "./receiver/nack";
 import { ReceiverTWCC } from "./receiver/receiverTwcc";
 import { StreamStatistics } from "./receiver/statistics";
 
-import type { MediaStreamTrack } from "./track";
+import { MediaStreamTrack } from "./track";
 
 const log = debug("werift:packages/webrtc/src/media/rtpReceiver.ts");
 
@@ -91,7 +91,7 @@ export class RTCRtpReceiver {
 
   // todo fix
   get track() {
-    return this.tracks[0];
+    return this.tracks[0] ?? new MediaStreamTrack({ kind: this.kind });
   }
 
   get nackEnabled() {
