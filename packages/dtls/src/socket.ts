@@ -1,7 +1,7 @@
 import { decode, types } from "@shinyoshiaki/binary-data";
 import debug from "debug";
 import { setTimeout } from "timers/promises";
-import { Event } from "./imports/common";
+import { Event, type Transport } from "./imports/common";
 
 import {
   NamedCurveAlgorithmList,
@@ -23,7 +23,6 @@ import { createPlaintext } from "./record/builder";
 import { ContentType } from "./record/const";
 import { FragmentedHandshake } from "./record/message/fragment";
 import { parsePacket, parsePlainText } from "./record/receive";
-import type { Transport } from "./transport";
 import type { Extension } from "./typings/domain";
 
 const log = debug("werift-dtls : packages/dtls/src/socket.ts : log");

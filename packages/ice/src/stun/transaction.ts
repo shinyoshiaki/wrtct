@@ -1,8 +1,8 @@
 import debug from "debug";
-import { Event } from "../imports/common";
+import { type Address, Event } from "../imports/common";
 
 import { TransactionFailed, TransactionTimeout } from "../exceptions";
-import type { Address, Protocol } from "../types/model";
+import type { Protocol } from "../types/model";
 import { RETRY_MAX, RETRY_RTO, classes } from "./const";
 import type { Message } from "./message";
 

@@ -2,23 +2,21 @@ import { Certificate, PrivateKey } from "@fidm/x509";
 import debug from "debug";
 import { setTimeout } from "timers/promises";
 import { v4 } from "uuid";
-import { Event } from "../imports/common";
+import { Event, type Transport } from "../imports/common";
 
+import type { AddressInfo } from "net";
 import {
+  CipherContext,
   DtlsClient,
   DtlsServer,
   type DtlsSocket,
-  type Transport,
-} from "../../../dtls/src";
-import {
   HashAlgorithm,
   NamedCurveAlgorithm,
+  type Profile,
   SignatureAlgorithm,
   type SignatureHash,
-} from "../../../dtls/src/cipher/const";
-import { CipherContext } from "../../../dtls/src/context/cipher";
-import type { Profile } from "../../../dtls/src/context/srtp";
-import type { IceConnection } from "../../../ice/src";
+} from "../imports/dtls";
+import type { IceConnection } from "../imports/ice";
 import {
   type RtcpPacket,
   RtcpPacketConverter,
@@ -28,8 +26,9 @@ import {
   SrtpSession,
   isMedia,
   isRtcp,
-} from "../../../rtp/src";
-import { keyLength, saltLength } from "../../../rtp/src/srtp/const";
+  keyLength,
+  saltLength,
+} from "../imports/rtp";
 import type { RtpRouter } from "../media/router";
 import type { PeerConfig } from "../peerConnection";
 import { fingerprint, isDtls } from "../utils";
@@ -369,13 +368,19 @@ class IceTransport implements Transport {
       }
     });
   }
-  onData?: (buf: Buffer) => void;
+  onData: (buf: Buffer) => void = () => {};
+
+  get address() {
+    return {} as AddressInfo;
+  }
+
+  type: string = "ice";
 
   readonly send = (data: Buffer) => {
     return this.ice.send(data);
   };
 
-  close() {
+  async close() {
     this.ice.close();
   }
 }

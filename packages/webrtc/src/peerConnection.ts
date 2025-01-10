@@ -2,18 +2,7 @@ import debug from "debug";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import * as uuid from "uuid";
-import {
-  type Address,
-  type CandidatePair,
-  type InterfaceAddresses,
-  Recvonly,
-  Sendonly,
-  Sendrecv,
-  deepMerge,
-} from ".";
-import type { Profile } from "../../dtls/src/context/srtp";
-import type { Message } from "../../ice/src/stun/message";
-import type { Protocol } from "../../ice/src/types/model";
+
 import {
   DISCARD_HOST,
   DISCARD_PORT,
@@ -23,36 +12,45 @@ import {
 } from "./const";
 import { RTCDataChannel, RTCDataChannelParameters } from "./dataChannel";
 import { EventTarget, enumerate } from "./helper";
-import { Event } from "./imports/common";
-import { useOPUS, usePCMU, useVP8 } from "./media/codec";
+import { type Address, Event, type InterfaceAddresses } from "./imports/common";
+import type { Profile } from "./imports/dtls";
+import type { CandidatePair, Message, Protocol } from "./imports/ice";
 import {
+  type Direction,
+  MediaStream,
+  type MediaStreamTrack,
   type RTCRtpCodecParameters,
   RTCRtpCodingParameters,
   type RTCRtpHeaderExtensionParameters,
   type RTCRtpParameters,
   type RTCRtpReceiveParameters,
+  RTCRtpReceiver,
   RTCRtpRtxParameters,
+  RTCRtpSender,
   RTCRtpSimulcastParameters,
-} from "./media/parameters";
-import { RtpRouter } from "./media/router";
-import { RTCRtpReceiver } from "./media/rtpReceiver";
-import { RTCRtpSender } from "./media/rtpSender";
-import {
-  type Direction,
   RTCRtpTransceiver,
+  Recvonly,
+  RtpRouter,
+  Sendonly,
+  Sendrecv,
   type TransceiverOptions,
-} from "./media/rtpTransceiver";
-import { MediaStream, type MediaStreamTrack } from "./media/track";
-import { codecParametersFromString } from "./sdp";
+  useOPUS,
+  usePCMU,
+  useVP8,
+} from "./media";
 import {
   GroupDescription,
   MediaDescription,
   SessionDescription,
   SsrcDescription,
   addSDPHeader,
+  codecParametersFromString,
 } from "./sdp";
-import type { DtlsKeys } from "./transport/dtls";
-import { RTCCertificate, RTCDtlsTransport } from "./transport/dtls";
+import {
+  type DtlsKeys,
+  RTCCertificate,
+  RTCDtlsTransport,
+} from "./transport/dtls";
 import {
   IceCandidate,
   type IceGathererState,
@@ -66,6 +64,7 @@ import type { ConnectionState, Kind, RTCSignalingState } from "./types/domain";
 import type { Callback, CallbackWithValue } from "./types/util";
 import {
   andDirection,
+  deepMerge,
   parseIceServers,
   reverseDirection,
   reverseSimulcastDirection,

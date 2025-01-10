@@ -1,13 +1,18 @@
 /* eslint-disable prefer-const */
 import { createHash } from "crypto";
-import { RemoteInfo, createSocket } from "dgram";
+import { createSocket } from "dgram";
 import debug from "debug";
 import mergeWith from "lodash/mergeWith";
 import { performance } from "perf_hooks";
 
-import { bufferReader, bufferWriter, randomPort } from "../../common/src";
-import { CipherContext } from "../../dtls/src/context/cipher";
-import type { Address } from "../../ice/src";
+import {
+  type Address,
+  bufferReader,
+  bufferWriter,
+  randomPort,
+} from "./imports/common";
+import { CipherContext } from "./imports/dtls";
+
 import { type Direction, Directions } from "./media/rtpTransceiver";
 import { MediaStreamTrack } from "./media/track";
 import type { RTCIceServer } from "./peerConnection";

@@ -1,32 +1,42 @@
-import { type Socket, type SocketType, createSocket } from "dgram";
+import {
+  type RemoteInfo,
+  type Socket,
+  type SocketType,
+  createSocket,
+} from "dgram";
 import debug from "debug";
 
-import { type Socket as TcpSocket, connect } from "net";
+import { type AddressInfo, type Socket as TcpSocket, connect } from "net";
 import {
+  type Address,
   type InterfaceAddresses,
   findPort,
   interfaceAddress,
-} from "../../common/src";
-import type { Address } from "./types/model";
-import { normalizeFamilyNodeV18 } from "./utils";
+  normalizeFamilyNodeV18,
+} from "./network";
 
 const log = debug("werift-ice:packages/ice/src/transport.ts");
 
 export class UdpTransport implements Transport {
   readonly type = "udp";
   readonly socket: Socket;
+  rinfo?: Partial<Pick<RemoteInfo, "address" | "port">>;
   onData: (data: Buffer, addr: Address) => void = () => {};
 
   private constructor(
     private socketType: SocketType,
-    private portRange?: [number, number],
-    private interfaceAddresses?: InterfaceAddresses,
+    private options: {
+      portRange?: [number, number];
+      interfaceAddresses?: InterfaceAddresses;
+      port?: number;
+    } = {},
   ) {
     this.socket = createSocket(socketType);
     this.socket.on("message", (data, info) => {
       if (normalizeFamilyNodeV18(info.family) === 6) {
         [info.address] = info.address.split("%"); // example fe80::1d3a:8751:4ffd:eb80%wlp82s0
       }
+      this.rinfo = info;
       try {
         this.onData(data, [info.address, info.port]);
       } catch (error) {
@@ -37,22 +47,30 @@ export class UdpTransport implements Transport {
 
   static async init(
     type: SocketType,
-    portRange?: [number, number],
-    interfaceAddresses?: InterfaceAddresses,
+    options: {
+      portRange?: [number, number];
+      port?: number;
+      interfaceAddresses?: InterfaceAddresses;
+    } = {},
   ) {
-    const transport = new UdpTransport(type, portRange, interfaceAddresses);
+    const transport = new UdpTransport(type, options);
     await transport.init();
     return transport;
   }
 
   private async init() {
-    const address = interfaceAddress(this.socketType, this.interfaceAddresses);
-    if (this.portRange) {
+    const address = interfaceAddress(
+      this.socketType,
+      this.options.interfaceAddresses,
+    );
+    if (this.options.port) {
+      this.socket.bind({ port: this.options.port, address });
+    } else if (this.options.portRange) {
       const port = await findPort(
-        this.portRange[0],
-        this.portRange[1],
+        this.options.portRange[0],
+        this.options.portRange[1],
         this.socketType,
-        this.interfaceAddresses,
+        this.options.interfaceAddresses,
       );
       this.socket.bind({ port, address });
     } else {
@@ -61,8 +79,9 @@ export class UdpTransport implements Transport {
     await new Promise((r) => this.socket.once("listening", r));
   }
 
-  send = (data: Buffer, addr: Address) =>
+  send = (data: Buffer, addr?: Address) =>
     new Promise<void>((r, f) => {
+      addr = addr ?? [this.rinfo?.address!, this.rinfo?.port!];
       this.socket.send(data, addr[1], addr[0], (error) => {
         if (error) {
           log("send error", addr, data);
@@ -73,8 +92,16 @@ export class UdpTransport implements Transport {
       });
     });
 
-  address() {
+  get address() {
     return this.socket.address();
+  }
+
+  get host() {
+    return this.socket.address().address;
+  }
+
+  get port() {
+    return this.socket.address().port;
   }
 
   close = () =>
@@ -140,7 +167,11 @@ export class TcpTransport implements Transport {
     return transport;
   }
 
-  send = async (data: Buffer, addr: Address) => {
+  get address() {
+    return {} as AddressInfo;
+  }
+
+  send = async (data: Buffer, addr?: Address) => {
     await this.connecting;
     this.client.write(data, (err) => {
       if (err) {
@@ -157,7 +188,8 @@ export class TcpTransport implements Transport {
 
 export interface Transport {
   type: string;
+  address: AddressInfo;
   onData: (data: Buffer, addr: Address) => void;
-  send: (data: Buffer, addr: Address) => Promise<void>;
+  send: (data: Buffer, addr?: Address) => Promise<void>;
   close: () => Promise<void>;
 }

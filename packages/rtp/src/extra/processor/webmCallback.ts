@@ -28,7 +28,7 @@ export class WebmCallback extends WebmBase {
     );
   }
 
-  pipe = (cb: (input: WebmOutput) => Promise<void>) => {
+  pipe = (cb: (input: WebmOutput) => Promise<any>) => {
     this.cb = cb;
     this.start();
   };

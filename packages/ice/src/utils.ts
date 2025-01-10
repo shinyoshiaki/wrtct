@@ -1,10 +1,13 @@
 import os from "os";
 import * as nodeIp from "ip";
-import type { InterfaceAddresses } from "../../common/src/network";
+import {
+  type Address,
+  type InterfaceAddresses,
+  normalizeFamilyNodeV18,
+} from "./imports/common";
 import { classes, methods } from "./stun/const";
 import { Message } from "./stun/message";
 import { StunProtocol } from "./stun/protocol";
-import type { Address } from "./types/model";
 
 export async function getGlobalIp(
   stunServer?: Address,
@@ -21,13 +24,6 @@ export async function getGlobalIp(
 
   const address = response.getAttributeValue("XOR-MAPPED-ADDRESS");
   return address[0] as string;
-}
-
-export function normalizeFamilyNodeV18(family: string | number): 4 | 6 {
-  if (family === "IPv4") return 4;
-  if (family === "IPv6") return 6;
-
-  return family as 4 | 6;
 }
 
 function isAutoconfigurationAddress(info: os.NetworkInterfaceInfo) {

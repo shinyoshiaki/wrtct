@@ -6,7 +6,7 @@ import { Uint64BE } from "int64-buffer";
 
 import isEqual from "lodash/isEqual";
 import timers from "timers/promises";
-import { Event } from "./imports/common";
+import { type Address, Event } from "./imports/common";
 
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import { MdnsLookup } from "./dns/lookup";
@@ -29,10 +29,10 @@ import {
   validateRemoteCandidate,
 } from "./iceBase";
 import { classes, methods } from "./stun/const";
-import { Message, parseMessage } from "./stun/message";
+import { Message } from "./stun/message";
 import { StunProtocol } from "./stun/protocol";
 import { createStunOverTurnClient } from "./turn/protocol";
-import type { Address, Protocol } from "./types/model";
+import type { Protocol } from "./types/model";
 import { getHostAddresses } from "./utils";
 
 const log = debug("werift-ice : packages/ice/src/ice.ts : log");

@@ -64,12 +64,13 @@ export class MediaDevices extends EventTarget {
   readonly getUdpMedia = ({
     port,
     codec,
-    kind,
   }: {
     port: number;
     codec: ConstructorParameters<typeof RTCRtpCodecParameters>[0];
-    kind: "audio" | "video";
   }) => {
+    const kind = codec.mimeType.toLowerCase().includes("video")
+      ? "video"
+      : "audio";
     const track = new MediaStreamTrack({
       kind,
       codec: new RTCRtpCodecParameters(codec),
