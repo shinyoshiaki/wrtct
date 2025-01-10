@@ -25,3 +25,11 @@ export const useVP8 = (props: Partial<RTCRtpCodecParameters> = {}) =>
     ],
     ...props,
   });
+
+export const useOpus = (props: Partial<RTCRtpCodecParameters> = {}) =>
+  new RTCRtpCodecParameters({
+    mimeType: "audio/opus",
+    clockRate: 48000,
+    channels: 2,
+    ...props,
+  });
