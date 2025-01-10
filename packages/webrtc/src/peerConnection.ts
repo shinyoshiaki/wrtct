@@ -13,7 +13,7 @@ import {
 import { RTCDataChannel, RTCDataChannelParameters } from "./dataChannel";
 import { EventTarget, enumerate } from "./helper";
 import { type Address, Event, type InterfaceAddresses } from "./imports/common";
-import type { Profile } from "./imports/dtls";
+import type { Profile } from "./imports/rtp";
 import type { CandidatePair, Message, Protocol } from "./imports/ice";
 import {
   type Direction,

@@ -1,11 +1,8 @@
-import {
-  type HashAlgorithms,
-  SignatureAlgorithm,
-} from "../../dtls/src/cipher/const";
+import { type HashAlgorithms, SignatureAlgorithm } from "./imports/dtls";
 import {
   ProtectionProfileAeadAes128Gcm,
   ProtectionProfileAes128CmHmacSha1_80,
-} from "../../dtls/src/context/srtp";
+} from "./imports/rtp";
 import type { DtlsRole } from "./transport/dtls";
 
 // data channel export constants

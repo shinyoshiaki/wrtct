@@ -12,12 +12,12 @@ import {
   type DtlsSocket,
   HashAlgorithm,
   NamedCurveAlgorithm,
-  type Profile,
   SignatureAlgorithm,
   type SignatureHash,
 } from "../imports/dtls";
 import type { IceConnection } from "../imports/ice";
 import {
+  Profile,
   type RtcpPacket,
   RtcpPacketConverter,
   type RtpHeader,
