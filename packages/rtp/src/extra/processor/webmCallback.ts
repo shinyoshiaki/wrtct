@@ -46,9 +46,16 @@ export class WebmCallback extends WebmBase {
   };
 }
 
+/**
+ *
+ * @param path
+ * @returns eol
+ */
 export const saveToFileSystem = (path: string) => async (value: WebmOutput) => {
   if (value.saveToFile) {
     await appendFile(path, value.saveToFile);
+
+    return false;
   } else if (value.eol) {
     const { durationElement } = value.eol;
     const handler = await open(path, "r+");
@@ -67,5 +74,7 @@ export const saveToFileSystem = (path: string) => async (value: WebmOutput) => {
     await handler.write(resize, 0, resize.length, SegmentSizePosition);
 
     await handler.close();
+
+    return true;
   }
 };

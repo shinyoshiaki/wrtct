@@ -1,5 +1,5 @@
 import { unlink } from "fs/promises";
-import { EventDisposer } from "../../../imports/common";
+import { EventDisposer, Event } from "../../../imports/common";
 
 import { MediaWriter } from ".";
 import { type MediaStreamTrack, WeriftError } from "../../..";
@@ -21,7 +21,8 @@ const sourcePath = "packages/webrtc/src/nonstandard/recorder/writer/webm.ts";
 
 export class WebmFactory extends MediaWriter {
   rtpSources: RtpSourceCallback[] = [];
-
+  private onEol = new Event();
+  private ended = false;
   unSubscribers = new EventDisposer();
 
   async start(tracks: MediaStreamTrack[]) {
@@ -140,7 +141,13 @@ export class WebmFactory extends MediaWriter {
       return rtpSource;
     });
     if (this.props.path) {
-      webm.pipe(saveToFileSystem(this.props.path));
+      webm.pipe(async (o) => {
+        const eol = await saveToFileSystem(this.props.path)(o);
+        if (eol) {
+          this.onEol.execute();
+          this.ended = true;
+        }
+      });
     } else if (this.props.stream) {
       webm.pipe(async (o) => {
         this.props.stream.execute(o);
@@ -150,6 +157,10 @@ export class WebmFactory extends MediaWriter {
 
   async stop() {
     await Promise.all(this.rtpSources.map((r) => r.stop()));
+
+    if (!this.ended) {
+      await this.onEol.asPromise(5000);
+    }
     this.unSubscribers.dispose();
   }
 }
