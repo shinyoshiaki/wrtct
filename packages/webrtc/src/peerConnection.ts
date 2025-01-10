@@ -2,8 +2,6 @@ import debug from "debug";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import * as uuid from "uuid";
-import { Event } from "./imports/common";
-
 import {
   type Address,
   type CandidatePair,
@@ -12,11 +10,7 @@ import {
   Sendonly,
   Sendrecv,
   deepMerge,
-  useOPUS,
-  usePCMU,
-  useVP8,
 } from ".";
-import { type DtlsKeys, codecParametersFromString } from ".";
 import type { Profile } from "../../dtls/src/context/srtp";
 import type { Message } from "../../ice/src/stun/message";
 import type { Protocol } from "../../ice/src/types/model";
@@ -29,6 +23,8 @@ import {
 } from "./const";
 import { RTCDataChannel, RTCDataChannelParameters } from "./dataChannel";
 import { EventTarget, enumerate } from "./helper";
+import { Event } from "./imports/common";
+import { useOPUS, usePCMU, useVP8 } from "./media/codec";
 import {
   type RTCRtpCodecParameters,
   RTCRtpCodingParameters,
@@ -47,6 +43,7 @@ import {
   type TransceiverOptions,
 } from "./media/rtpTransceiver";
 import { MediaStream, type MediaStreamTrack } from "./media/track";
+import { codecParametersFromString } from "./sdp";
 import {
   GroupDescription,
   MediaDescription,
@@ -54,6 +51,7 @@ import {
   SsrcDescription,
   addSDPHeader,
 } from "./sdp";
+import type { DtlsKeys } from "./transport/dtls";
 import { RTCCertificate, RTCDtlsTransport } from "./transport/dtls";
 import {
   IceCandidate,
