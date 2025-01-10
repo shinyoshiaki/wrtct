@@ -12,14 +12,11 @@ import {
   Sendonly,
   Sendrecv,
   deepMerge,
+  useOPUS,
+  usePCMU,
+  useVP8,
 } from ".";
-import {
-  type DtlsKeys,
-  codecParametersFromString,
-  useNACK,
-  usePLI,
-  useREMB,
-} from ".";
+import { type DtlsKeys, codecParametersFromString } from ".";
 import type { Profile } from "../../dtls/src/context/srtp";
 import type { Message } from "../../ice/src/stun/message";
 import type { Protocol } from "../../ice/src/types/model";
@@ -33,7 +30,7 @@ import {
 import { RTCDataChannel, RTCDataChannelParameters } from "./dataChannel";
 import { EventTarget, enumerate } from "./helper";
 import {
-  RTCRtpCodecParameters,
+  type RTCRtpCodecParameters,
   RTCRtpCodingParameters,
   type RTCRtpHeaderExtensionParameters,
   type RTCRtpParameters,
@@ -1736,26 +1733,8 @@ export type RTCIceServer = {
 
 export const defaultPeerConfig: PeerConfig = {
   codecs: {
-    audio: [
-      new RTCRtpCodecParameters({
-        mimeType: "audio/opus",
-        clockRate: 48000,
-        channels: 2,
-      }),
-      new RTCRtpCodecParameters({
-        mimeType: "audio/PCMU",
-        clockRate: 8000,
-        channels: 1,
-        payloadType: 0,
-      }),
-    ],
-    video: [
-      new RTCRtpCodecParameters({
-        mimeType: "video/VP8",
-        clockRate: 90000,
-        rtcpFeedback: [useNACK(), usePLI(), useREMB()],
-      }),
-    ],
+    audio: [useOPUS(), usePCMU()],
+    video: [useVP8()],
   },
   headerExtensions: {
     audio: [],
