@@ -1,10 +1,10 @@
 import debug from "debug";
-import { Event } from "../imports/common";
+import { Event, UdpTransport } from "../imports/common";
 
-import type { InterfaceAddresses } from "../../../common/src/network";
+import type { Address, InterfaceAddresses } from "../../../common/src/network";
 import type { Candidate } from "../candidate";
-import { UdpTransport } from "../transport";
-import type { Address, Protocol } from "../types/model";
+
+import type { Protocol } from "../types/model";
 import { classes } from "./const";
 import { type Message, parseMessage } from "./message";
 import { Transaction } from "./transaction";
@@ -34,17 +34,15 @@ export class StunProtocol implements Protocol {
     interfaceAddresses?: InterfaceAddresses,
   ) => {
     if (useIpv4) {
-      this.transport = await UdpTransport.init(
-        "udp4",
+      this.transport = await UdpTransport.init("udp4", {
         portRange,
         interfaceAddresses,
-      );
+      });
     } else {
-      this.transport = await UdpTransport.init(
-        "udp6",
+      this.transport = await UdpTransport.init("udp6", {
         portRange,
         interfaceAddresses,
-      );
+      });
     }
 
     this.transport.onData = (data, addr) => {
@@ -78,7 +76,7 @@ export class StunProtocol implements Protocol {
   }
 
   getExtraInfo(): Address {
-    const { address: host, port } = this.transport.address();
+    const { address: host, port } = this.transport.address;
     return [host, port];
   }
 

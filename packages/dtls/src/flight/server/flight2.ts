@@ -10,7 +10,7 @@ import {
 import { generateKeyPair } from "../../cipher/namedCurve";
 import type { CipherContext } from "../../context/cipher";
 import type { DtlsContext } from "../../context/dtls";
-import { type Profile, SrtpContext } from "../../context/srtp";
+import { SrtpContext } from "../../context/srtp";
 import type { TransportContext } from "../../context/transport";
 import { EllipticCurves } from "../../handshake/extensions/ellipticCurves";
 import { ExtendedMasterSecret } from "../../handshake/extensions/extendedMasterSecret";
@@ -22,6 +22,7 @@ import { ServerHelloVerifyRequest } from "../../handshake/message/server/helloVe
 import { DtlsRandom } from "../../handshake/random";
 import { createFragments, createPlaintext } from "../../record/builder";
 import { ContentType } from "../../record/const";
+import { Profile } from "../../imports/rtp";
 
 const log = debug("werift-dtls : packages/dtls/flight/server/flight2.ts : log");
 

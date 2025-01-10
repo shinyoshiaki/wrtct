@@ -1,7 +1,7 @@
 import { decode, types } from "@shinyoshiaki/binary-data";
 import debug from "debug";
 import { setTimeout } from "timers/promises";
-import { Event } from "./imports/common";
+import { Event, type Transport } from "./imports/common";
 
 import {
   NamedCurveAlgorithmList,
@@ -12,7 +12,7 @@ import { exportKeyingMaterial } from "./cipher/prf";
 import { SessionType, type SessionTypes } from "./cipher/suites/abstract";
 import { CipherContext } from "./context/cipher";
 import { DtlsContext } from "./context/dtls";
-import { type Profile, SrtpContext } from "./context/srtp";
+import { SrtpContext } from "./context/srtp";
 import { TransportContext } from "./context/transport";
 import { EllipticCurves } from "./handshake/extensions/ellipticCurves";
 import { ExtendedMasterSecret } from "./handshake/extensions/extendedMasterSecret";
@@ -23,8 +23,8 @@ import { createPlaintext } from "./record/builder";
 import { ContentType } from "./record/const";
 import { FragmentedHandshake } from "./record/message/fragment";
 import { parsePacket, parsePlainText } from "./record/receive";
-import type { Transport } from "./transport";
 import type { Extension } from "./typings/domain";
+import { Profile } from "./imports/rtp";
 
 const log = debug("werift-dtls : packages/dtls/src/socket.ts : log");
 const err = debug("werift-dtls : packages/dtls/src/socket.ts : err");

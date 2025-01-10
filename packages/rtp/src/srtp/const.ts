@@ -1,9 +1,12 @@
 export const ProtectionProfileAes128CmHmacSha1_80 = 0x0001 as const;
 export const ProtectionProfileAeadAes128Gcm = 0x0007 as const;
 
-export type Profile =
-  | typeof ProtectionProfileAes128CmHmacSha1_80
-  | typeof ProtectionProfileAeadAes128Gcm;
+export const Profiles = [
+  ProtectionProfileAes128CmHmacSha1_80,
+  ProtectionProfileAeadAes128Gcm,
+] as const;
+
+export type Profile = (typeof Profiles)[number];
 
 export const keyLength = (profile: Profile) => {
   switch (profile) {

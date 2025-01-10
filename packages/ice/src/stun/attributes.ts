@@ -3,7 +3,7 @@ import { Int64BE } from "int64-buffer";
 import * as nodeIp from "ip";
 import range from "lodash/range";
 
-import type { Address } from "../types/model";
+import type { Address } from "../imports/common";
 import {
   type AttributeKeys,
   COOKIE,

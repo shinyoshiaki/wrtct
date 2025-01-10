@@ -10,7 +10,7 @@ import {
 } from "../../cipher/prf";
 import type { CipherContext } from "../../context/cipher";
 import type { DtlsContext } from "../../context/dtls";
-import { type Profile, SrtpContext } from "../../context/srtp";
+import { SrtpContext } from "../../context/srtp";
 import type { TransportContext } from "../../context/transport";
 import { HandshakeType } from "../../handshake/const";
 import { ExtendedMasterSecret } from "../../handshake/extensions/extendedMasterSecret";
@@ -26,11 +26,11 @@ import { ServerHello } from "../../handshake/message/server/hello";
 import { ServerHelloDone } from "../../handshake/message/server/helloDone";
 import { ServerKeyExchange } from "../../handshake/message/server/keyExchange";
 import { DtlsRandom } from "../../handshake/random";
-import { dumpBuffer } from "../../helper";
 import { createPlaintext } from "../../record/builder";
 import { ContentType } from "../../record/const";
 import type { FragmentedHandshake } from "../../record/message/fragment";
 import { Flight } from "../flight";
+import { Profile } from "../../imports/rtp";
 
 const log = debug(
   "werift-dtls : packages/dtls/src/flight/client/flight5.ts : log",
