@@ -17,7 +17,7 @@ import {
 } from "../imports/dtls";
 import type { IceConnection } from "../imports/ice";
 import {
-  Profile,
+  type Profile,
   type RtcpPacket,
   RtcpPacketConverter,
   type RtpHeader,
