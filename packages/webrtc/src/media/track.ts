@@ -3,6 +3,7 @@ import { Event } from "../imports/common";
 
 import {
   type Extensions,
+  JitterBufferCallback,
   type RtcpPacket,
   type RtpHeader,
   RtpPacket,
@@ -26,6 +27,7 @@ export class MediaStreamTrack extends EventTarget {
   codec?: RTCRtpCodecParameters;
   /**todo impl */
   enabled = true;
+  jitterBuffer: JitterBufferCallback;
 
   readonly onReceiveRtp = new Event<[RtpPacket, Extensions?]>();
   readonly onReceiveRtcp = new Event<[RtcpPacket]>();
@@ -48,6 +50,14 @@ export class MediaStreamTrack extends EventTarget {
     });
 
     this.label = `${this.remote ? "remote" : "local"} ${this.kind}`;
+    this.jitterBuffer = new JitterBufferCallback(
+      this.codec?.clockRate ?? (this.kind === "audio" ? 48000 : 90000),
+    );
+    this.jitterBuffer.pipe((o) => {
+      if (o.rtp) {
+        this.onReceiveRtp.execute(o.rtp, o.extensions);
+      }
+    });
   }
 
   stop = () => {
@@ -70,6 +80,10 @@ export class MediaStreamTrack extends EventTarget {
       this.codec?.payloadType ?? packet.header.payloadType;
     this.onReceiveRtp.execute(packet);
   };
+
+  handleRtp(rtp: RtpPacket, extensions: Extensions) {
+    this.jitterBuffer.input({ rtp, extensions });
+  }
 }
 
 export class MediaStream {

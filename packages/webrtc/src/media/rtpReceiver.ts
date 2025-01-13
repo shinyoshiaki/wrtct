@@ -343,12 +343,12 @@ export class RTCRtpReceiver {
         if (track.kind === "audio") {
           const payloads = this.audioRedHandler.push(red, packet);
           for (const packet of payloads) {
-            track.onReceiveRtp.execute(packet.clone(), extensions);
+            track.handleRtp(packet.clone(), extensions);
           }
         } else {
         }
       } else {
-        track.onReceiveRtp.execute(packet.clone(), extensions);
+        track.handleRtp(packet.clone(), extensions);
       }
     }
 

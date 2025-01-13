@@ -1,4 +1,5 @@
 import {
+  type Extensions,
   type RequireAtLeastOne,
   type RtpPacket,
   uint16Add,
@@ -9,10 +10,12 @@ import {
 import type { Processor } from "./interface";
 import type { RtpOutput } from "./rtpCallback";
 
-export type JitterBufferInput = RtpOutput;
+export type JitterBufferInput = RtpOutput & { extensions?: Extensions };
+type RtpSet = { extension: Extensions; rtp: RtpPacket };
 
 export interface JitterBufferOutput extends RtpOutput {
   isPacketLost?: { from: number; to: number };
+  extensions?: Extensions;
 }
 
 export class JitterBufferBase
@@ -21,7 +24,7 @@ export class JitterBufferBase
   private options: JitterBufferOptions;
   /**uint16 */
   private presentSeqNum?: number;
-  private rtpBuffer: { [sequenceNumber: number]: RtpPacket } = {};
+  private rtpBuffer: { [sequenceNumber: number]: RtpSet } = {};
   private get expectNextSeqNum() {
     return uint16Add(this.presentSeqNum!, 1);
   }
@@ -57,7 +60,7 @@ export class JitterBufferBase
       if (input.eol) {
         const packets = this.sortAndClearBuffer(this.rtpBuffer);
         for (const rtp of packets) {
-          output.push({ rtp });
+          output.push(rtp);
         }
         output.push({ eol: true });
 
@@ -66,7 +69,7 @@ export class JitterBufferBase
       return output;
     }
 
-    const { packets, timeoutSeqNum } = this.processRtp(input.rtp);
+    const { packets, timeoutSeqNum } = this.processRtp(input as RtpSet);
 
     if (timeoutSeqNum != undefined) {
       const isPacketLost = {
@@ -76,8 +79,8 @@ export class JitterBufferBase
       this.presentSeqNum = input.rtp.header.sequenceNumber;
       output.push({ isPacketLost });
       if (packets) {
-        for (const rtp of [...packets, input.rtp]) {
-          output.push({ rtp });
+        for (const rtp of [...packets, input]) {
+          output.push(rtp);
         }
       }
       this.internalStats["jitterBuffer"] = new Date().toISOString();
@@ -85,7 +88,7 @@ export class JitterBufferBase
     } else {
       if (packets) {
         for (const rtp of packets) {
-          output.push({ rtp });
+          output.push(rtp);
         }
         this.internalStats["jitterBuffer"] = new Date().toISOString();
         return output;
@@ -94,17 +97,17 @@ export class JitterBufferBase
     }
   }
 
-  private processRtp(rtp: RtpPacket): RequireAtLeastOne<{
-    packets: RtpPacket[];
+  private processRtp(input: RtpSet): RequireAtLeastOne<{
+    packets: RtpSet[];
     timeoutSeqNum: number;
     nothing: undefined;
   }> {
-    const { sequenceNumber, timestamp } = rtp.header;
+    const { sequenceNumber, timestamp } = input.rtp.header;
 
     // init
     if (this.presentSeqNum == undefined) {
       this.presentSeqNum = sequenceNumber;
-      return { packets: [rtp] };
+      return { packets: [input] };
     }
 
     // duplicate
@@ -123,14 +126,14 @@ export class JitterBufferBase
 
       const rtpBuffer = this.resolveBuffer(uint16Add(sequenceNumber, 1));
       this.presentSeqNum =
-        rtpBuffer.at(-1)?.header.sequenceNumber ?? this.presentSeqNum;
+        rtpBuffer.at(-1)?.rtp.header.sequenceNumber ?? this.presentSeqNum;
 
       this.disposeTimeoutPackets(timestamp);
 
-      return { packets: [rtp, ...rtpBuffer] };
+      return { packets: [input, ...rtpBuffer] };
     }
 
-    this.pushRtpBuffer(rtp);
+    this.pushRtpBuffer(input);
 
     const { latestTimeoutSeqNum, sorted } =
       this.disposeTimeoutPackets(timestamp);
@@ -142,7 +145,7 @@ export class JitterBufferBase
     }
   }
 
-  private pushRtpBuffer(rtp: RtpPacket) {
+  private pushRtpBuffer(input: RtpSet) {
     if (Object.values(this.rtpBuffer).length > this.options.bufferSize) {
       this.internalStats["buffer_overflow"] = {
         count: (this.internalStats["buffer_overflow"]?.count ?? 0) + 1,
@@ -151,11 +154,11 @@ export class JitterBufferBase
       return;
     }
 
-    this.rtpBuffer[rtp.header.sequenceNumber] = rtp;
+    this.rtpBuffer[input.rtp!.header.sequenceNumber] = input;
   }
 
   private resolveBuffer(seqNumFrom: number) {
-    const resolve: RtpPacket[] = [];
+    const resolve: RtpSet[] = [];
 
     for (let index = seqNumFrom; ; index = uint16Add(index, 1)) {
       const rtp = this.rtpBuffer[index];
@@ -171,9 +174,9 @@ export class JitterBufferBase
   }
 
   private sortAndClearBuffer(rtpBuffer: {
-    [sequenceNumber: number]: RtpPacket;
+    [sequenceNumber: number]: RtpSet;
   }) {
-    const buffer: RtpPacket[] = [];
+    const buffer: RtpSet[] = [];
     for (let index = this.presentSeqNum ?? 0; ; index = uint16Add(index, 1)) {
       const rtp = rtpBuffer[index];
       if (rtp) {
@@ -191,8 +194,8 @@ export class JitterBufferBase
     let latestTimeoutSeqNum: number | undefined;
 
     const packets = Object.values(this.rtpBuffer)
-      .map((rtp) => {
-        const { timestamp, sequenceNumber } = rtp.header;
+      .flatMap((input) => {
+        const { timestamp, sequenceNumber } = input.rtp.header;
 
         if (uint32Gt(timestamp, baseTimestamp)) {
           return;
@@ -227,12 +230,11 @@ export class JitterBufferBase
           return packet;
         }
       })
-      .flatMap((p): RtpPacket => p as RtpPacket)
-      .filter((p) => p);
+      .filter((p): p is RtpSet => p != undefined);
 
     const sorted = this.sortAndClearBuffer(
       packets.reduce((acc, cur) => {
-        acc[cur.header.sequenceNumber] = cur;
+        acc[cur.rtp.header.sequenceNumber] = cur;
         return acc;
       }, {}),
     );
