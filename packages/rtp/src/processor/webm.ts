@@ -1,12 +1,12 @@
-import { Event } from "../../imports/common";
+import { Event } from "../imports/common";
 
 import {
   WEBMContainer,
   getEBMLByteLength,
   numberToByteArray,
   vintEncode,
-} from "../container";
-import type { SupportedCodec } from "../container/webm";
+} from "../extra/container";
+import type { SupportedCodec } from "../extra/container/webm";
 import type { AVProcessor } from "./interface";
 
 export interface WebmTrack {

@@ -24,7 +24,7 @@ import {
   type RtpPacket,
   type TransportWideCCPayload,
   unwrapRtx,
-} from "../../../rtp/src";
+} from "../imports/rtp";
 import type { RTCDtlsTransport } from "../transport/dtls";
 import type { Kind } from "../types/domain";
 import { compactNtp, timestampSeconds } from "../utils";

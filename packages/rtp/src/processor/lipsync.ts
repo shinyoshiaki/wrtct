@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 
-import { int } from "../..";
+import { int } from "..";
 import type { CodecFrame } from "./depacketizer";
 import type { AVProcessor } from "./interface";
 import type { MediaKind } from "./webm";

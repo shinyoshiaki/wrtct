@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 
-import { int } from "../..";
+import { int } from "..";
 import type { CodecFrame, DepacketizerOutput } from "./depacketizer";
 import type { Processor } from "./interface";
 

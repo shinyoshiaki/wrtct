@@ -1,5 +1,5 @@
 import { RtpHeader, RtpPacket, int } from "../../src";
-import { Max32Uint, RtpTimeBase } from "../../src/extra/processor";
+import { Max32Uint, RtpTimeBase } from "../../src/processor";
 
 describe("rtpTime", () => {
   it("rollover", () => {

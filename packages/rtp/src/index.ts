@@ -23,3 +23,4 @@ export * from "./rtp/rtx";
 export * from "./srtp/srtcp";
 export * from "./srtp/srtp";
 export * from "./util";
+export * from "./processor";

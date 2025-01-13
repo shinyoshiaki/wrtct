@@ -5,7 +5,7 @@ import {
   uint16Gte,
   uint32Add,
   uint32Gt,
-} from "../..";
+} from "..";
 import type { Processor } from "./interface";
 import type { RtpOutput } from "./rtpCallback";
 

@@ -1,5 +1,5 @@
 import debug from "debug";
-import { Event } from "../../imports/common";
+import { Event } from "../imports/common";
 
 import {
   GenericNack,
@@ -7,7 +7,7 @@ import {
   type RtpPacket,
   timer,
   uint16Add,
-} from "../..";
+} from "..";
 import type { Processor } from "./interface";
 import type { RtpOutput } from "./rtpCallback";
 

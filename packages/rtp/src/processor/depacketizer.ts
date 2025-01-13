@@ -1,5 +1,5 @@
 import debug from "debug";
-import { Event } from "../../imports/common";
+import { Event } from "../imports/common";
 
 import {
   type DepacketizerCodec,
@@ -9,7 +9,7 @@ import {
   enumerate,
   uint16Add,
   uint16Gt,
-} from "../..";
+} from "..";
 import type { Processor } from "./interface";
 
 const path = `werift-rtp : packages/rtp/src/processor/depacketizer.ts`;
