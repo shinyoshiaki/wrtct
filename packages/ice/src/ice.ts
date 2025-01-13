@@ -5,7 +5,7 @@ import Int64 from "int64-buffer";
 
 import isEqual from "lodash/isEqual.js";
 import timers from "timers/promises";
-import { type Address, debug, Event } from "./imports/common";
+import { type Address, Event, debug } from "./imports/common";
 
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import { MdnsLookup } from "./dns/lookup";

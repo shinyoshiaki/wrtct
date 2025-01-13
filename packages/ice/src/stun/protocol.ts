@@ -1,4 +1,4 @@
-import { debug, Event, UdpTransport } from "../imports/common";
+import { Event, UdpTransport, debug } from "../imports/common";
 
 import type { Address, InterfaceAddresses } from "../../../common/src/network";
 import type { Candidate } from "../candidate";

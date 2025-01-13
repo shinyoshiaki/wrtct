@@ -3,10 +3,10 @@ import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import type { MdnsLookup } from "./dns/lookup";
 import type { Cancelable } from "./helper";
 import {
-  debug,
   type Address,
   type Event,
   type InterfaceAddresses,
+  debug,
 } from "./imports/common";
 import { classes, methods } from "./stun/const";
 import { Message } from "./stun/message";
