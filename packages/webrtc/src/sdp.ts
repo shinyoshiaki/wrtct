@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import { isIPv4 } from "net";
-import Int64 from "int64-buffer";
+import * as Int64 from "int64-buffer";
 import range from "lodash/range.js";
 
 import {

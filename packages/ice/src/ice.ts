@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { isIPv4 } from "net";
 
-import Int64 from "int64-buffer";
+import * as Int64 from "int64-buffer";
 
 import isEqual from "lodash/isEqual.js";
 import timers from "timers/promises";
