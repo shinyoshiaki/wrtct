@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "bowser": "^2.11.0",
-    "werift": "^0.20.1",
+    "werift": "^0.21.9",
     "werift-rtp": "^0.8.2"
   },
   "devDependencies": {

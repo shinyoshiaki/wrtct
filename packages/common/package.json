@@ -1,6 +1,6 @@
 {
   "name": "werift-common",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "common",
   "keywords": [
     "WebRTC",
@@ -18,8 +18,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "lib",
-    "src"
+    "lib"
   ],
   "scripts": {
     "build": "rm -rf lib && npm run format && tsc -p ./tsconfig.production.json",

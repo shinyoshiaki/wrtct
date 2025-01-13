@@ -1,6 +1,6 @@
 {
   "name": "werift",
-  "version": "0.21.9",
+  "version": "0.21.10",
   "description": "WebRTC Implementation for TypeScript (Node.js)",
   "keywords": [
     "WebRTC",
@@ -30,8 +30,7 @@
   "main": "lib/webrtc/src/index.js",
   "types": "lib/webrtc/src/index.d.ts",
   "files": [
-    "lib",
-    "src"
+    "lib"
   ],
   "scripts": {
     "build": "npm i && rm -rf lib && run-s format compile:*",

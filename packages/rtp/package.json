@@ -1,6 +1,6 @@
 {
   "name": "werift-rtp",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "RTP,RTCP,SRTP,SRTCP implementation for TypeScript.",
   "homepage": "https://github.com/shinyoshiaki/werift-webrtc",
   "repository": {
@@ -24,8 +24,7 @@
   "main": "lib/rtp/src/index.js",
   "types": "lib/rtp/src/index.d.ts",
   "files": [
-    "lib",
-    "src"
+    "lib"
   ],
   "scripts": {
     "build": "rm -rf lib && npm run format && tsc -p ./tsconfig.production.json",
