@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "build": "npm i && rm -rf lib && run-s format compile:*",
-    "compile:esm": "esbuild src/index.ts src/nonstandard/index.ts --bundle --platform=node --format=esm --target=es2022 --outdir=lib --out-extension:.js=.mjs",
+    "compile:esm": "esbuild src/index.ts src/nonstandard/index.ts --bundle --packages=external --platform=node --format=esm --target=es2022 --outdir=lib --out-extension:.js=.mjs && node lib/index.mjs",
     "compile:cjs": "tsc -p ./tsconfig.production.json",
     "depcheck": "npx depcheck --ignores='@typescript-eslint/*,eslint-*'",
     "deploy": "npm run build && npm publish",
@@ -59,7 +59,7 @@
     "@shinyoshiaki/binary-data": "^0.6.1",
     "buffer-crc32": "^1.0.0",
     "date-fns": "^2.29.3",
-    "debug": "^4.3.4",
+    "debug": "^4.4.0",
     "int64-buffer": "^1.0.1",
     "ip": "^2.0.1",
     "@shinyoshiaki/jspack": "^0.0.6",

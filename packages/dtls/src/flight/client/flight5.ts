@@ -1,5 +1,3 @@
-import debug from "debug";
-
 import { SignatureAlgorithm, SignatureScheme } from "../../cipher/const";
 import { createCipher } from "../../cipher/create";
 import { generateKeyPair } from "../../cipher/namedCurve";
@@ -26,11 +24,11 @@ import { ServerHello } from "../../handshake/message/server/hello";
 import { ServerHelloDone } from "../../handshake/message/server/helloDone";
 import { ServerKeyExchange } from "../../handshake/message/server/keyExchange";
 import { DtlsRandom } from "../../handshake/random";
+import { type Profile, debug } from "../../imports/rtp";
 import { createPlaintext } from "../../record/builder";
 import { ContentType } from "../../record/const";
 import type { FragmentedHandshake } from "../../record/message/fragment";
 import { Flight } from "../flight";
-import { Profile } from "../../imports/rtp";
 
 const log = debug(
   "werift-dtls : packages/dtls/src/flight/client/flight5.ts : log",

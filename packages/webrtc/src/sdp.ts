@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { isIPv4 } from "net";
-import { Uint64BE } from "int64-buffer";
-import range from "lodash/range";
+import Int64 from "int64-buffer";
+import range from "lodash/range.js";
 
 import {
   DTLS_ROLE_SETUP,
@@ -678,7 +678,7 @@ export function addSDPHeader(
   description: SessionDescription,
 ) {
   const username = "-";
-  const sessionId = new Uint64BE(randomBytes(64)).toString().slice(0, 8);
+  const sessionId = new Int64.Uint64BE(randomBytes(64)).toString().slice(0, 8);
   const sessionVersion = 0;
 
   description.origin = `${username} ${sessionId} ${sessionVersion} IN IP4 0.0.0.0`;

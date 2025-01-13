@@ -1,5 +1,5 @@
 import { type Hmac, createHmac } from "crypto";
-import { AES } from "aes-js";
+import AES from "aes-js";
 
 import type { CipherAesBase } from "../cipher";
 import { CipherAesCtr } from "../cipher/ctr";
@@ -91,7 +91,7 @@ export class Context {
     }
 
     sessionKey = Buffer.concat([sessionKey, Buffer.from([0x00, 0x00])]);
-    const block = new AES(this.masterKey);
+    const block = new AES.AES(this.masterKey);
     return Buffer.from(block.encrypt(sessionKey) as ArrayBuffer);
   }
 
@@ -114,7 +114,7 @@ export class Context {
       sessionSalt[j] = sessionSalt[j] ^ labelAndIndexOverKdr[i];
     }
     sessionSalt = Buffer.concat([sessionSalt, Buffer.from([0x00, 0x00])]);
-    const block = new AES(this.masterKey);
+    const block = new AES.AES(this.masterKey);
     sessionSalt = Buffer.from(block.encrypt(sessionSalt) as ArrayBuffer);
     return sessionSalt.slice(0, 14);
   }
@@ -139,7 +139,7 @@ export class Context {
     }
     let firstRun = Buffer.concat([sessionAuthTag, Buffer.from([0x00, 0x00])]);
     let secondRun = Buffer.concat([sessionAuthTag, Buffer.from([0x00, 0x01])]);
-    const block = new AES(this.masterKey);
+    const block = new AES.AES(this.masterKey);
     firstRun = Buffer.from(block.encrypt(firstRun) as ArrayBuffer);
     secondRun = Buffer.from(block.encrypt(secondRun) as ArrayBuffer);
     return Buffer.concat([firstRun, secondRun.slice(0, 4)]);

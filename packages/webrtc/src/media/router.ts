@@ -1,5 +1,3 @@
-import debug from "debug";
-
 import {
   type Extensions,
   RTP_EXTENSION_URI,
@@ -11,6 +9,7 @@ import {
   RtcpSrPacket,
   RtcpTransportLayerFeedback,
   type RtpPacket,
+  debug,
   rtpHeaderExtensionsParser,
 } from "../imports/rtp";
 import type {

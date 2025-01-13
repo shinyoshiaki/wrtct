@@ -1,5 +1,4 @@
-import debug from "debug";
-import { Event } from "../../imports/common";
+import { debug, Event } from "../../imports/common";
 
 import {
   GenericNack,

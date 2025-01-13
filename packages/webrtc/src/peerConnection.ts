@@ -1,6 +1,5 @@
-import debug from "debug";
-import cloneDeep from "lodash/cloneDeep";
-import isEqual from "lodash/isEqual";
+import cloneDeep from "lodash/cloneDeep.js";
+import isEqual from "lodash/isEqual.js";
 import * as uuid from "uuid";
 
 import {
@@ -12,7 +11,12 @@ import {
 } from "./const";
 import { RTCDataChannel, RTCDataChannelParameters } from "./dataChannel";
 import { EventTarget, enumerate } from "./helper";
-import { type Address, Event, type InterfaceAddresses } from "./imports/common";
+import {
+  type Address,
+  Event,
+  type InterfaceAddresses,
+  debug,
+} from "./imports/common";
 import type { CandidatePair, Message, Protocol } from "./imports/ice";
 import type { Profile } from "./imports/rtp";
 import {

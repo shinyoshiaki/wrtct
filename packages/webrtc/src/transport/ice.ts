@@ -1,6 +1,5 @@
-import debug from "debug";
 import { v4 } from "uuid";
-import { Event } from "../imports/common";
+import { Event, debug } from "../imports/common";
 
 import {
   Candidate,

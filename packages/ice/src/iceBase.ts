@@ -1,10 +1,13 @@
-import debug from "debug";
-
 import { randomUUID } from "crypto";
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import type { MdnsLookup } from "./dns/lookup";
 import type { Cancelable } from "./helper";
-import type { Address, Event, InterfaceAddresses } from "./imports/common";
+import {
+  debug,
+  type Address,
+  type Event,
+  type InterfaceAddresses,
+} from "./imports/common";
 import { classes, methods } from "./stun/const";
 import { Message } from "./stun/message";
 import type { Protocol } from "./types/model";

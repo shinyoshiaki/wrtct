@@ -1,5 +1,5 @@
 import { Certificate, PrivateKey } from "@fidm/x509";
-import debug from "debug";
+
 import { setTimeout } from "timers/promises";
 import { v4 } from "uuid";
 import { Event, type Transport } from "../imports/common";
@@ -24,6 +24,7 @@ import {
   RtpPacket,
   SrtcpSession,
   SrtpSession,
+  debug,
   isMedia,
   isRtcp,
   keyLength,

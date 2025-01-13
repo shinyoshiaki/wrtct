@@ -1,5 +1,4 @@
-import debug from "debug";
-import { type Address, Event } from "../imports/common";
+import { type Address, debug, Event } from "../imports/common";
 
 import { TransactionFailed, TransactionTimeout } from "../exceptions";
 import type { Protocol } from "../types/model";

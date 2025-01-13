@@ -4,9 +4,9 @@ import {
   type SocketType,
   createSocket,
 } from "dgram";
-import debug from "debug";
 
 import { type AddressInfo, type Socket as TcpSocket, connect } from "net";
+import { debug } from "./log";
 import {
   type Address,
   type InterfaceAddresses,

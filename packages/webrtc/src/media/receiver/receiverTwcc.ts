@@ -1,4 +1,3 @@
-import debug from "debug";
 import { setTimeout } from "timers/promises";
 
 import { uint8Add, uint16Add, uint24 } from "../../imports/common";
@@ -9,6 +8,7 @@ import {
   RunLengthChunk,
   type StatusVectorChunk,
   TransportWideCC,
+  debug,
 } from "../../imports/rtp";
 import type { RTCDtlsTransport } from "../../transport/dtls";
 import { microTime } from "../../utils";

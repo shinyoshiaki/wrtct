@@ -26,7 +26,7 @@
 // 255        - reserved for IETF-defined Chunk Extensions
 
 import { jspack } from "@shinyoshiaki/jspack";
-const crc32c = require("turbo-crc32/crc32c");
+import crc32c from "turbo-crc32/crc32c.js";
 
 export class Chunk {
   public get body(): Buffer | undefined {

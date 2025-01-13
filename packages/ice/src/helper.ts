@@ -1,8 +1,6 @@
 import { randomBytes } from "crypto";
-import debug from "debug";
-import { Event } from "./imports/common";
 
-const log = debug("werift-ice:packages/ice/src/helper.ts");
+import { Event } from "./imports/common";
 
 export function randomString(length: number) {
   return randomBytes(length).toString("hex").substring(0, length);

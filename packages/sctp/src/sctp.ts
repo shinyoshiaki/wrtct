@@ -1,16 +1,16 @@
 import { createHmac, randomBytes } from "crypto";
 import { jspack } from "@shinyoshiaki/jspack";
-import debug from "debug";
-import range from "lodash/range";
-import { Event } from "./imports/common";
 
+import range from "lodash/range.js";
 import {
+  Event,
+  debug,
   random32,
   uint16Add,
   uint16Gt,
   uint32Gt,
   uint32Gte,
-} from "../../common/src";
+} from "./imports/common";
 import {
   AbortChunk,
   type Chunk,

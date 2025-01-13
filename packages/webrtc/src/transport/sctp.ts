@@ -1,7 +1,7 @@
 import { jspack } from "@shinyoshiaki/jspack";
-import debug from "debug";
+
 import * as uuid from "uuid";
-import { Event } from "../imports/common";
+import { Event, debug } from "../imports/common";
 
 import { SCTP, SCTP_STATE, type Transport } from "../../../sctp/src";
 import {

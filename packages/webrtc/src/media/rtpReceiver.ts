@@ -1,4 +1,3 @@
-import { debug } from "debug";
 import { setTimeout } from "timers/promises";
 import { v4 as uuid } from "uuid";
 import { Event, int } from "../imports/common";
@@ -16,6 +15,7 @@ import {
   RtcpSrPacket,
   type RtpPacket,
   type TransportWideCCPayload,
+  debug,
   unwrapRtx,
 } from "../imports/rtp";
 import type { PeerConfig } from "../peerConnection";

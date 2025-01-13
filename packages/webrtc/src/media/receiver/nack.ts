@@ -1,5 +1,4 @@
-import debug from "debug";
-import range from "lodash/range";
+import range from "lodash/range.js";
 import { Event } from "../../imports/common";
 
 import { uint16Add } from "../../imports/common";
@@ -7,6 +6,7 @@ import {
   GenericNack,
   RtcpTransportLayerFeedback,
   type RtpPacket,
+  debug,
 } from "../../imports/rtp";
 import type { RTCRtpReceiver } from "../rtpReceiver";
 

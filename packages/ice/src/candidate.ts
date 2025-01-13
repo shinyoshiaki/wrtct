@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import { isIPv4 } from "net";
-import range from "lodash/range";
+import range from "lodash/range.js";
 
 export class Candidate {
   // An ICE candidate.

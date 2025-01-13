@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import { jspack } from "@shinyoshiaki/jspack";
-import debug from "debug";
+
 import { setTimeout } from "timers/promises";
 
 import type { Candidate } from "../candidate";
@@ -15,6 +15,7 @@ import {
   type Transport,
   UdpTransport,
   bufferReader,
+  debug,
   int,
 } from "../imports/common";
 import { classes, methods } from "../stun/const";

@@ -1,12 +1,11 @@
 import { randomBytes } from "crypto";
 import { isIPv4 } from "net";
 
-import debug from "debug";
-import { Uint64BE } from "int64-buffer";
+import Int64 from "int64-buffer";
 
-import isEqual from "lodash/isEqual";
+import isEqual from "lodash/isEqual.js";
 import timers from "timers/promises";
-import { type Address, Event } from "./imports/common";
+import { type Address, debug, Event } from "./imports/common";
 
 import { Candidate, candidateFoundation, candidatePriority } from "./candidate";
 import { MdnsLookup } from "./dns/lookup";
@@ -53,7 +52,7 @@ export class Connection implements IceConnection {
   generation = -1;
   userHistory: { [username: string]: string } = {};
   private readonly tieBreaker: bigint = BigInt(
-    new Uint64BE(randomBytes(64)).toString(),
+    new Int64.Uint64BE(randomBytes(64)).toString(),
   );
   state: IceState = "new";
   lookup?: MdnsLookup;

@@ -1,5 +1,4 @@
 import { randomBytes } from "crypto";
-import debug from "debug";
 
 import {
   CipherSuite,
@@ -20,9 +19,9 @@ import { UseSRTP } from "../../handshake/extensions/useSrtp";
 import type { ClientHello } from "../../handshake/message/client/hello";
 import { ServerHelloVerifyRequest } from "../../handshake/message/server/helloVerifyRequest";
 import { DtlsRandom } from "../../handshake/random";
+import { debug, type Profile } from "../../imports/rtp";
 import { createFragments, createPlaintext } from "../../record/builder";
 import { ContentType } from "../../record/const";
-import { Profile } from "../../imports/rtp";
 
 const log = debug("werift-dtls : packages/dtls/flight/server/flight2.ts : log");
 
