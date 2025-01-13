@@ -1,4 +1,4 @@
-import { RTP_EXTENSION_URI } from "../../../../rtp/src";
+import { RTP_EXTENSION_URI } from "../../imports/rtp";
 import { RTCRtpHeaderExtensionParameters } from "../parameters";
 
 export function useSdesMid() {

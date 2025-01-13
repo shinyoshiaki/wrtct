@@ -15,7 +15,7 @@ import {
   WebmCallback,
   type WebmTrack,
   saveToFileSystem,
-} from "../../../../../rtp/src/extra";
+} from "../../../imports/rtpExtra";
 
 const sourcePath = "packages/webrtc/src/nonstandard/recorder/writer/webm.ts";
 

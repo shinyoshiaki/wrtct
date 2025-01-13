@@ -25,10 +25,9 @@ import { jspack } from "@shinyoshiaki/jspack";
 import debug from "debug";
 import { setTimeout } from "timers/promises";
 import * as uuid from "uuid";
-import { Event } from "../imports/common";
+import { Event, random16, uint16Add, uint32Add } from "../imports/common";
 
 import { codecParametersFromString } from "..";
-import { random16, uint16Add, uint32Add } from "../../../common/src";
 import {
   type Extension,
   GenericNack,
@@ -54,7 +53,7 @@ import {
   serializeSdesRTPStreamID,
   serializeTransportWideCC,
   wrapRtx,
-} from "../../../rtp/src";
+} from "../imports/rtp";
 import type { RTCDtlsTransport } from "../transport/dtls";
 import type { Kind } from "../types/domain";
 import { compactNtp, milliTime, ntpTime, timestampSeconds } from "../utils";

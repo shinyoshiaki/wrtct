@@ -12,7 +12,7 @@ import {
   RtcpTransportLayerFeedback,
   type RtpPacket,
   rtpHeaderExtensionsParser,
-} from "../../../rtp/src";
+} from "../imports/rtp";
 import type {
   RTCRtpReceiveParameters,
   RTCRtpSimulcastParameters,

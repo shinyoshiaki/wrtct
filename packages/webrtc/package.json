@@ -1,6 +1,6 @@
 {
   "name": "werift",
-  "version": "0.21.6",
+  "version": "0.21.7",
   "description": "WebRTC Implementation for TypeScript (Node.js)",
   "keywords": [
     "WebRTC",
@@ -18,11 +18,13 @@
   "exports": {
     ".": {
       "types": "./lib/webrtc/src/index.d.ts",
-      "default": "./lib/webrtc/src/index.js"
+      "require": "./lib/webrtc/src/index.js",
+      "import": "./lib/index.mjs"
     },
     "./nonstandard": {
       "types": "./lib/webrtc/src/nonstandard/index.d.ts",
-      "default": "./lib/webrtc/src/nonstandard/index.js"
+      "require": "./lib/webrtc/src/nonstandard/index.js",
+      "import": "./lib/nonstandard/index.mjs"
     }
   },
   "main": "lib/webrtc/src/index.js",
@@ -32,7 +34,9 @@
     "src"
   ],
   "scripts": {
-    "build": "npm i && rm -rf lib && npm run format && tsc -p ./tsconfig.production.json",
+    "build": "npm i && rm -rf lib && run-s format compile:*",
+    "compile:esm": "esbuild src/index.ts src/nonstandard/index.ts --bundle --platform=node --format=esm --target=es2022 --outdir=lib --out-extension:.js=.mjs",
+    "compile:cjs": "tsc -p ./tsconfig.production.json",
     "depcheck": "npx depcheck --ignores='@typescript-eslint/*,eslint-*'",
     "deploy": "npm run build && npm publish",
     "deploy:alpha": "npm run build && npm publish --tag alpha",

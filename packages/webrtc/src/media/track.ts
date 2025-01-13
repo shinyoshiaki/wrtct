@@ -1,13 +1,13 @@
 import { v4 } from "uuid";
 import { Event } from "../imports/common";
 
+import { EventTarget } from "../helper";
 import {
   type Extensions,
   type RtcpPacket,
   type RtpHeader,
   RtpPacket,
-} from "../../../rtp/src";
-import { EventTarget } from "../helper";
+} from "../imports/rtp";
 import type { Kind } from "../types/domain";
 import type { RTCRtpCodecParameters } from "./parameters";
 
