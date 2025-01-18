@@ -1,6 +1,6 @@
 import { jspack } from "@shinyoshiaki/jspack";
 import * as Int64 from "int64-buffer";
-import * as nodeIp from "ip";
+import nodeIp from "ip";
 import range from "lodash/range.js";
 
 import type { Address } from "../imports/common";
