@@ -370,6 +370,13 @@ export class SessionDescription {
   toJSON() {
     return new RTCSessionDescription(this.string, this.type);
   }
+
+  toSdp() {
+    return {
+      type: this.type,
+      sdp: this.string,
+    };
+  }
 }
 
 export class MediaDescription {
@@ -668,8 +675,16 @@ export class RTCSessionDescription {
     public sdp: string,
     public type: "offer" | "answer",
   ) {}
+
   static isThis(o: any) {
     if (typeof o?.sdp === "string") return true;
+  }
+
+  toSdp() {
+    return {
+      sdp: this.sdp,
+      type: this.type,
+    };
   }
 }
 
