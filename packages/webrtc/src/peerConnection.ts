@@ -1114,21 +1114,20 @@ export class RTCPeerConnection extends EventTarget {
       this.router.registerRtpReceiverBySsrc(transceiver, remotePrams);
     }
     if (["sendonly", "sendrecv"].includes(mediaDirection)) {
-      // assign msid
-      if (remoteMedia.msid != undefined) {
+      if (remoteMedia.msid) {
         const [streamId, trackId] = remoteMedia.msid.split(" ");
         transceiver.receiver.remoteStreamId = streamId;
         transceiver.receiver.remoteTrackId = trackId;
-
-        this.fireOnTrack(
-          transceiver.receiver.track,
-          transceiver,
-          new MediaStream({
-            id: streamId,
-            tracks: [transceiver.receiver.track],
-          }),
-        );
       }
+
+      this.fireOnTrack(
+        transceiver.receiver.track,
+        transceiver,
+        new MediaStream({
+          id: transceiver.receiver.remoteStreamId,
+          tracks: [transceiver.receiver.track],
+        }),
+      );
     }
 
     if (remoteMedia.ssrc[0]?.ssrc) {
@@ -1222,7 +1221,9 @@ export class RTCPeerConnection extends EventTarget {
     };
     this.onTrack.execute(track);
     this.emit("track", event);
-    if (this.ontrack) this.ontrack(event);
+    if (this.ontrack) {
+      this.ontrack(event);
+    }
   }
 
   addTransceiver(
