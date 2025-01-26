@@ -159,7 +159,7 @@ export class WebmFactory extends MediaWriter {
     await Promise.all(this.rtpSources.map((r) => r.stop()));
 
     if (!this.ended) {
-      await this.onEol.asPromise(5000);
+      await this.onEol.asPromise(5000).catch((e) => e);
     }
     this.unSubscribers.dispose();
   }
