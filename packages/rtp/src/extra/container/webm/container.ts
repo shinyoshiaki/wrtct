@@ -28,7 +28,7 @@ export class WEBMContainer {
       height?: number;
       roll?: number;
       kind: "audio" | "video";
-      codec: SupportedCodec;
+      codec: ContainerSupportedCodec;
       trackNumber: number;
     }[],
     encryptionKey?: Buffer,
@@ -254,12 +254,12 @@ export class WEBMContainer {
   }
 }
 
-export const supportedCodecs = [
+export const containerSupportedCodecs = [
   "MPEG4/ISO/AVC",
   "VP8",
   "VP9",
   "AV1",
   "OPUS",
 ] as const;
-export type SupportedCodec = (typeof supportedCodecs)[number];
+export type ContainerSupportedCodec = (typeof containerSupportedCodecs)[number];
 const millisecond = 1000000;
