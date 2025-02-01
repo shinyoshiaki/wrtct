@@ -33,6 +33,7 @@ export class UdpTransport implements Transport {
   ) {
     this.socket = createSocket(socketType);
     this.socket.on("message", (data, info) => {
+      console.log("message", data, info, this.socket.address());
       if (normalizeFamilyNodeV18(info.family) === 6) {
         [info.address] = info.address.split("%"); // example fe80::1d3a:8751:4ffd:eb80%wlp82s0
       }
@@ -59,24 +60,30 @@ export class UdpTransport implements Transport {
   }
 
   private async init() {
-    const address = interfaceAddress(
-      this.socketType,
-      this.options.interfaceAddresses,
+    // const address = interfaceAddress(
+    //   this.socketType,
+    //   this.options.interfaceAddresses,
+    // );
+    // if (this.options.port) {
+    //   this.socket.bind({ port: this.options.port, address });
+    // } else if (this.options.portRange) {
+    //   const port = await findPort(
+    //     this.options.portRange[0],
+    //     this.options.portRange[1],
+    //     this.socketType,
+    //     this.options.interfaceAddresses,
+    //   );
+    //   this.socket.bind({ port, address });
+    // } else {
+    //   this.socket.bind();
+    // }
+    this.socket.bind();
+    await new Promise<void>((r) =>
+      this.socket.once("listening", (i) => {
+        console.log("listening", i);
+        r();
+      }),
     );
-    if (this.options.port) {
-      this.socket.bind({ port: this.options.port, address });
-    } else if (this.options.portRange) {
-      const port = await findPort(
-        this.options.portRange[0],
-        this.options.portRange[1],
-        this.socketType,
-        this.options.interfaceAddresses,
-      );
-      this.socket.bind({ port, address });
-    } else {
-      this.socket.bind({ address });
-    }
-    await new Promise((r) => this.socket.once("listening", r));
   }
 
   send = (data: Buffer, addr?: Address) =>

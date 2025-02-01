@@ -89,6 +89,7 @@ export class Connection implements IceConnection {
     ];
     this.turnServer = validateAddress(turnServer);
     this.restart();
+    log("new Connection", this.options);
   }
 
   get iceControlling() {
@@ -293,12 +294,12 @@ export class Connection implements IceConnection {
         this.ensureProtocol(protocol);
         try {
           await protocol.connectionMade(
-            isIPv4(address),
+            true,
             this.options.portRange,
             this.options.interfaceAddresses,
           );
         } catch (error) {
-          log("protocol STUN", error);
+          log("error protocol STUN", error);
           return;
         }
 
@@ -329,6 +330,11 @@ export class Connection implements IceConnection {
       }),
     );
 
+    log(
+      "protocols",
+      this.protocols.map((p) => p.localIp),
+    );
+
     let candidatePromises: Promise<Candidate | void>[] = [];
 
     // # query STUN server for server-reflexive candidates (IPv4 only)
@@ -337,10 +343,7 @@ export class Connection implements IceConnection {
       const stunPromises = this.protocols.map((protocol) =>
         new Promise<Candidate | void>(async (r, f) => {
           const timer = setTimeout(f, timeout * 1000);
-          if (
-            protocol.localCandidate?.host &&
-            isIPv4(protocol.localCandidate?.host)
-          ) {
+          if (protocol.localCandidate?.host) {
             const candidate = await serverReflexiveCandidate(
               protocol,
               stunServer,

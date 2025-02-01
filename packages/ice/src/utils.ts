@@ -2,12 +2,15 @@ import os from "os";
 import nodeIp from "ip";
 import {
   type Address,
+  debug,
   type InterfaceAddresses,
   normalizeFamilyNodeV18,
 } from "./imports/common";
 import { classes, methods } from "./stun/const";
 import { Message } from "./stun/message";
 import { StunProtocol } from "./stun/protocol";
+
+const logger = debug("werift-ice : packages/ice/src/utils.ts");
 
 export async function getGlobalIp(
   stunServer?: Address,
@@ -39,6 +42,8 @@ function nodeIpAddress(family: number): string[] {
   const banNetworks = ["vmnet", "veth"];
 
   const interfaces = os.networkInterfaces();
+
+  logger(interfaces);
 
   const all = Object.keys(interfaces)
     .map((nic) => {
