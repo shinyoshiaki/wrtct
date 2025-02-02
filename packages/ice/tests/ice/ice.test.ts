@@ -224,8 +224,16 @@ describe("ice", () => {
   // });
 
   test("test_connect_ipv6", async () => {
-    const a = new Connection(true, { useIpv4: false, useIpv6: true });
-    const b = new Connection(false, { useIpv4: false, useIpv6: true });
+    const a = new Connection(true, {
+      useIpv4: false,
+      useIpv6: true,
+      useLinkLocalAddress: true,
+    });
+    const b = new Connection(false, {
+      useIpv4: false,
+      useIpv6: true,
+      useLinkLocalAddress: true,
+    });
 
     // # invite / accept
     await inviteAccept(a, b);
@@ -538,11 +546,13 @@ describe("ice", () => {
         stunServer: ["stun.l.google.com", 19302],
         useIpv4: false,
         useIpv6: true,
+        useLinkLocalAddress: true,
       });
       const b = new Connection(false, {
         stunServer: ["stun.l.google.com", 19302],
         useIpv4: false,
         useIpv6: true,
+        useLinkLocalAddress: true,
       });
 
       // # invite / accept

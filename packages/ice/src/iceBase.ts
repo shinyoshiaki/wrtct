@@ -147,6 +147,7 @@ export interface IceOptions {
   localPasswordPrefix?: string;
   useIpv4: boolean;
   useIpv6: boolean;
+  useLinkLocalAddress?: boolean;
   portRange?: [number, number];
   interfaceAddresses?: InterfaceAddresses;
   additionalHostAddresses?: string[];

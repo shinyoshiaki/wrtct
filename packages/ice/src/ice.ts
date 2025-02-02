@@ -89,6 +89,7 @@ export class Connection implements IceConnection {
     ];
     this.turnServer = validateAddress(turnServer);
     this.restart();
+    log("new Connection", this.options);
   }
 
   get iceControlling() {
@@ -178,6 +179,9 @@ export class Connection implements IceConnection {
       let address = getHostAddresses(
         this.options.useIpv4,
         this.options.useIpv6,
+        {
+          useLinkLocalAddress: this.options.useLinkLocalAddress,
+        },
       );
       const { interfaceAddresses } = this.options;
       if (interfaceAddresses) {
@@ -298,7 +302,7 @@ export class Connection implements IceConnection {
             this.options.interfaceAddresses,
           );
         } catch (error) {
-          log("protocol STUN", error);
+          log("error protocol STUN", error);
           return;
         }
 
@@ -327,6 +331,11 @@ export class Connection implements IceConnection {
         candidates.push(protocol.localCandidate);
         this.onIceCandidate.execute(protocol.localCandidate);
       }),
+    );
+
+    log(
+      "protocols",
+      this.protocols.map((p) => p.localIp),
     );
 
     let candidatePromises: Promise<Candidate | void>[] = [];
@@ -499,6 +508,7 @@ export class Connection implements IceConnection {
     let res: number = ICE_FAILED;
     while (this.checkList.length > 0 && res === ICE_FAILED) {
       res = await this.checkListState.get();
+      log("checkListState", res);
     }
 
     // # cancel remaining checks
@@ -923,6 +933,7 @@ export class Connection implements IceConnection {
             remotePassword,
             generation,
           },
+          pair.remoteAddr,
         );
         if (exc.response?.getAttributeValue("ERROR-CODE")[0] === 487) {
           if (request.attributesKeys.includes("ICE-CONTROLLED")) {
@@ -1056,8 +1067,6 @@ export class Connection implements IceConnection {
       )
     ) {
       pair.handle = this.checkStart(pair);
-    } else {
-      pair;
     }
 
     // 7.2.1.5. Updating the Nominated Flag
