@@ -31,10 +31,10 @@ export async function getGlobalIp(
 
 export function isLinkLocalAddress(info: os.NetworkInterfaceInfo) {
   return (
-    // (normalizeFamilyNodeV18(info.family) === 4 &&
-    //   info.address?.startsWith("169.254.")) ||
-    normalizeFamilyNodeV18(info.family) === 6 &&
-    info.address?.startsWith("fe80::")
+    (normalizeFamilyNodeV18(info.family) === 4 &&
+      info.address?.startsWith("169.254.")) ||
+    (normalizeFamilyNodeV18(info.family) === 6 &&
+      info.address?.startsWith("fe80::"))
   );
 }
 
