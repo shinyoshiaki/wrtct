@@ -2,13 +2,14 @@ type EventExecute<T extends any[]> = (...args: T) => void;
 type PromiseEventExecute<T extends any[]> = (...args: T) => Promise<void>;
 type EventComplete = () => void;
 type EventError = (e: any) => void;
-type IEvent<T extends any[]> = {
-  stack: {
-    execute: EventExecute<T>;
-    complete?: EventComplete;
-    error?: EventError;
-    id: number;
-  }[];
+interface Stack<T extends any[]> {
+  execute: EventExecute<T>;
+  complete?: EventComplete;
+  error?: EventError;
+  id: number;
+}
+interface IEvent<T extends any[]> {
+  stack: Stack<T>[];
   promiseStack: {
     execute: PromiseEventExecute<T>;
     complete?: EventComplete;
@@ -16,7 +17,7 @@ type IEvent<T extends any[]> = {
     id: number;
   }[];
   eventId: number;
-};
+}
 
 export class Event<T extends any[]> {
   private event: IEvent<T> = {

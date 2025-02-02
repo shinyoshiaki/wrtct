@@ -29,10 +29,12 @@ export async function getGlobalIp(
   return address[0] as string;
 }
 
-function isAutoconfigurationAddress(info: os.NetworkInterfaceInfo) {
+function isLinkLocalAddress(info: os.NetworkInterfaceInfo) {
   return (
-    normalizeFamilyNodeV18(info.family) === 4 &&
-    info.address?.startsWith("169.254.")
+    (normalizeFamilyNodeV18(info.family) === 4 &&
+      info.address?.startsWith("169.254.")) ||
+    (normalizeFamilyNodeV18(info.family) === 6 &&
+      info.address?.startsWith("fe80::"))
   );
 }
 
@@ -59,7 +61,7 @@ function nodeIpAddress(family: number): string[] {
         (details) =>
           normalizeFamilyNodeV18(details.family) === family &&
           !nodeIp.isLoopback(details.address) &&
-          !isAutoconfigurationAddress(details),
+          !isLinkLocalAddress(details),
       );
       return {
         nic,

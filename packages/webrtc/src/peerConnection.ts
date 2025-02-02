@@ -786,7 +786,7 @@ export class RTCPeerConnection extends EventTarget {
   private async connect() {
     log("start connect");
 
-    await Promise.allSettled(
+    const res = await Promise.allSettled(
       this.dtlsTransports.map(async (dtlsTransport) => {
         const { iceTransport } = dtlsTransport;
         if (iceTransport.state === "connected") {
@@ -819,7 +819,11 @@ export class RTCPeerConnection extends EventTarget {
       }),
     );
 
-    this.setConnectionState("connected");
+    if (res.find((r) => r.status === "rejected")) {
+      this.setConnectionState("failed");
+    } else {
+      this.setConnectionState("connected");
+    }
   }
 
   private getLocalRtpParams(transceiver: RTCRtpTransceiver): RTCRtpParameters {

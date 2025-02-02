@@ -294,7 +294,7 @@ export class Connection implements IceConnection {
         this.ensureProtocol(protocol);
         try {
           await protocol.connectionMade(
-            true,
+            isIPv4(address),
             this.options.portRange,
             this.options.interfaceAddresses,
           );
@@ -343,7 +343,10 @@ export class Connection implements IceConnection {
       const stunPromises = this.protocols.map((protocol) =>
         new Promise<Candidate | void>(async (r, f) => {
           const timer = setTimeout(f, timeout * 1000);
-          if (protocol.localCandidate?.host) {
+          if (
+            protocol.localCandidate?.host &&
+            isIPv4(protocol.localCandidate?.host)
+          ) {
             const candidate = await serverReflexiveCandidate(
               protocol,
               stunServer,
@@ -502,6 +505,7 @@ export class Connection implements IceConnection {
     let res: number = ICE_FAILED;
     while (this.checkList.length > 0 && res === ICE_FAILED) {
       res = await this.checkListState.get();
+      log("checkListState", res);
     }
 
     // # cancel remaining checks
@@ -926,6 +930,7 @@ export class Connection implements IceConnection {
             remotePassword,
             generation,
           },
+          pair.remoteAddr,
         );
         if (exc.response?.getAttributeValue("ERROR-CODE")[0] === 487) {
           if (request.attributesKeys.includes("ICE-CONTROLLED")) {
@@ -1059,8 +1064,6 @@ export class Connection implements IceConnection {
       )
     ) {
       pair.handle = this.checkStart(pair);
-    } else {
-      pair;
     }
 
     // 7.2.1.5. Updating the Nominated Flag
