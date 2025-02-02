@@ -179,6 +179,9 @@ export class Connection implements IceConnection {
       let address = getHostAddresses(
         this.options.useIpv4,
         this.options.useIpv6,
+        {
+          useLinkLocalAddress: this.options.useLinkLocalAddress,
+        },
       );
       const { interfaceAddresses } = this.options;
       if (interfaceAddresses) {

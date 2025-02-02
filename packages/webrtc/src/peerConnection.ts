@@ -514,6 +514,7 @@ export class RTCPeerConnection extends EventTarget {
       useIpv4: this.config.iceUseIpv4,
       useIpv6: this.config.iceUseIpv6,
       turnTransport: this.config.forceTurnTCP === true ? "tcp" : "udp",
+      useLinkLocalAddress: this.config.iceUseLinkLocalAddress,
     });
     if (existing) {
       iceGatherer.connection.localUsername = existing.connection.localUsername;
@@ -1696,6 +1697,8 @@ export interface PeerConfig {
   iceUseIpv4: boolean;
   iceUseIpv6: boolean;
   forceTurnTCP: boolean;
+  /** such as google cloud run */
+  iceUseLinkLocalAddress: boolean | undefined;
   /** If provided, is called on each STUN request.
    * Return `true` if a STUN response should be sent, false if it should be skipped. */
   iceFilterStunResponse:
@@ -1756,6 +1759,7 @@ export const defaultPeerConfig: PeerConfig = {
   iceFilterStunResponse: undefined,
   iceFilterCandidatePair: undefined,
   icePasswordPrefix: undefined,
+  iceUseLinkLocalAddress: undefined,
   dtls: {},
   bundlePolicy: "max-compat",
   debug: {},
