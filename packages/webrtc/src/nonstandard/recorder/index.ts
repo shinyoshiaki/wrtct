@@ -1,4 +1,8 @@
 import { Event } from "../../imports/common";
+import type {
+  JitterBufferOptions,
+  LipSyncOptions,
+} from "../../imports/rtpExtra";
 import type { MediaStreamTrack } from "../../media/track";
 import type { MediaWriter, StreamEvent } from "./writer";
 import { WebmFactory } from "./writer/webm";
@@ -93,11 +97,10 @@ export interface MediaRecorderOptions {
   width: number;
   height: number;
   roll: number;
-  jitterBufferLatency: number;
-  jitterBufferSize: number;
   disableLipSync: boolean;
-  waitForKeyframe: boolean;
+  disableNtp: boolean;
   defaultDuration: number;
   tracks: MediaStreamTrack[];
-  disableNtp: boolean;
+  lipsync: Partial<LipSyncOptions>;
+  jitterBuffer: Partial<JitterBufferOptions>;
 }

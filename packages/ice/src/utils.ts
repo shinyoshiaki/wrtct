@@ -2,8 +2,8 @@ import os from "os";
 import nodeIp from "ip";
 import {
   type Address,
-  debug,
   type InterfaceAddresses,
+  debug,
   normalizeFamilyNodeV18,
 } from "./imports/common";
 import { classes, methods } from "./stun/const";

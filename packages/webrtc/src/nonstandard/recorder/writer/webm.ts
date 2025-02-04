@@ -80,7 +80,7 @@ export class WebmFactory extends MediaWriter {
     const webm = new WebmCallback(inputTracks, {
       duration: this.props.defaultDuration ?? 1000 * 60 * 60 * 24,
     });
-    const lipsync = new LipsyncCallback();
+    const lipsync = new LipsyncCallback(this.props.lipsync ?? {});
 
     if (inputTracks.length === 1 || this.props.disableNtp) {
       this.props.disableLipSync = true;
@@ -107,10 +107,10 @@ export class WebmFactory extends MediaWriter {
         const depacketizer = new DepacketizeCallback(codec, {
           isFinalPacketInSequence: (h) => h.marker,
         });
-        const jitterBuffer = new JitterBufferCallback(clockRate, {
-          bufferSize: this.props.jitterBufferSize,
-          latency: this.props.jitterBufferLatency,
-        });
+        const jitterBuffer = new JitterBufferCallback(
+          clockRate,
+          this.props.jitterBuffer ?? {},
+        );
 
         rtpSource.pipe(jitterBuffer.input);
         rtcpSource.pipe(time.input);
