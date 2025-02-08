@@ -111,6 +111,7 @@ export class RTCPeerConnection extends EventTarget {
   onsignalingstatechange?: CallbackWithValue<any>;
   ontrack?: CallbackWithValue<RTCTrackEvent>;
   onconnectionstatechange?: Callback;
+  oniceconnectionstatechange?: Callback;
 
   private readonly router = new RtpRouter();
   private certificate?: RTCCertificate;
@@ -1540,13 +1541,18 @@ export class RTCPeerConnection extends EventTarget {
     this.iceConnectionState = newState;
     this.iceConnectionStateChange.execute(newState);
     this.emit("iceconnectionstatechange", newState);
+    if (this.oniceconnectionstatechange) {
+      this.oniceconnectionstatechange();
+    }
   }
 
   private setSignalingState(state: RTCSignalingState) {
     log("signalingStateChange", state);
     this.signalingState = state;
     this.signalingStateChange.execute(state);
-    if (this.onsignalingstatechange) this.onsignalingstatechange({});
+    if (this.onsignalingstatechange) {
+      this.onsignalingstatechange({});
+    }
   }
 
   private setConnectionState(state: ConnectionState) {
