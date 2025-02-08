@@ -27,7 +27,7 @@
         console.log("open websocket");
 
         const peer = (rtc = new RTCPeerConnection({
-          iceServers: [],
+          iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
         }));
 
         socket.onmessage = async (ev) => {
@@ -40,9 +40,8 @@
           console.log("oniceconnectionstatechange", peer.iceConnectionState);
         };
         peer.onicecandidate = (ev) => {
-          if (!ev.candidate) {
-            console.log("offer", peer.localDescription.sdp);
-            socket.send(JSON.stringify(peer.localDescription));
+          if (ev.candidate) {
+            socket.send(JSON.stringify(ev.candidate));
           }
         };
 
@@ -56,9 +55,11 @@
           audio: false,
         });
 
-        peer.addTrack(stream.getVideoTracks()[0],);
+        peer.addTrack(stream.getVideoTracks()[0]);
 
         await peer.setLocalDescription(await peer.createOffer());
+        socket.send(JSON.stringify(peer.localDescription));
+
       };
 
       React.useEffect(() => {
