@@ -59,7 +59,7 @@
     "buffer-crc32": "^1.0.0",
     "date-fns": "^2.29.3",
     "debug": "^4.4.0",
-    "int64-buffer": "^1.0.1",
+    "int64-buffer": "1.1.0",
     "ip": "^2.0.1",
     "@shinyoshiaki/jspack": "^0.0.6",
     "lodash": "^4.17.21",
