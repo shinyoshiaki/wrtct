@@ -81,39 +81,41 @@ export class DtlsSocket {
 
     for (const packet of packets) {
       try {
-        const message = parsePlainText(this.dtls, this.cipher)(packet);
-        switch (message.type) {
-          case ContentType.handshake:
-            {
-              const handshake = message.data as FragmentedHandshake;
-              const handshakes = this.handleFragmentHandshake([handshake]);
-              const assembled = Object.values(
-                handshakes.reduce(
-                  (acc: { [type: string]: FragmentedHandshake[] }, cur) => {
-                    if (!acc[cur.msg_type]) acc[cur.msg_type] = [];
-                    acc[cur.msg_type].push(cur);
-                    return acc;
-                  },
-                  {},
-                ),
-              )
-                .map((v) => FragmentedHandshake.assemble(v))
-                .sort((a, b) => a.msg_type - b.msg_type);
+        const messages = parsePlainText(this.dtls, this.cipher)(packet);
+        for (const message of messages) {
+          switch (message.type) {
+            case ContentType.handshake:
+              {
+                const handshake = message.data as FragmentedHandshake;
+                const handshakes = this.handleFragmentHandshake([handshake]);
+                const assembled = Object.values(
+                  handshakes.reduce(
+                    (acc: { [type: string]: FragmentedHandshake[] }, cur) => {
+                      if (!acc[cur.msg_type]) acc[cur.msg_type] = [];
+                      acc[cur.msg_type].push(cur);
+                      return acc;
+                    },
+                    {},
+                  ),
+                )
+                  .map((v) => FragmentedHandshake.assemble(v))
+                  .sort((a, b) => a.msg_type - b.msg_type);
 
-              this.onHandleHandshakes(assembled).catch((error) => {
-                err(this.dtls.sessionId, "onHandleHandshakes error", error);
-                this.onError.execute(error);
-              });
-            }
-            break;
-          case ContentType.applicationData:
-            {
-              this.onData.execute(message.data as Buffer);
-            }
-            break;
-          case ContentType.alert:
-            this.onClose.execute();
-            break;
+                this.onHandleHandshakes(assembled).catch((error) => {
+                  err(this.dtls.sessionId, "onHandleHandshakes error", error);
+                  this.onError.execute(error);
+                });
+              }
+              break;
+            case ContentType.applicationData:
+              {
+                this.onData.execute(message.data as Buffer);
+              }
+              break;
+            case ContentType.alert:
+              this.onClose.execute();
+              break;
+          }
         }
       } catch (error) {
         err(this.dtls.sessionId, "catch udpOnMessage error", error);
