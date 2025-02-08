@@ -22,9 +22,12 @@ server.on("connection", (socket) => {
     console.log("ice connection state", pc.iceConnectionState);
   };
 
-  const transceiver = pc.addTransceiver("video", { direction: "recvonly" });
+  const transceiver = pc.addTransceiver("video", { direction: "sendrecv" });
   transceiver.onTrack.subscribe((track, transceiver) => {
     transceiver.sender.replaceTrack(track);
+    track.onReceiveRtp.once(() => {
+      transceiver.receiver.sendRtcpPLI(track.ssrc);
+    });
   });
 
   socket.on("message", async (data) => {
