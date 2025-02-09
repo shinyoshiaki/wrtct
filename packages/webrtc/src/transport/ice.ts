@@ -234,9 +234,9 @@ export function candidateToIce(x: IceCandidate) {
 
 export interface RTCIceCandidateInit {
   candidate?: string;
-  sdpMLineIndex?: number;
-  sdpMid?: string;
-  usernameFragment?: string;
+  sdpMLineIndex?: number | null;
+  sdpMid?: string | null;
+  usernameFragment?: string | null;
 }
 
 export class RTCIceCandidate {
@@ -308,8 +308,8 @@ export class IceCandidate {
         throw new Error("candidate is required");
       }
       const candidate = candidateFromSdp(data.candidate);
-      candidate.sdpMLineIndex = data.sdpMLineIndex;
-      candidate.sdpMid = data.sdpMid;
+      candidate.sdpMLineIndex = data.sdpMLineIndex ?? undefined;
+      candidate.sdpMid = data.sdpMid ?? undefined;
       return candidate;
     } catch (error) {}
   }
