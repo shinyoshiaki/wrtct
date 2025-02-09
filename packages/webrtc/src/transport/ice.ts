@@ -232,6 +232,13 @@ export function candidateToIce(x: IceCandidate) {
   );
 }
 
+export interface RTCIceCandidateInit {
+  candidate?: string;
+  sdpMLineIndex?: number;
+  sdpMid?: string;
+  usernameFragment?: string;
+}
+
 export class RTCIceCandidate {
   candidate!: string;
   sdpMid?: string;
@@ -242,7 +249,7 @@ export class RTCIceCandidate {
     Object.assign(this, props);
   }
 
-  static fromString(sdp: string): RTCIceCandidate {
+  static fromSdp(sdp: string): RTCIceCandidate {
     const ice = Candidate.fromSdp(sdp);
     const candidate = candidateFromIce(ice);
     return candidate.toJSON();
@@ -295,8 +302,11 @@ export class IceCandidate {
     });
   }
 
-  static fromJSON(data: RTCIceCandidate) {
+  static fromJSON(data: RTCIceCandidate | RTCIceCandidateInit) {
     try {
+      if (!data.candidate) {
+        throw new Error("candidate is required");
+      }
       const candidate = candidateFromSdp(data.candidate);
       candidate.sdpMLineIndex = data.sdpMLineIndex;
       candidate.sdpMid = data.sdpMid;
