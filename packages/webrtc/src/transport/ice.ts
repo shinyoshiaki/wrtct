@@ -242,6 +242,12 @@ export class RTCIceCandidate {
     Object.assign(this, props);
   }
 
+  static fromString(sdp: string): RTCIceCandidate {
+    const ice = Candidate.fromSdp(sdp);
+    const candidate = candidateFromIce(ice);
+    return candidate.toJSON();
+  }
+
   static isThis(o: any) {
     if (typeof o?.candidate === "string") return true;
   }
