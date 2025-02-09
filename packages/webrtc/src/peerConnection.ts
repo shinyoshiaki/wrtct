@@ -874,7 +874,7 @@ export class RTCPeerConnection extends EventTarget {
     return receiveParameters;
   }
 
-  private get remoteIsBundled() {
+  get remoteIsBundled() {
     const remoteSdp = this._remoteDescription;
     if (!remoteSdp) {
       return undefined;
