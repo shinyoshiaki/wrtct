@@ -10,7 +10,7 @@ on:
       - "maintain/*"
       - "shinyoshiaki/*"
   pull_request:
-    types: [opened]
+    types: [opened, synchronize, reopened, closed]
     branches: [develop]
 
 jobs:
