@@ -1,7 +1,6 @@
 import { randomBytes } from "crypto";
 import { isIPv4 } from "net";
 import * as Int64 from "int64-buffer";
-import range from "lodash/range.js";
 
 import {
   DTLS_ROLE_SETUP,
@@ -10,6 +9,7 @@ import {
   SSRC_INFO_ATTRS,
 } from "./const";
 import { divide } from "./helper";
+import { Candidate } from "./imports/ice";
 import {
   RTCRtcpFeedback,
   RTCRtpCodecParameters,
@@ -23,7 +23,11 @@ import {
   RTCDtlsFingerprint,
   RTCDtlsParameters,
 } from "./transport/dtls";
-import { IceCandidate, RTCIceParameters } from "./transport/ice";
+import {
+  type IceCandidate,
+  RTCIceParameters,
+  candidateFromIce,
+} from "./transport/ice";
 import { RTCSctpCapabilities } from "./transport/sctp";
 import type { Kind } from "./types/domain";
 
@@ -632,41 +636,8 @@ export function parseGroup(
 }
 
 export function candidateFromSdp(sdp: string) {
-  const bits = sdp.split(" ");
-  if (bits.length < 8) {
-    throw new Error();
-  }
-
-  const candidate = new IceCandidate(
-    Number.parseInt(bits[1], 10),
-    bits[0],
-    bits[4],
-    Number.parseInt(bits[5], 10),
-    Number.parseInt(bits[3], 10),
-    bits[2],
-    bits[7],
-  );
-
-  range(8, bits.length - 1, 2).forEach((i) => {
-    switch (bits[i]) {
-      case "raddr":
-        candidate.relatedAddress = bits[i + 1];
-        break;
-      case "rport":
-        candidate.relatedPort = Number.parseInt(bits[i + 1]);
-        break;
-      case "tcptype":
-        candidate.tcpType = bits[i + 1];
-        break;
-      case "generation":
-        candidate.generation = Number.parseInt(bits[i + 1]);
-        break;
-      case "ufrag":
-        candidate.ufrag = bits[i + 1];
-        break;
-    }
-  });
-
+  const ice = Candidate.fromSdp(sdp);
+  const candidate = candidateFromIce(ice);
   return candidate;
 }
 

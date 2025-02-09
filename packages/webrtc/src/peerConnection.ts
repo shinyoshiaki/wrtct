@@ -59,6 +59,7 @@ import {
   IceCandidate,
   type IceGathererState,
   type RTCIceCandidate,
+  type RTCIceCandidateInit,
   type RTCIceConnectionState,
   RTCIceGatherer,
   RTCIceTransport,
@@ -758,7 +759,9 @@ export class RTCPeerConnection extends EventTarget {
     return transport;
   }
 
-  async addIceCandidate(candidateMessage: RTCIceCandidate) {
+  async addIceCandidate(
+    candidateMessage: RTCIceCandidate | RTCIceCandidateInit,
+  ) {
     const candidate = IceCandidate.fromJSON(candidateMessage);
     if (!candidate) {
       return;

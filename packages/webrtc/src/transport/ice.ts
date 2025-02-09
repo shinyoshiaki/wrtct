@@ -232,6 +232,13 @@ export function candidateToIce(x: IceCandidate) {
   );
 }
 
+export interface RTCIceCandidateInit {
+  candidate?: string;
+  sdpMLineIndex?: number | null;
+  sdpMid?: string | null;
+  usernameFragment?: string | null;
+}
+
 export class RTCIceCandidate {
   candidate!: string;
   sdpMid?: string;
@@ -240,6 +247,12 @@ export class RTCIceCandidate {
 
   constructor(props: Partial<RTCIceCandidate>) {
     Object.assign(this, props);
+  }
+
+  static fromSdp(sdp: string): RTCIceCandidate {
+    const ice = Candidate.fromSdp(sdp);
+    const candidate = candidateFromIce(ice);
+    return candidate.toJSON();
   }
 
   static isThis(o: any) {
@@ -289,11 +302,14 @@ export class IceCandidate {
     });
   }
 
-  static fromJSON(data: RTCIceCandidate) {
+  static fromJSON(data: RTCIceCandidate | RTCIceCandidateInit) {
     try {
+      if (!data.candidate) {
+        throw new Error("candidate is required");
+      }
       const candidate = candidateFromSdp(data.candidate);
-      candidate.sdpMLineIndex = data.sdpMLineIndex;
-      candidate.sdpMid = data.sdpMid;
+      candidate.sdpMLineIndex = data.sdpMLineIndex ?? undefined;
+      candidate.sdpMid = data.sdpMid ?? undefined;
       return candidate;
     } catch (error) {}
   }
