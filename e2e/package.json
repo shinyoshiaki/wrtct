@@ -30,7 +30,7 @@
     "@types/express": "^5.0.0",
     "@types/protoo-client": "^4.0.4",
     "@types/protoo-server": "^4.0.6",
-    "@vitest/browser": "2.1.8",
+    "@vitest/browser": "2.1.9",
     "axios": "^1.7.9",
     "babel-preset-env": "^1.7.0",
     "express": "^4.21.2",
